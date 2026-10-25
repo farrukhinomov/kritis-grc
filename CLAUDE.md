@@ -47,6 +47,13 @@ docker compose up                                  # development, http://localho
 docker compose -f compose.prod.yaml up --build     # production-like, http://localhost:8081
 ```
 
+Workflow checks (repository root):
+
+```bash
+docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.12   # workflow syntax and shellcheck
+uvx zizmor .github/workflows                                      # workflow security
+```
+
 ## Non-negotiable rules
 
 - **Tenant isolation:**

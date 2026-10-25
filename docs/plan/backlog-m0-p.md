@@ -79,13 +79,13 @@ As a developer, I want one command to run everything locally, and a production-l
 
 As a maintainer, I want every PR checked automatically, so that `main` stays releasable.
 
-- [ ] Workflows with path filters per part (backend, risk engine, frontend, infra, docs).
-- [ ] Backend and risk engine: Ruff, mypy, pytest against a Postgres service container with a coverage gate at 80 %, and import-linter.
-- [ ] Frontend: ESLint, `tsc`, Vitest with the coverage gate, and a production build.
-- [ ] Docker builds for both images, with Trivy scanning them.
-- [ ] Security and licensing: osv-scanner, gitleaks, CodeQL, a license check against the allowed list (fails on GPL/AGPL/SSPL/BUSL/non-commercial), and Dependabot configured.
-- [ ] Workflows use least-privilege `permissions`, actions pinned to commit SHAs, and concurrency groups that cancel superseded runs.
-- [ ] All of these jobs are registered as required checks on `main`.
+- [x] Workflows with path filters per part (backend, risk engine, frontend, infra, docs).
+- [x] Backend and risk engine: Ruff, mypy, pytest against a Postgres service container with a coverage gate at 80 %, and import-linter.
+- [x] Frontend: ESLint, `tsc`, Vitest with the coverage gate, and a production build.
+- [x] Docker builds for all three images, with Trivy scanning each, plus a production-like stack run (`compose.prod.yaml`, waiting until all services are healthy).
+- [x] Security and licensing: osv-scanner, gitleaks, CodeQL, a license check against the allowed list (fails on GPL/AGPL/SSPL/BUSL/non-commercial), and Dependabot configured.
+- [x] Workflows use least-privilege `permissions`, actions pinned to commit SHAs, and concurrency groups that cancel superseded runs.
+- [ ] One aggregating job, "CI passed", is registered as the required check on `main`. This needs the GitHub repository (deferred with M0-01).
 
 ### M0-07 Infrastructure as code
 **Labels:** `infra`, `type:chore`, `prio:must` · **Estimate:** 4 h · **Depends on:** M0-01

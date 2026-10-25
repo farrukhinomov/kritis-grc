@@ -30,7 +30,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PATH="/app/.venv/bin:${PATH}" \
     PORT=8080
 
-RUN groupadd --system --gid 10001 app \
+# The base image's pip is never used at runtime (dependencies live in /app/.venv), and
+# the copies of libraries vendored inside it only add attack surface and scanner noise.
+RUN python -m pip uninstall --yes pip \
+    && groupadd --system --gid 10001 app \
     && useradd --system --uid 10001 --gid app --no-create-home --shell /usr/sbin/nologin app
 
 WORKDIR /app

@@ -1,0 +1,294 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  merge_group:
+
+# Nothing by default; each job asks only for what it needs.
+permissions: {}
+
+# A newer push to the same branch makes older runs pointless.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # Scanner images are pinned by digest, like everything else that runs here.
+  TRIVY_IMAGE: aquasec/trivy:0.76.1@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c
+  GITLEAKS_IMAGE: zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+  OSV_SCANNER_IMAGE: ghcr.io/google/osv-scanner:v2.7.0@sha256:4f3b7e2c64b9d38a5febc5a7e4a3dfef1d1362f726dea7a2ef4762b46469fcd0
+
+jobs:
+  changes:
+    name: Detect changed parts
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      risk-engine: ${{ steps.filter.outputs.risk-engine }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      stack: ${{ steps.filter.outputs.stack }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: filter
+        with:
+          filters: |
+            shared: &shared
+              - .github/workflows/ci.yml
+              - .github/license-policy.json
+              - scripts/**
+            backend:
+              - *shared
+              - backend/**
+            risk-engine:
+              - *shared
+              - services/risk-engine/**
+            frontend:
+              - *shared
+              - frontend/**
+            stack:
+              - *shared
+              - backend/**
+              - services/risk-engine/**
+              - frontend/**
+              - infra/**
+              - compose*.yaml
+
+  backend:
+    name: Backend
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:17-bookworm@sha256:858bb5e98eed02eb8cafbcdc007f9a65d1b613972028944a8ec2133ccaf80d27
+        env:
+          POSTGRES_USER: grc
+          POSTGRES_PASSWORD: grc
+          POSTGRES_DB: grc
+        ports: ["55432:5432"]
+        options: >-
+          --health-cmd "pg_isready -h 127.0.0.1 -U grc"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      # Throwaway values for the CI database and settings validation; no real secret.
+      APP_ENV: test
+      DJANGO_SECRET_KEY: ci-only-insecure-placeholder-key-used-for-type-checks-and-tests
+      DATABASE_URL: postgres://grc:grc@localhost:55432/grc
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - run: uv sync --locked
+      - run: uv run ruff format --check .
+      - run: uv run ruff check --output-format=github .
+      - run: uv run mypy src manage.py
+      - run: uv run lint-imports
+        env:
+          PYTHONPATH: src
+      - name: Migrations match the models
+        run: uv run python manage.py makemigrations --check --dry-run
+      - run: uv run pytest
+      - name: Runtime dependency licenses
+        run: uv run python ../scripts/check_python_licenses.py
+
+  risk-engine:
+    name: Risk engine
+    needs: changes
+    if: needs.changes.outputs.risk-engine == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: services/risk-engine
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/risk-engine/uv.lock
+      - run: uv sync --locked
+      - run: uv run ruff format --check .
+      - run: uv run ruff check --output-format=github .
+      - run: uv run mypy src tests
+      - run: uv run pytest
+      - name: Runtime dependency licenses
+        run: uv run python ../../scripts/check_python_licenses.py
+      - name: Export the OpenAPI schema
+        run: uv run python -m risk_engine.export_openapi openapi.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: risk-engine-openapi
+          path: services/risk-engine/openapi.json
+          if-no-files-found: error
+
+  frontend:
+    name: Frontend
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Version comes from the packageManager field in frontend/package.json.
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test:coverage
+      - run: pnpm build
+      - name: Production dependency licenses
+        run: pnpm licenses list --prod --json | node ../scripts/check-node-licenses.mjs
+
+  images:
+    name: Image ${{ matrix.name }}
+    needs: changes
+    if: needs.changes.outputs.stack == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: backend
+            context: backend
+          - name: risk-engine
+            context: services/risk-engine
+          - name: frontend
+            context: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ matrix.context }}
+          load: true
+          tags: grc-${{ matrix.name }}:ci
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+      - name: Scan the image for known vulnerabilities
+        env:
+          IMAGE: grc-${{ matrix.name }}:ci
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock "$TRIVY_IMAGE" \
+            image --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed --no-progress "$IMAGE"
+
+  dependencies:
+    name: Dependency vulnerabilities
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Scan all lockfiles
+        run: docker run --rm -v "$PWD:/src:ro" "$OSV_SCANNER_IMAGE" scan source --recursive /src
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The whole history: a secret removed in a later commit is still leaked.
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Scan the git history
+        run: |
+          docker run --rm -v "$PWD:/repo:ro" \
+            -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0=/repo \
+            "$GITLEAKS_IMAGE" git /repo --redact --no-banner
+
+  stack:
+    name: Production-like stack
+    needs: [changes, images]
+    if: needs.changes.outputs.stack == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Generate throwaway secrets
+        run: |
+          {
+            echo "POSTGRES_OWNER_PASSWORD=$(openssl rand -hex 24)"
+            echo "APP_DB_PASSWORD=$(openssl rand -hex 24)"
+            echo "DJANGO_SECRET_KEY=$(openssl rand -hex 40)"
+            echo "S3_ACCESS_KEY=ci-$(openssl rand -hex 6)"
+            echo "S3_SECRET_KEY=$(openssl rand -hex 24)"
+          } > .env
+      - name: Start every service and wait until all are healthy
+        run: docker compose -f compose.prod.yaml up --build --detach --wait --wait-timeout 300
+      - name: Smoke-test through nginx
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error http://localhost:8081/ > /dev/null
+          curl --fail --silent --show-error http://localhost:8081/t/demo > /dev/null
+          curl --fail --silent --show-error http://localhost:8081/api/v1/schema > /dev/null
+          test "$(curl --silent --output /dev/null --write-out '%header{cache-control}' \
+            http://localhost:8081/api/v1/unknown)" = "private, no-store"
+      - name: Logs on failure
+        if: failure()
+        run: docker compose -f compose.prod.yaml logs --no-color
+      - name: Stop
+        if: always()
+        run: docker compose -f compose.prod.yaml down --volumes
+
+  # The single check branch protection requires. Jobs skipped because their part didn't
+  # change count as passed; anything failed or cancelled fails this one.
+  ci-passed:
+    name: CI passed
+    if: always()
+    needs: [changes, backend, risk-engine, frontend, images, dependencies, secrets, stack]
+    runs-on: ubuntu-24.04
+    permissions: {}
+    steps:
+      - name: Check the outcome of every job
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Job results: $RESULTS"
+          for result in $RESULTS; do
+            case "$result" in success|skipped) ;; *) exit 1 ;; esac
+          done

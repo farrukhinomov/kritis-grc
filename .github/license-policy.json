@@ -1,0 +1,28 @@
+{
+  "description": "Licenses allowed for shipped (non-dev) dependencies. Anything not listed fails CI. Changing this file needs the same review as a code change.",
+  "allowed": [
+    "MIT",
+    "MIT-0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "0BSD",
+    "Apache-2.0",
+    "ISC",
+    "Unlicense",
+    "CC0-1.0",
+    "OFL-1.1",
+    "PSF-2.0",
+    "Python-2.0",
+    "BlueOak-1.0.0"
+  ],
+  "conditional": {
+    "MPL-2.0": "File-level copyleft: allowed while the package's own files are used unmodified.",
+    "LGPL-3.0-only": "Allowed while the library is used unmodified and dynamically linked (e.g. psycopg).",
+    "LGPL-3.0-or-later": "Allowed while the library is used unmodified and dynamically linked (e.g. psycopg)."
+  },
+  "packages": {
+    "grc-backend": "Our own project.",
+    "grc-risk-engine": "Our own project.",
+    "grc-frontend": "Our own project."
+  }
+}

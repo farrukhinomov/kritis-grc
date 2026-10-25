@@ -141,8 +141,11 @@ Every check below is required before merging into `main`.
 - The authorization matrix (every endpoint × every actor) and the RLS raw-SQL check.
 - Playwright E2E for 3–4 core flows, including the two-user cache test, axe checks on the main screens, a reduced-motion check, and **30 visual baselines**: 5 main screens × (Saar Green light, Saar Green dark, High Contrast light) × (desktop, 390 px).
 - Security and licensing:
-  - Scanners: osv-scanner, Trivy (images), gitleaks, CodeQL (while the repo is public), Dependabot. High/critical findings block merges.
-  - A license check enforces ADR 0016.
+  - Scanners: osv-scanner (lockfiles), Trivy (images), gitleaks (full git history), CodeQL with `security-extended` (while the repo is public), Dependabot with a 7-day cooldown. High/critical fixable findings block merges.
+  - Scanners run as digest-pinned containers, not through third-party actions. Actions are pinned to commit SHAs, workflows have `permissions: {}` by default, and checkout never persists credentials. `actionlint` and `zizmor` check the workflows themselves.
+  - A license check enforces ADR 0016 against `.github/license-policy.json` for runtime dependencies only.
+  - Runtime images ship without pip and get OS security patches at build time.
+- Path filters skip unaffected parts. A single aggregating job, "CI passed", is the required check, so skipped jobs count as passed and failed ones never do.
 
 ## Infrastructure and deployment
 

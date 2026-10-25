@@ -2,7 +2,7 @@
 
 # Base images are pinned by digest so builds are reproducible and updates deliberate.
 ARG NODE_IMAGE=node:24-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53
-ARG NGINX_IMAGE=nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6
+ARG NGINX_IMAGE=nginxinc/nginx-unprivileged:1.30-alpine@sha256:f5116ed4606f3eb015dd4a8e28cb9b351476dc0ad4bc6e9f93b19cec130cdf03
 
 FROM ${NODE_IMAGE} AS build
 # pnpm's exact version comes from the packageManager field in package.json.
@@ -20,8 +20,12 @@ ENV VITE_API_MOCKING=${VITE_API_MOCKING}
 RUN pnpm build
 
 
-# Runs as an unprivileged user on port 8080, so it needs no root at any point.
+# Serves as an unprivileged user on port 8080; root is used only to apply OS patches.
 FROM ${NGINX_IMAGE} AS runtime
+# Security patches published after the pinned base image are applied on every build.
+USER root
+RUN apk upgrade --no-cache
+USER 101
 ENV API_UPSTREAM=http://backend:8080
 COPY nginx/security-headers.conf /etc/nginx/snippets/security-headers.conf
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
