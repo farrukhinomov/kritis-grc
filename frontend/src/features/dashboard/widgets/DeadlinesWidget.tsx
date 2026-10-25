@@ -8,7 +8,7 @@ import { useCurrentMembership } from "@/shared/session/sessionContext";
 import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 
 import { CountUp } from "../CountUp";
-import { daysUntil, formatDate } from "../format";
+import { daysUntil, formatDate } from "@/shared/lib/format";
 
 /** Enough to see what's next for both facilities without turning into a calendar. */
 const SHOWN = 4;

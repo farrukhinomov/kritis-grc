@@ -6,7 +6,7 @@ import { combine } from "@/shared/lib/combineQueries";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
 import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 
-import { formatRelative } from "../format";
+import { formatRelative } from "@/shared/lib/format";
 
 const SHOWN = 5;
 

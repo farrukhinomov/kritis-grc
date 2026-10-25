@@ -14,7 +14,7 @@ The same files feed the prototype's mock API (MSW) and, from M1, the Django seed
 | `assets.json` | Assets with their dependencies |
 | `implementations.json` | KRITIS-DachG per Critical Facility, BSIG for the organization |
 | `evidence.json` | File, Link and Reference Evidence |
-| `mappings.json` | The 7 Platform Mappings and one approved Tenant Mapping |
+| `mappings.json` | The 7 Platform Mappings (all partial) and two approved Tenant Mappings, one of them full |
 | `mapping-suggestions.json` | Pending Mapping Suggestions |
 | `hazards.json` | Sample Hazard catalogue (natural, technical, human-made), to be replaced by the national risk analyses |
 | `risks.json` | Risks with Inherent and Target Ratings and their Treatments |

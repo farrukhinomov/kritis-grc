@@ -221,13 +221,13 @@ As a GRC Manager, I want to drill from a paragraph to a single Implementation wi
 
 As a GRC Manager, I want to update an Implementation and prove it.
 
-- [ ] Status change with an optimistic update. A simulated 412 shows the conflict dialog and visibly rolls back.
-- [ ] Evidence tab:
+- [x] Status change with an optimistic update. A simulated 412 shows the conflict dialog and visibly rolls back.
+- [x] Evidence tab:
   - File upload (mock presign flow, 20 MB and type limits, upload progress).
   - Link Evidence.
   - Reference Evidence, with a suggested NIS2 Implementation via a full Mapping (one click).
-- [ ] History tab showing field-level changes.
-- [ ] A bottom sheet on phones, draggable between half and full height.
+- [x] History tab showing field-level changes.
+- [x] A bottom sheet on phones, draggable between half and full height.
 
 ### P-07 Risk explorer
 **Labels:** `module:frontend`, `module:risk`, `type:feature`, `prio:must` · **Estimate:** 4 h · **Depends on:** P-02

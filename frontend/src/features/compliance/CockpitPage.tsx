@@ -1,7 +1,7 @@
 import "./cockpit.css";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { Alert, Select } from "antd";
+import { Alert, Button, Select } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -20,15 +20,16 @@ import type {
   Requirement,
 } from "@/shared/api/types";
 import { combine } from "@/shared/lib/combineQueries";
-import { useCurrentMembership } from "@/shared/session/sessionContext";
+import { useCan, useCurrentMembership } from "@/shared/session/sessionContext";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { ColumnDrillDown, type DrillColumn } from "@/shared/ui/patterns/ColumnDrillDown";
 import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 import { StatusBadge } from "@/shared/ui/StatusBadge/StatusBadge";
 
 import { DrillList } from "./DrillList";
+import { ImplementationDrawer } from "./drawer/ImplementationDrawer";
 import { overallStatus } from "./status";
-import { useCockpitPlace } from "./useCockpitPlace";
+import { PANELS, useCockpitPlace } from "./useCockpitPlace";
 import { currentVersion } from "./version";
 
 /** Critical Facilities first, as the KRITIS duties attach to them. */
@@ -73,8 +74,18 @@ interface CockpitProps {
 
 function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
   const { t } = useTranslation();
-  const { place, selectFramework, selectScope, selectParagraph, selectRequirement, back, discard } =
-    useCockpitPlace();
+  const {
+    place,
+    selectFramework,
+    selectScope,
+    selectParagraph,
+    selectRequirement,
+    back,
+    discard,
+    openPanel,
+    switchPanel,
+    closePanel,
+  } = useCockpitPlace();
   // Which column the keyboard is moving to; it takes focus once its items are there.
   const [focusLevel, setFocusLevel] = useState<number | null>(null);
   const focused = useCallback(() => {
@@ -144,6 +155,9 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
   if (!framework || !scope) {
     return null;
   }
+
+  const panel = PANELS.find((option) => option === place.panel);
+  const openImplementation = requirement && implementationOf(requirement.id);
 
   const openParagraph = (key: string) => {
     setFocusLevel(null);
@@ -233,6 +247,9 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
         <ImplementationDetail
           requirement={requirement}
           implementation={implementationOf(requirement.id)}
+          onOpen={() => {
+            openPanel("status");
+          }}
         />
       ),
     });
@@ -256,6 +273,17 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
           onChange={selectScope}
         />
       </div>
+      {requirement && openImplementation && panel && (
+        <ImplementationDrawer
+          tenant={tenant}
+          implementation={openImplementation}
+          requirement={requirement}
+          scopeName={scope.scope_name}
+          panel={panel}
+          onPanel={switchPanel}
+          onClose={closePanel}
+        />
+      )}
       <ColumnDrillDown
         label={t("compliance.drill")}
         columns={columns}
@@ -331,11 +359,14 @@ function RequirementItem({
 function ImplementationDetail({
   requirement,
   implementation,
+  onOpen,
 }: {
   requirement: Requirement;
   implementation: Implementation | undefined;
+  onOpen: () => void;
 }) {
   const { t, i18n } = useTranslation();
+  const canChange = useCan("change");
   const english = i18n.language === "en";
   const date = (iso: string) =>
     new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium", timeZone: "UTC" }).format(
@@ -380,6 +411,11 @@ function ImplementationDetail({
           <dt>{t("compliance.updated")}</dt>
           <dd>{date(implementation.updated_at)}</dd>
         </dl>
+      ) : null}
+      {implementation ? (
+        <Button type={canChange ? "primary" : "default"} onClick={onOpen}>
+          {t(canChange ? "compliance.edit" : "compliance.view")}
+        </Button>
       ) : (
         <p className="grc-cockpit-summary">{t("compliance.noImplementation")}</p>
       )}

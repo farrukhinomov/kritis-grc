@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 
-import { apiGet, apiRequest, tenantPath } from "./client";
+import { ApiError, apiGet, apiRequest, tenantPath } from "./client";
 import { resourceKey } from "./keys";
 import type {
   ComplianceSummary,
@@ -17,6 +17,8 @@ import type {
   PageParams,
   Requirement,
   SuggestionStatus,
+  UploadRequest,
+  UploadSlot,
 } from "./types";
 
 export const frameworksQuery = (tenant: string) =>
@@ -141,6 +143,78 @@ export function addEvidence(
     tenantPath(tenant, ["implementations", implementationId, "evidence"]),
     { method: "POST", body: evidence, idempotencyKey },
   );
+}
+
+/** Part of the API contract: the server enforces both; the UI checks first to say why. */
+export const MAX_EVIDENCE_BYTES = 20 * 1024 * 1024;
+export const EVIDENCE_FILE_TYPES: ReadonlySet<string> = new Set([
+  "application/pdf",
+  "image/png",
+  "image/jpeg",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
+
+/** Issued for one file; the API checks its size and type before handing out the URL. */
+export function requestUpload(tenant: string, file: UploadRequest): Promise<UploadSlot> {
+  return apiRequest<UploadSlot>(tenantPath(tenant, ["uploads"]), { method: "POST", body: file });
+}
+
+/**
+ * Sends the file straight to storage, bypassing the API, and reports progress between 0
+ * and 1. XMLHttpRequest rather than fetch: fetch can't report upload progress.
+ */
+export function uploadFile(
+  slot: UploadSlot,
+  file: File,
+  onProgress: (fraction: number) => void,
+  signal?: AbortSignal,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("PUT", slot.upload_url);
+    request.setRequestHeader("Content-Type", file.type);
+    request.upload.onprogress = (event) => {
+      if (event.lengthComputable && event.total > 0) {
+        onProgress(event.loaded / event.total);
+      }
+    };
+    request.onload = () => {
+      if (request.status >= 200 && request.status < 300) {
+        onProgress(1);
+        resolve();
+      } else {
+        reject(storageError(request));
+      }
+    };
+    request.onerror = () => {
+      reject(new ApiError(0, "network_error", "The upload did not reach storage."));
+    };
+    request.onabort = () => {
+      reject(new DOMException("The upload was cancelled.", "AbortError"));
+    };
+    signal?.addEventListener(
+      "abort",
+      () => {
+        request.abort();
+      },
+      { once: true },
+    );
+    request.send(file);
+  });
+}
+
+function storageError(request: XMLHttpRequest): ApiError {
+  try {
+    const problem = JSON.parse(request.responseText) as { code?: unknown; detail?: unknown };
+    return new ApiError(
+      request.status,
+      typeof problem.code === "string" ? problem.code : "upload_failed",
+      typeof problem.detail === "string" ? problem.detail : "",
+    );
+  } catch {
+    return new ApiError(request.status, "upload_failed", "");
+  }
 }
 
 export function removeEvidence(

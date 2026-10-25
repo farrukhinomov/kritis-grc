@@ -1,0 +1,163 @@
+.grc-drawer-title {
+  font-weight: 400;
+}
+
+.grc-drawer-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.grc-status-choice {
+  display: grid;
+  gap: 8px;
+}
+
+.grc-status-option {
+  padding: 8px 12px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 10px;
+}
+
+/* A rollback has to be seen: the choice flashes once where the status jumped back. */
+.grc-status-choice[data-rolled-back] {
+  animation: grc-rollback var(--grc-duration-slow) var(--grc-ease-standard) 2;
+}
+
+@keyframes grc-rollback {
+  50% {
+    background: var(--grc-status-warning-bg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grc-status-choice[data-rolled-back] {
+    animation: none;
+    outline: 2px solid var(--grc-status-warning-solid);
+    outline-offset: 4px;
+    border-radius: 10px;
+  }
+}
+
+.grc-drawer-feedback {
+  min-height: 22px;
+}
+
+.grc-drawer-panel .grc-drawer-subtitle {
+  margin: 8px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.grc-evidence-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grc-evidence-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 10px;
+}
+
+.grc-evidence-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--grc-text-secondary);
+}
+
+.grc-evidence-text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.grc-evidence-meta {
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+}
+
+.grc-evidence-add {
+  display: grid;
+  gap: 12px;
+}
+
+/* The native file input stays in the tab order; the label around it is the target. */
+.grc-dropzone {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  padding: 20px;
+  border: 1px dashed var(--grc-control-border);
+  border-radius: 10px;
+  background: var(--grc-surface-sunken);
+  text-align: center;
+  cursor: pointer;
+}
+
+.grc-dropzone:focus-within {
+  outline: 2px solid var(--grc-focus-ring);
+  outline-offset: 2px;
+}
+
+.grc-dropzone-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.grc-dropzone-label {
+  font-weight: 600;
+}
+
+.grc-suggestion {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 10px;
+}
+
+.grc-suggestion .grc-suggestion-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--grc-text-secondary);
+}
+
+.grc-suggestion .grc-suggestion-text,
+.grc-suggestion .grc-evidence-meta {
+  margin: 0;
+}
+
+.grc-suggestion > .ant-btn {
+  justify-self: start;
+}
+
+.grc-history {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grc-history-entry {
+  padding-inline-start: 12px;
+  border-inline-start: 2px solid var(--grc-border-subtle);
+}
+
+.grc-history-changes {
+  margin: 4px 0 0;
+  padding-inline-start: 18px;
+  color: var(--grc-text-secondary);
+}

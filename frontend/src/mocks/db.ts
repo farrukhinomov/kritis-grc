@@ -1,4 +1,4 @@
-import type { Evidence } from "@/shared/api/types";
+import type { Evidence, EvidenceFile } from "@/shared/api/types";
 
 import { DEMO_ACCOUNTS, SHOWCASE_TENANTS } from "./accounts";
 import { SEED, type SeedData, type StoredActivity } from "./seed";
@@ -10,8 +10,17 @@ interface StoredResponse {
   fingerprint: string;
 }
 
+/** An issued upload URL and, once the browser has PUT it, what actually arrived. */
+export interface StoredUpload {
+  announced: EvidenceFile;
+  expiresAt: number;
+  stored: { size_bytes: number; content_type: string } | null;
+  used: boolean;
+}
+
 export interface TenantData extends SeedData {
   idempotency: Map<string, StoredResponse>;
+  uploads: Map<string, StoredUpload>;
 }
 
 const tenants = new Map<string, TenantData>();
@@ -41,9 +50,17 @@ function empty(slug: string, name: string, theme: SeedData["tenant"]["theme"]): 
  */
 export function resetDb(): void {
   tenants.clear();
-  tenants.set(SEED.tenant.slug, { ...structuredClone(SEED), idempotency: new Map() });
+  tenants.set(SEED.tenant.slug, {
+    ...structuredClone(SEED),
+    idempotency: new Map(),
+    uploads: new Map(),
+  });
   for (const { slug, name, theme } of SHOWCASE_TENANTS) {
-    tenants.set(slug, { ...structuredClone(empty(slug, name, theme)), idempotency: new Map() });
+    tenants.set(slug, {
+      ...structuredClone(empty(slug, name, theme)),
+      idempotency: new Map(),
+      uploads: new Map(),
+    });
   }
 }
 

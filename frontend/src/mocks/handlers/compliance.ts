@@ -1,4 +1,4 @@
-import { HttpResponse } from "msw";
+import { http, HttpResponse } from "msw";
 
 import type {
   ComplianceSummary,
@@ -8,11 +8,12 @@ import type {
   Implementation,
   ParagraphSummary,
   ParagraphSummaryRow,
+  UploadSlot,
   ImplementationChange,
   Mapping,
 } from "@/shared/api/types";
 
-import { ACTOR_ID, logActivity, nextId, type TenantData } from "../db";
+import { ACTOR_ID, logActivity, nextId, type TenantData, tenantData } from "../db";
 import type { StoredImplementation } from "../seed";
 import {
   canonicalJson,
@@ -24,7 +25,12 @@ import {
   tenantRoute,
 } from "../http";
 import { getSimulation, setSimulation } from "../simulation";
-import { parseIfMatch, validateChange, validateEvidence } from "../validation";
+import {
+  parseIfMatch,
+  validateChange,
+  validateEvidence,
+  validateUploadRequest,
+} from "../validation";
 
 const byParam = <T>(items: T[], value: string | null, key: (item: T) => string) =>
   value === null ? items : items.filter((item) => key(item) === value);
@@ -238,6 +244,50 @@ const implementationRoutes = [
   }),
 ];
 
+/** Where the mock pretends the object store is; in production a separate origin. */
+const STORAGE_ORIGIN = "/mock-storage";
+
+/** Upload URLs live about five minutes, long enough for 20 MB on a slow connection. */
+const UPLOAD_URL_LIFETIME_MS = 5 * 60_000;
+
+const uploadRoutes = [
+  tenantRoute("post", "/uploads", async ({ data, request, params }) => {
+    const result = validateUploadRequest(await jsonBody(request));
+    if (!result.ok) {
+      return problem(422, "validation_error", "The file can't be uploaded.", result.errors);
+    }
+    const id = nextId("up");
+    const expiresAt = Date.now() + UPLOAD_URL_LIFETIME_MS;
+    data.uploads.set(id, { announced: result.value, expiresAt, stored: null, used: false });
+    return HttpResponse.json<UploadSlot>(
+      {
+        upload_id: id,
+        upload_url: `${STORAGE_ORIGIN}/${params.tenant ?? ""}/${id}`,
+        expires_at: new Date(expiresAt).toISOString(),
+      },
+      { status: 201 },
+    );
+  }),
+
+  // Storage, not the API: the signed URL itself is the permission, so there is no session
+  // check here, only whether the URL is known and still valid.
+  http.put(`${STORAGE_ORIGIN}/:tenant/:id`, async ({ params, request }) => {
+    const upload = tenantData(String(params.tenant))?.uploads.get(String(params.id));
+    if (!upload) {
+      return problem(404, "not_found", "No such upload.");
+    }
+    if (Date.now() > upload.expiresAt) {
+      return problem(403, "upload_expired", "The upload URL has expired.");
+    }
+    const body = await request.arrayBuffer();
+    upload.stored = {
+      size_bytes: body.byteLength,
+      content_type: request.headers.get("Content-Type") ?? "",
+    };
+    return new HttpResponse(null, { status: 200 });
+  }),
+];
+
 const evidenceRoutes = [
   tenantRoute("get", "/implementations/:id/evidence", ({ data, params, url }) => {
     if (!data.implementations.some((i) => i.id === params.id)) {
@@ -276,14 +326,7 @@ const evidenceRoutes = [
       implementation_id: implementationId,
       kind: input.kind,
       title: input.title.trim(),
-      file:
-        input.kind === "file"
-          ? {
-              name: input.file.name,
-              size_bytes: input.file.size_bytes,
-              content_type: input.file.content_type,
-            }
-          : null,
+      file: input.kind === "file" ? (data.uploads.get(input.upload_id)?.announced ?? null) : null,
       url: input.kind === "link" ? input.url : null,
       referenced_implementation_id:
         input.kind === "reference" ? input.referenced_implementation_id : null,
@@ -291,6 +334,13 @@ const evidenceRoutes = [
       added_at: new Date().toISOString(),
     };
     data.evidence.push(evidence);
+    if (input.kind === "file") {
+      // One upload backs one Evidence; reusing it would let two records share one file.
+      const upload = data.uploads.get(input.upload_id);
+      if (upload) {
+        upload.used = true;
+      }
+    }
     if (key !== null) {
       data.idempotency.set(key, { status: 201, body: evidence, fingerprint });
     }
@@ -432,6 +482,7 @@ const suggestionRoutes = [
 export const complianceHandlers = [
   ...catalogueRoutes,
   ...implementationRoutes,
+  ...uploadRoutes,
   ...evidenceRoutes,
   ...suggestionRoutes,
 ];

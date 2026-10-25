@@ -1,23 +1,28 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 
+export const PANELS = ["status", "evidence", "history"] as const;
+export type Panel = (typeof PANELS)[number];
+
 export interface CockpitPlace {
   framework: string | null;
   scope: string | null;
   paragraph: string | null;
   requirement: string | null;
+  /** The open tab of the Implementation drawer; none when the drawer is closed. */
+  panel: string | null;
 }
 
-const KEYS = ["framework", "scope", "paragraph", "requirement"] as const;
+const KEYS = ["framework", "scope", "paragraph", "requirement", "panel"] as const;
 
-/** Marks history entries that went one level deeper, so "back" can return to them. */
-const DRILL_STATE = { cockpit: "drill" } as const;
+/** Marks history entries that opened something, so closing it can return to them. */
+type EntryKind = "drill" | "panel";
 
-function isDrillEntry(state: unknown): boolean {
-  return (
-    typeof state === "object" &&
-    state !== null &&
-    (state as Record<string, unknown>).cockpit === DRILL_STATE.cockpit
-  );
+function entryKind(state: unknown): EntryKind | null {
+  if (typeof state !== "object" || state === null) {
+    return null;
+  }
+  const kind = (state as Record<string, unknown>).cockpit;
+  return kind === "drill" || kind === "panel" ? kind : null;
 }
 
 /**
@@ -33,7 +38,7 @@ export function useCockpitPlace() {
     KEYS.map((key) => [key, params.get(key)]),
   ) as unknown as CockpitPlace;
 
-  const go = (change: Partial<CockpitPlace>, options: { replace?: boolean; drill?: boolean }) => {
+  const go = (change: Partial<CockpitPlace>, options: { replace?: boolean; entry?: EntryKind }) => {
     setParams(
       (current) => {
         const next = new URLSearchParams(current);
@@ -49,7 +54,10 @@ export function useCockpitPlace() {
         }
         return next;
       },
-      { replace: options.replace ?? false, ...(options.drill ? { state: DRILL_STATE } : {}) },
+      {
+        replace: options.replace ?? false,
+        ...(options.entry ? { state: { cockpit: options.entry } } : {}),
+      },
     );
   };
 
@@ -57,17 +65,17 @@ export function useCockpitPlace() {
     place,
     /** Another Framework has other paragraphs, so the drill-down starts over. */
     selectFramework: (framework: string) => {
-      go({ framework, scope: null, paragraph: null, requirement: null }, {});
+      go({ framework, scope: null, paragraph: null, requirement: null, panel: null }, {});
     },
     /** The same place in another Scope, so two facilities can be compared directly. */
     selectScope: (scope: string) => {
-      go({ scope }, {});
+      go({ scope, panel: null }, {});
     },
     selectParagraph: (paragraph: string) => {
-      go({ paragraph, requirement: null }, { drill: true });
+      go({ paragraph, requirement: null, panel: null }, { entry: "drill" });
     },
     selectRequirement: (requirement: string) => {
-      go({ requirement }, { drill: true });
+      go({ requirement, panel: null }, { entry: "drill" });
     },
     /**
      * One level up from what is shown. After a drill-down the level above is the previous
@@ -75,13 +83,28 @@ export function useCockpitPlace() {
      * screen; after a deep link there is none, and the URL is shortened in place.
      */
     back: (shown: { requirement: boolean }) => {
-      if (isDrillEntry(state)) {
+      if (entryKind(state) === "drill") {
         void navigate(-1);
         return;
       }
       go(shown.requirement ? { requirement: null } : { paragraph: null, requirement: null }, {
         replace: true,
       });
+    },
+    /** Opening the drawer is a history entry, so the phone's back gesture closes it. */
+    openPanel: (panel: Panel) => {
+      go({ panel }, { entry: "panel" });
+    },
+    /** Another tab of the open drawer replaces the entry instead of adding to history. */
+    switchPanel: (panel: Panel) => {
+      go({ panel }, { replace: true, entry: "panel" });
+    },
+    closePanel: () => {
+      if (entryKind(state) === "panel") {
+        void navigate(-1);
+        return;
+      }
+      go({ panel: null }, { replace: true });
     },
     /** Removes levels from the URL that don't exist, such as a Requirement from an old link. */
     discard: (change: Partial<CockpitPlace>) => {

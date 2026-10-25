@@ -1,5 +1,10 @@
 import { tenantData } from "./db";
-import { parseIfMatch, validateChange, validateEvidence } from "./validation";
+import {
+  parseIfMatch,
+  validateChange,
+  validateEvidence,
+  validateUploadRequest,
+} from "./validation";
 
 const data = () => tenantData("muster-stadtwerke")!;
 const errorsOf = (result: { ok: boolean; errors?: unknown }) => (result.ok ? [] : result.errors);
@@ -42,12 +47,76 @@ describe("validateChange", () => {
   });
 });
 
-describe("validateEvidence", () => {
+describe("validateUploadRequest", () => {
   const file = { name: "plan.pdf", size_bytes: 1024, content_type: "application/pdf" };
+
+  it("accepts an allowed file up to 20 MB", () => {
+    expect(validateUploadRequest(file)).toMatchObject({ ok: true });
+    expect(validateUploadRequest({ ...file, size_bytes: 20 * 1024 * 1024 })).toMatchObject({
+      ok: true,
+    });
+  });
+
+  it.each([
+    ["no details", null, "required"],
+    ["a missing name", { ...file, name: " " }, "required"],
+    ["an empty file", { ...file, size_bytes: 0 }, "invalid_size"],
+    ["a file over 20 MB", { ...file, size_bytes: 20 * 1024 * 1024 + 1 }, "invalid_size"],
+    ["an unsupported type", { ...file, content_type: "text/html" }, "unsupported_type"],
+  ])("rejects %s", (_, body, code) => {
+    expect(errorsOf(validateUploadRequest(body))).toEqual([{ field: "file", code }]);
+  });
+});
+
+describe("validateEvidence", () => {
+  const announced = { name: "plan.pdf", size_bytes: 1024, content_type: "application/pdf" };
+  const withUpload = (
+    stored: { size_bytes: number; content_type: string } | null,
+    used = false,
+  ) => {
+    const tenant = data();
+    tenant.uploads.set("up-1", { announced, expiresAt: Date.now() + 60_000, stored, used });
+    return tenant;
+  };
+  const storedAsAnnounced = { size_bytes: 1024, content_type: "application/pdf" };
+
+  it("accepts a finished upload", () => {
+    expect(
+      validateEvidence(
+        { kind: "file", title: "Plan", upload_id: "up-1" },
+        "im-001",
+        withUpload(storedAsAnnounced),
+      ),
+    ).toMatchObject({ ok: true });
+  });
+
+  it.each([
+    ["an unknown upload", () => withUpload(storedAsAnnounced), "nope", "invalid_choice"],
+    ["a used upload", () => withUpload(storedAsAnnounced, true), "up-1", "invalid_choice"],
+    ["an upload not yet stored", () => withUpload(null), "up-1", "not_uploaded"],
+    [
+      "a different size",
+      () => withUpload({ ...storedAsAnnounced, size_bytes: 9 }),
+      "up-1",
+      "size_mismatch",
+    ],
+    [
+      "a different type",
+      () => withUpload({ ...storedAsAnnounced, content_type: "text/html" }),
+      "up-1",
+      "unsupported_type",
+    ],
+  ])("rejects %s", (_, tenant, uploadId, code) => {
+    // Built per case: every case writes "up-1" into the same Tenant data.
+    expect(
+      errorsOf(
+        validateEvidence({ kind: "file", title: "T", upload_id: uploadId }, "im-001", tenant()),
+      ),
+    ).toEqual([{ field: "upload_id", code }]);
+  });
 
   it.each([
     ["a link", { kind: "link", title: "Bericht", url: "https://example.org" }],
-    ["a file", { kind: "file", title: "Plan", file }],
     ["a reference", { kind: "reference", title: "BSIG", referenced_implementation_id: "im-033" }],
   ])("accepts %s", (_, body) => {
     expect(validateEvidence(body, "im-001", data())).toMatchObject({ ok: true });
@@ -74,25 +143,7 @@ describe("validateEvidence", () => {
       "invalid_url",
     ],
     ["a malformed link", { kind: "link", title: "T", url: "not a url" }, "url", "invalid_url"],
-    ["a missing file", { kind: "file", title: "T" }, "file", "required"],
-    [
-      "an empty file",
-      { kind: "file", title: "T", file: { ...file, size_bytes: 0 } },
-      "file",
-      "invalid_size",
-    ],
-    [
-      "an oversized file",
-      { kind: "file", title: "T", file: { ...file, size_bytes: 26 * 1024 * 1024 } },
-      "file",
-      "invalid_size",
-    ],
-    [
-      "an unsupported file type",
-      { kind: "file", title: "T", file: { ...file, content_type: "text/html" } },
-      "file",
-      "unsupported_type",
-    ],
+    ["a missing upload", { kind: "file", title: "T" }, "upload_id", "required"],
     [
       "an unknown reference",
       { kind: "reference", title: "T", referenced_implementation_id: "im-999" },
