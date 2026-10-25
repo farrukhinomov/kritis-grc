@@ -93,7 +93,10 @@ See [ADR 0017](adr/0017-http-standard-responses-no-envelope.md), [ADR 0018](adr/
 
 ## Frontend
 
-- pnpm with a committed lockfile. Vite, React 19, TypeScript in strict mode, **Ant Design 6**, React Router. Routes live under `/t/{tenant_slug}/…`.
+- pnpm with a committed lockfile. Vite, React 19, TypeScript in strict mode, **Ant Design 6**, React Router.
+- Tool versions held back on purpose: TypeScript 6.0 until typescript-eslint supports 7, and ESLint 9 until eslint-plugin-jsx-a11y supports 10.
+- Mocks: MSW, shared by the prototype and the tests. Tests fail on any request without a mock (`onUnhandledFrame: "error"`).
+- Pages are lazy-loaded per route. React and Ant Design get their own long-cached vendor chunks. Initial JavaScript stays below 300 KB gzipped. Routes live under `/t/{tenant_slug}/…`.
 - Feature folders mirror the backend modules (`features/compliance`, `features/risk`, …), plus `shared/ui` and `shared/api`.
 - Server state: TanStack Query. UI-only state: local state or Zustand. No Redux. Each route is code-split.
 - An error boundary per route and per dashboard widget. Skeletons shaped like the final layout, never full-page spinners. Optimistic updates with a visible rollback on error.

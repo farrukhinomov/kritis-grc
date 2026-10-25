@@ -56,13 +56,13 @@ As a developer, I want the stateless risk engine running with its final contract
 
 As a developer, I want the SPA foundation with routing, i18n and theming hooks, so that prototype screens can be built directly on it.
 
-- [ ] `frontend/` with pnpm, Vite, React 19, TypeScript (strict), Ant Design 6, React Router, TanStack Query and Motion. The lockfile is committed.
-- [ ] Feature-folder layout (`features/*`, `shared/ui`, `shared/api`) and route skeleton `/t/:tenantSlug/…`.
-- [ ] i18next with German as the default and English, plus a language switch. A check fails the build on missing keys.
-- [ ] Self-hosted Inter (no external requests) and Lucide icons.
-- [ ] MSW is wired for development and tests, and switched off through an environment flag.
-- [ ] A start page that calls `/api/health/ready` through the dev proxy and shows the result.
-- [ ] ESLint (with a rule against raw hex colors outside the token files), `tsc --noEmit`, and Vitest with Testing Library.
+- [x] `frontend/` with pnpm, Vite, React 19, TypeScript (strict), Ant Design 6, React Router, TanStack Query and Motion. The lockfile is committed.
+- [x] Feature-folder layout (`features/*`, `shared/ui`, `shared/api`) and route skeleton `/t/:tenantSlug/…`.
+- [x] i18next with German as the default and English, plus a language switch. A check fails the build on missing keys.
+- [x] Self-hosted Inter (no external requests) and Lucide icons.
+- [x] MSW is wired for development and tests, and switched off through an environment flag.
+- [x] A start page that shows the system status from `GET /api/v1/status` (mocked for now; the real endpoint comes with M0-09).
+- [x] ESLint (with a rule against raw hex colors outside the token files), `tsc --noEmit`, and Vitest with Testing Library.
 
 ### M0-05 Local development and production-like compose
 **Labels:** `infra`, `type:chore`, `prio:must` · **Estimate:** 2 h · **Depends on:** M0-02, M0-03, M0-04
@@ -124,7 +124,7 @@ As a maintainer, I want merges to `main` deployed automatically in a safe order.
 
 As the maintainer, I want proof that a request passes through every layer of the demo environment.
 
-- [ ] `grc.inomov.online` shows a status page with one green check per hop: Vercel → Django → database (through the pooler) → risk engine (IAM call) → R2 (presigned PUT and GET of a small object).
+- [ ] `GET /api/v1/status` (public, no tenant data) reports the checks, and `grc.inomov.online` shows them with one green check per hop: Vercel → Django → database (through the pooler) → risk engine (IAM call) → R2 (presigned PUT and GET of a small object).
 - [ ] A check confirms that a transaction-local `set_config` survives within the transaction and is gone after it, through Supavisor.
 - [ ] Playwright is set up. One E2E test runs the status page. The **cache test** checks that two clients with different sessions requesting the same `/api` URL get different responses.
 - [ ] Request ID and `traceparent` appear in both services' logs for the same request.
@@ -166,6 +166,9 @@ As a user, I want a consistent, polished interface on every device, so that the 
   - Layout-shaped skeletons.
   - An error boundary.
 - [ ] 44 px minimum tap targets and a visible focus ring in every Theme.
+- [ ] Every route sets a page title, and focus moves to the main heading after navigation.
+- [ ] Test code is type-checked in its own tsconfig, so test globals aren't visible to app code.
+- [ ] The raw-color lint rule also covers template literals and CSS named colors.
 
 ### P-02 Demo fixtures and mock API
 **Labels:** `module:frontend`, `module:demo`, `type:feature`, `prio:must` · **Estimate:** 4 h · **Depends on:** P-01

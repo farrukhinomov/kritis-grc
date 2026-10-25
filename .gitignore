@@ -32,3 +32,6 @@ test-results/
 !.vscode/extensions.json
 .DS_Store
 Thumbs.db
+
+# Local editor/assistant launch settings
+.claude/launch.json
