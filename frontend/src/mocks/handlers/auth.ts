@@ -1,9 +1,10 @@
 import { http, HttpResponse } from "msw";
 
 import type { FieldError } from "@/shared/api/client";
-import { ROLES, type Role } from "@/shared/session/session";
+import { ROLES, type Role, type Session } from "@/shared/session/session";
 
 import { currentSession, demoSession, setMockSession } from "../accounts";
+import { tenantData } from "../db";
 import { isRecord, jsonBody, notAuthenticated, problem } from "../http";
 
 const nonEmpty = (value: unknown) => typeof value === "string" && value.trim() !== "";
@@ -14,10 +15,24 @@ const isRole = (value: unknown): value is Role => ROLES.some((role) => role === 
  * password login is always refused, with the same answer for known and unknown emails;
  * the demo logins are the way in.
  */
+/** A Tenant's Theme can change in its settings; the session always carries the current one. */
+function withCurrentThemes(session: Session): Session {
+  return {
+    ...session,
+    memberships: session.memberships.map((membership) => ({
+      ...membership,
+      tenant: {
+        ...membership.tenant,
+        theme: tenantData(membership.tenant.slug)?.tenant.theme ?? membership.tenant.theme,
+      },
+    })),
+  };
+}
+
 export const authHandlers = [
   http.get("/api/v1/me", () => {
     const session = currentSession();
-    return session ? HttpResponse.json(session) : notAuthenticated();
+    return session ? HttpResponse.json(withCurrentThemes(session)) : notAuthenticated();
   }),
 
   http.post("/api/v1/auth/login", async ({ request }) => {
@@ -40,7 +55,7 @@ export const authHandlers = [
       ]);
     }
     setMockSession(role);
-    return HttpResponse.json(demoSession(role));
+    return HttpResponse.json(withCurrentThemes(demoSession(role)));
   }),
 
   http.post("/api/v1/auth/logout", () => {

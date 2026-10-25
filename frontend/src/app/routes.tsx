@@ -24,6 +24,18 @@ const SCREENS: Partial<Record<NavEntry["key"], typeof placeholder>> = {
   applicability: async () => ({
     Component: (await import("@/features/applicability/ApplicabilityPage")).ApplicabilityPage,
   }),
+  facilities: async () => ({
+    Component: (await import("@/features/facilities/FacilitiesPage")).FacilitiesPage,
+  }),
+  activity: async () => ({
+    Component: (await import("@/features/activity/ActivityPage")).ActivityPage,
+  }),
+  settings: async () => ({
+    Component: (await import("@/features/settings/SettingsPage")).SettingsPage,
+  }),
+  roadmap: async () => ({
+    Component: (await import("@/features/roadmap/RoadmapPage")).RoadmapPage,
+  }),
   suggestions: async () => ({
     Component: (await import("@/features/suggestions/SuggestionsPage")).SuggestionsPage,
   }),

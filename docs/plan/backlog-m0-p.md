@@ -279,7 +279,7 @@ As a GRC Manager, I want to see how my measures change the risk picture.
 ### P-15 Standard screens
 **Labels:** `module:frontend`, `type:feature`, `prio:must` · **Estimate:** 3 h · **Depends on:** P-02
 
-- [ ] Facilities and Assets lists, the Activity Log (cursor-style infinite list with filters), Tenant settings (Theme picker) and a roadmap page.
+- [x] Facilities and Assets lists, the Activity Log (cursor-style infinite list with filters), Tenant settings (Theme picker) and a roadmap page.
 
 ### P-16 Quality pass and prototype release
 **Labels:** `module:frontend`, `type:test`, `prio:must` · **Estimate:** 3 h · **Depends on:** P-03 to P-15

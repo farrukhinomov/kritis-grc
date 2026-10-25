@@ -1,10 +1,18 @@
 import { HttpResponse } from "msw";
 
-import type { ActivityEntry, CursorPage } from "@/shared/api/types";
+import type { ActivityAction, ActivityEntry, CursorPage } from "@/shared/api/types";
 
 import { positiveInt, problem, tenantRoute } from "../http";
 
 const DEFAULT_LIMIT = 20;
+const ACTIONS: readonly ActivityAction[] = [
+  "created",
+  "updated",
+  "deleted",
+  "approved",
+  "rejected",
+  "commented",
+];
 const MAX_LIMIT = 100;
 
 /**
@@ -29,9 +37,20 @@ export const activityHandlers = [
       return problem(400, "invalid_pagination", "limit must be a positive integer.");
     }
     const limit = Math.min(requested, MAX_LIMIT);
-    const objectId = url.searchParams.get("object_id");
+    const params = url.searchParams;
+    const objectId = params.get("object_id");
+    const objectType = params.get("object_type");
+    const action = params.get("action");
+    if (action !== null && !ACTIONS.some((item) => item === action)) {
+      return problem(400, "invalid_filter", `Unknown action "${action}".`);
+    }
     const newestFirst = data.activity
-      .filter((entry) => objectId === null || entry.object_id === objectId)
+      .filter(
+        (entry) =>
+          (objectId === null || entry.object_id === objectId) &&
+          (objectType === null || entry.object_type === objectType) &&
+          (action === null || entry.action === action),
+      )
       .toReversed();
 
     let start = 0;

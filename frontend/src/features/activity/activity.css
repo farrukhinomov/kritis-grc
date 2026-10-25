@@ -1,0 +1,38 @@
+.grc-activity-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.grc-activity-select {
+  min-width: 220px;
+}
+
+@media (max-width: 767.98px) {
+  .grc-activity-select {
+    flex: 1 1 100%;
+  }
+}
+
+.grc-activity-log {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.grc-activity-entry {
+  display: grid;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 10px;
+  background: var(--grc-surface);
+}
+
+.grc-activity-changes {
+  gap: 2px;
+  font-size: 13px;
+}

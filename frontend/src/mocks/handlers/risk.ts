@@ -124,7 +124,9 @@ export const riskHandlers = [
     if (!filter) {
       return problem(400, "invalid_filter", "Unknown rating, category or cell.");
     }
+    const asset = params.get("asset");
     const risks = inScope(data, params.get("scope"))
+      .filter((risk) => asset === null || risk.asset_ids.includes(asset))
       .map((risk) => present(risk, data))
       .filter((risk) => matches(risk, filter));
     return listResponse(ordering === null ? risks : risks.toSorted(byResidualScore), url);

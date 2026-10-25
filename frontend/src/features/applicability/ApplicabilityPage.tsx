@@ -118,6 +118,7 @@ export function ApplicabilityPage() {
                   {t("applicability.sector.question")}
                 </legend>
                 <Radio.Group
+                  name="applicability-sector"
                   className="grc-applicability-options"
                   value={sector}
                   onChange={(event) => {
@@ -155,6 +156,7 @@ export function ApplicabilityPage() {
               {t("applicability.service.question")}
             </legend>
             <Radio.Group
+              name="applicability-service"
               className="grc-applicability-options"
               value={service}
               onChange={(event) => {
