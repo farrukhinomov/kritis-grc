@@ -154,23 +154,23 @@ All P screens run on MSW mock data from `seed/`, work at desktop, tablet and 390
 
 As a user, I want a consistent, polished interface on every device, so that the product feels professional everywhere.
 
-- [ ] Tokens in three layers (primitive → semantic → antd `ConfigProvider`) for Saar Green, Blue and High Contrast, each with light and dark. Dark values are tuned by hand.
-- [ ] A unit test checks WCAG AA contrast for every semantic text/background pair in all six combinations.
-- [ ] Motion tokens. `AnimatedIcon` with presets: refresh, bell, check, chevron, plus, trash, upload, and more as needed. Presets run on hover (pointer devices only) and press, and are off with reduced motion.
-- [ ] App shell:
+- [x] Tokens in three layers (primitive → semantic → antd `ConfigProvider`) for Saar Green, Blue and High Contrast, each with light and dark. Dark values are tuned by hand.
+- [x] A unit test checks WCAG AA contrast for every semantic text/background pair in all six combinations.
+- [x] Motion tokens. `AnimatedIcon` with presets: refresh, bell, check, chevron, plus, trash, upload, and more as needed. Presets run on hover (pointer devices only) and press, and are off with reduced motion.
+- [x] App shell:
   - Sidebar on desktop, a bottom tab bar plus "More" sheet on phones.
   - Header with Tenant switcher, DE/EN switch and user menu (light/dark/system).
   - The mode is applied before first paint.
-- [ ] Reusable responsive patterns:
+- [x] Reusable responsive patterns:
   - Column drill-down on wide screens that becomes stacked screens on phones.
   - Drawer on wide screens that becomes a bottom sheet on phones.
   - Table on wide screens that becomes a card list with swipe actions on phones.
   - Layout-shaped skeletons.
   - An error boundary.
-- [ ] 44 px minimum tap targets and a visible focus ring in every Theme.
-- [ ] Every route sets a page title, and focus moves to the main heading after navigation.
-- [ ] Test code is type-checked in its own tsconfig, so test globals aren't visible to app code.
-- [ ] The raw-color lint rule also covers template literals and CSS named colors.
+- [x] 44 px minimum tap targets and a visible focus ring in every Theme.
+- [x] Every route sets a page title, and focus moves to the main heading after navigation.
+- [x] Test code is type-checked in its own tsconfig, so test globals aren't visible to app code.
+- [x] The raw-color lint rule also covers template literals and CSS named colors.
 
 ### P-02 Demo fixtures and mock API
 **Labels:** `module:frontend`, `module:demo`, `type:feature`, `prio:must` · **Estimate:** 4 h · **Depends on:** P-01

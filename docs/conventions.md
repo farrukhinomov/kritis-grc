@@ -96,7 +96,7 @@ See [ADR 0017](adr/0017-http-standard-responses-no-envelope.md), [ADR 0018](adr/
 - pnpm with a committed lockfile. Vite, React 19, TypeScript in strict mode, **Ant Design 6**, React Router.
 - Tool versions held back on purpose: TypeScript 6.0 until typescript-eslint supports 7, and ESLint 9 until eslint-plugin-jsx-a11y supports 10.
 - Mocks: MSW, shared by the prototype and the tests. Tests fail on any request without a mock (`onUnhandledFrame: "error"`).
-- Pages are lazy-loaded per route. React and Ant Design get their own long-cached vendor chunks. Initial JavaScript stays below 300 KB gzipped. Routes live under `/t/{tenant_slug}/…`.
+- Pages and the Tenant shell are lazy-loaded per route. React gets its own long-cached vendor chunk; Ant Design is split by usage, so a screen downloads only the components it renders. Motion loads its animation features after the first render (`LazyMotion` with `m.*` components; a full `motion.*` component fails at runtime). Initial JavaScript stays below 300 KB gzipped. Routes live under `/t/{tenant_slug}/…`.
 - Feature folders mirror the backend modules (`features/compliance`, `features/risk`, …), plus `shared/ui` and `shared/api`.
 - Server state: TanStack Query. UI-only state: local state or Zustand. No Redux. Each route is code-split.
 - An error boundary per route and per dashboard widget. Skeletons shaped like the final layout, never full-page spinners. Optimistic updates with a visible rollback on error.
@@ -108,7 +108,8 @@ See [ADR 0017](adr/0017-http-standard-responses-no-envelope.md), [ADR 0018](adr/
   - **Motion** is the only library besides antd's built-in motion.
   - Signature moments: the risk gliding across the matrix, the compliance bar filling, the cockpit columns sliding, an accepted suggestion moving into place.
   - `prefers-reduced-motion` turns non-essential motion off.
-- Icons: **Lucide**, wrapped in `AnimatedIcon` with a preset per meaning. Presets run on hover (pointer devices only) and on press, in all buttons.
+- Icons: **Lucide**, wrapped in `AnimatedIcon` with a preset per meaning. Presets run on hover (pointer devices only) and on press, in all buttons. The animations are CSS keyframes, so they cost no re-renders and stop under reduced motion without JavaScript.
+- Styles: antd components take the Theme through `ConfigProvider`. Everything else uses the semantic tokens as CSS variables (`var(--grc-surface)`) in plain style sheets whose classes carry a `grc-` prefix. Raw colors exist only in `shared/theme/primitives.ts`.
 - Fonts: self-hosted **Inter**. No external font or CDN requests.
 - No chart library in v1. The matrix, bars and rings are custom components using the tokens. The one exception is the Asset dependency graph, which uses **React Flow** (`@xyflow/react`, MIT) for graph layout and interaction, styled with the tokens.
 - Every screen is usable and editable on every device:

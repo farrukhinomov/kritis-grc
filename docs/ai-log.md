@@ -50,3 +50,29 @@ Each milestone gets one entry with four parts:
 ### Lesson
 - **Treat the AI's knowledge of library APIs and versions as a hypothesis.** Verify against the installed package or its changelog, and let strict type checks and linters catch the rest.
 - **Every review finding gets a reproducing test before it's fixed**, and every rejection gets a written reason. About a third of review findings were rejected or narrowed.
+
+---
+
+## P-01 Design system and app shell (2026-10-25)
+
+### Accepted
+- **Review findings that were real bugs**, fixed with a test each where jsdom allows:
+  - A swiped card could rest half-open: the animation target didn't change, so the card stayed where the finger left it, with its actions visible but inert. It now always settles at one end.
+  - Switching Tenants carried object IDs from one Tenant into the other's URL. Only the screen carries over now.
+  - A Tenant link that redirects to its dashboard counted as a navigation and stole focus on page load.
+  - Closing the "More" sheet by choosing a screen returned focus to "More" instead of the new page's heading.
+  - The drill-down dropped focus to the page body when its back button disappeared.
+  - Buttons that changed their label *and* exposed a pressed/expanded state were announced contradictorily.
+
+### Changed
+- **The sampled brand green fails contrast.** White text on the reference primary is 4.1:1. The Saar Green Theme uses a darker primary for fills (5.6:1) and keeps the sampled color for the focus ring, where 3:1 suffices. The contrast test found it before any screen did.
+- **The vendor chunk for Ant Design.** The existing build grouped all of antd into one long-cached chunk. With the shell, that group pulled every component any lazy page uses into the first download (334 KB, over the 300 KB budget). antd is now split by usage, Motion loads its features lazily, and the Tenant shell is a lazy route: 252 KB, below the 272 KB before this change.
+- **CSS Modules.** Under `noUncheckedIndexedAccess` every module class is `string | undefined`. Prefixed global classes (`grc-shell-*`), as antd itself does, keep the type checks strict without a code generator.
+
+### Rejected
+- **"The bottom sheet may keep antd's dragged size"** (review). Checked in the Drawer source: a controlled `size` always wins over the internal one, so it can't stick. The real defect was the opposite, the sheet not following the finger during a drag, which is fixed.
+- **"Report caught render errors from the error boundary"** (review). Deferred: the frontend has no telemetry by design, and `console` is banned in app code. Revisit when error reporting gets its own decision.
+- **"Lint CSS files for raw colors too"** (review). Deferred: style sheets only reference `var(--grc-*)` today, and adding Stylelint for one rule isn't worth a new tool yet.
+
+### Lesson
+- **Measure the bundle, don't assume it.** The obvious suspect (the antd group) explained a tenth of the growth; the shell being eager and Motion's full feature set explained the rest.

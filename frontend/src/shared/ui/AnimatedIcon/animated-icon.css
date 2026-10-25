@@ -1,0 +1,145 @@
+/*
+ * Icon micro-interactions. The icon plays its animation once when the interactive element
+ * around it is hovered (precise pointers only, so a tap on a phone doesn't leave a hover
+ * animation stuck) or pressed. Nothing moves when the user prefers reduced motion.
+ */
+
+.grc-animated-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  vertical-align: -0.125em;
+}
+
+.grc-animated-icon > svg {
+  transform-origin: center;
+}
+
+.grc-animated-icon[data-animated-icon="ring"] > svg {
+  transform-origin: 50% 10%;
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  :is(button, a, [role="button"], [role="menuitem"], [role="tab"]):hover .grc-animated-icon > svg {
+    animation: var(--grc-icon-animation) var(--grc-icon-duration, var(--grc-duration-base))
+      var(--grc-ease-standard);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(button, a, [role="button"], [role="menuitem"], [role="tab"]):active .grc-animated-icon > svg {
+    animation: var(--grc-icon-animation) var(--grc-icon-duration, var(--grc-duration-base))
+      var(--grc-ease-standard);
+  }
+}
+
+.grc-animated-icon[data-animated-icon="spin"] {
+  --grc-icon-animation: grc-icon-spin;
+  --grc-icon-duration: var(--grc-duration-slow);
+}
+.grc-animated-icon[data-animated-icon="ring"] {
+  --grc-icon-animation: grc-icon-ring;
+  --grc-icon-duration: var(--grc-duration-slow);
+}
+.grc-animated-icon[data-animated-icon="pop"] {
+  --grc-icon-animation: grc-icon-pop;
+}
+.grc-animated-icon[data-animated-icon="nudge-forward"] {
+  --grc-icon-animation: grc-icon-nudge-forward;
+}
+.grc-animated-icon[data-animated-icon="nudge-back"] {
+  --grc-icon-animation: grc-icon-nudge-back;
+}
+.grc-animated-icon[data-animated-icon="turn"] {
+  --grc-icon-animation: grc-icon-turn;
+}
+.grc-animated-icon[data-animated-icon="shake"] {
+  --grc-icon-animation: grc-icon-shake;
+  --grc-icon-duration: var(--grc-duration-slow);
+}
+.grc-animated-icon[data-animated-icon="rise"] {
+  --grc-icon-animation: grc-icon-rise;
+}
+.grc-animated-icon[data-animated-icon="drop"] {
+  --grc-icon-animation: grc-icon-drop;
+}
+.grc-animated-icon[data-animated-icon="tilt"] {
+  --grc-icon-animation: grc-icon-tilt;
+}
+.grc-animated-icon[data-animated-icon="lift"] {
+  --grc-icon-animation: grc-icon-lift;
+}
+
+/* Every animation ends where it started, so leaving the hover never snaps the icon. */
+@keyframes grc-icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes grc-icon-ring {
+  20% {
+    transform: rotate(14deg);
+  }
+  40% {
+    transform: rotate(-12deg);
+  }
+  60% {
+    transform: rotate(8deg);
+  }
+  80% {
+    transform: rotate(-4deg);
+  }
+}
+@keyframes grc-icon-pop {
+  50% {
+    transform: scale(1.2);
+  }
+}
+@keyframes grc-icon-nudge-forward {
+  50% {
+    transform: translateX(3px);
+  }
+}
+@keyframes grc-icon-nudge-back {
+  50% {
+    transform: translateX(-3px);
+  }
+}
+/* A quarter turn looks identical at both ends for plus and close, so it can't snap. */
+@keyframes grc-icon-turn {
+  to {
+    transform: rotate(90deg);
+  }
+}
+@keyframes grc-icon-shake {
+  25% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-6deg);
+  }
+}
+@keyframes grc-icon-rise {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+@keyframes grc-icon-drop {
+  50% {
+    transform: translateY(3px);
+  }
+}
+@keyframes grc-icon-tilt {
+  50% {
+    transform: rotate(-12deg);
+  }
+}
+@keyframes grc-icon-lift {
+  50% {
+    transform: translateY(-2px) scale(1.06);
+  }
+}

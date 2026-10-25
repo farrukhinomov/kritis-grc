@@ -1,0 +1,300 @@
+/*
+ * The app shell: sidebar and header on wide screens, header and tab bar on phones.
+ * The sheet is global, so every class carries the grc-shell prefix.
+ */
+
+.grc-shell {
+  display: flex;
+  min-height: 100dvh;
+  background: var(--grc-page);
+  color: var(--grc-text);
+}
+
+.grc-shell-column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ---------- Sidebar ---------- */
+
+.grc-shell-sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 256px;
+  height: 100dvh;
+  background: var(--grc-sidebar-bg);
+  color: var(--grc-sidebar-text);
+}
+
+.grc-shell-sidebar[data-collapsed="true"] {
+  width: 76px;
+}
+
+.grc-shell-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 64px;
+  padding-inline: 20px;
+  color: var(--grc-sidebar-text);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.grc-shell-brand-mark {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--grc-primary);
+  color: var(--grc-on-primary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.grc-shell-nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.grc-shell-nav-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 8px 12px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.grc-shell-nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding-inline: 14px;
+  border-radius: 10px;
+  color: var(--grc-sidebar-text);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--grc-duration-fast) var(--grc-ease-standard);
+}
+
+/* Hover keeps the regular text color: the active text color is only tested on the
+   active background, and in High Contrast it is black. */
+.grc-shell-nav-link:not([aria-current="page"]):hover {
+  background: var(--grc-sidebar-hover-bg);
+}
+
+.grc-shell-nav-link[aria-current="page"] {
+  color: var(--grc-sidebar-text-active);
+  font-weight: 600;
+}
+
+/* The active background is a separate element so it can glide between items. */
+.grc-shell-active-pill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: var(--grc-sidebar-active-bg);
+}
+
+.grc-shell-nav-link > :not(.grc-shell-active-pill) {
+  position: relative;
+  z-index: 1;
+}
+
+.grc-shell-sidebar[data-collapsed="true"] .grc-shell-nav-link {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.grc-shell-sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid var(--grc-sidebar-hover-bg);
+}
+
+.grc-shell-collapse-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--grc-sidebar-text);
+  cursor: pointer;
+}
+
+.grc-shell-collapse-button:hover {
+  background: var(--grc-sidebar-hover-bg);
+}
+
+/* ---------- Header ---------- */
+
+.grc-shell-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 64px;
+  padding-inline: 24px;
+  border-bottom: 1px solid var(--grc-border-subtle);
+  background: var(--grc-surface);
+}
+
+.grc-shell-header-spacer {
+  flex: 1;
+}
+
+.grc-shell-tenant-switcher {
+  min-width: 0;
+  max-width: 320px;
+  flex: 0 1 320px;
+}
+
+.grc-shell-tenant-name {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grc-shell-prototype-badge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--grc-status-warning-bg);
+  color: var(--grc-status-warning-text);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- Content ---------- */
+
+.grc-shell-main {
+  flex: 1;
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+.grc-shell-main:focus {
+  outline: none;
+}
+
+/* ---------- Phone ---------- */
+
+.grc-shell-tab-bar {
+  position: fixed;
+  bottom: 0;
+  inset-inline: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 1px solid var(--grc-border-subtle);
+  background: var(--grc-surface);
+}
+
+.grc-shell-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 60px;
+  padding: 6px 2px;
+  border: 0;
+  background: none;
+  color: var(--grc-text-secondary);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.grc-shell-tab[aria-current="page"],
+.grc-shell-tab[data-active="true"] {
+  color: var(--grc-link);
+  font-weight: 600;
+}
+
+.grc-shell-tab-indicator {
+  position: absolute;
+  top: 0;
+  width: 32px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--grc-primary);
+}
+
+.grc-shell-sheet-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grc-shell-sheet-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding-inline: 14px;
+  border-radius: 12px;
+  background: var(--grc-surface-sunken);
+  color: var(--grc-text);
+  text-decoration: none;
+}
+
+.grc-shell-sheet-link[aria-current="page"] {
+  background: var(--grc-primary);
+  color: var(--grc-on-primary);
+  font-weight: 600;
+}
+
+@media (max-width: 767.98px) {
+  .grc-shell-header {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+
+  .grc-shell-tenant-switcher {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+
+  .grc-shell-main {
+    padding: 20px 16px calc(84px + env(safe-area-inset-bottom));
+  }
+}
+
+.grc-shell-main[data-narrow] {
+  max-width: 960px;
+}
