@@ -15,6 +15,21 @@ A multi-tenant governance, risk and compliance SaaS for operators of critical fa
 | Work on this repo with an AI assistant | [CLAUDE.md](CLAUDE.md) |
 | Browse all documentation | [docs/README.md](docs/README.md) |
 
+## Run locally
+
+Requires Docker. Copy the example configuration and fill in random values:
+
+```bash
+cp .env.example .env
+```
+
+| Stack | Command | Open |
+|---|---|---|
+| Development (hot reload, Vite on the real API) | `docker compose up` | http://localhost:5173 |
+| Production-like (gunicorn, nginx, TLS to Postgres, S3 storage) | `docker compose -f compose.prod.yaml up --build` | http://localhost:8081 |
+
+The prototype on mock data needs only the frontend: see [frontend/README.md](frontend/README.md). Each service's own commands are in [backend/](backend/README.md), [services/risk-engine/](services/risk-engine/README.md) and [frontend/](frontend/README.md).
+
 ## License
 
 Proprietary. All rights reserved. The source is visible for evaluation only. See [LICENSE](LICENSE). Security issues: see [.github/SECURITY.md](.github/SECURITY.md).

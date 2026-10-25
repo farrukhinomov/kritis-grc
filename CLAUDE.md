@@ -40,7 +40,12 @@ pnpm lint && pnpm typecheck && pnpm format:check
 pnpm build
 ```
 
-_`docker compose` commands follow with M0-05._
+Whole system (repository root, needs `.env` from `.env.example`):
+
+```bash
+docker compose up                                  # development, http://localhost:5173
+docker compose -f compose.prod.yaml up --build     # production-like, http://localhost:8081
+```
 
 ## Non-negotiable rules
 

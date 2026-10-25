@@ -147,6 +147,8 @@ Every check below is required before merging into `main`.
 ## Infrastructure and deployment
 
 - **Environments:** local (`docker compose`, Postgres, R2 dev bucket) and one public demo. Vercel preview builds use the demo API.
+- **Compose:** `compose.yaml` for development (mounted sources, hot reload) and `compose.prod.yaml` for a production-like run (the real images in production mode, nginx in front with the same headers as the edge, Postgres with TLS, SeaweedFS). Images are pinned by digest, ports bind to `127.0.0.1` only, and required secrets come from a git-ignored `.env`.
+- **Database roles:** an owner role runs migrations and owns every table. The app role connects at runtime with data access only: no table ownership, no `CREATE`, no `BYPASSRLS`. Hosted databases get the same split.
 - **Cloud Run:**
   - Region `europe-west3`.
   - Two services, `min-instances 0` and `max-instances 1`. Per-instance concurrency equals gunicorn workers x threads (8 for Django).

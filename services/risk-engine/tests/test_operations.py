@@ -6,7 +6,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from risk_engine.log_setup import RequestContextFilter, logging_config
-from risk_engine.main import create_app
+from risk_engine.main import create_app, create_app_from_env
 from risk_engine.settings import ConfigurationError, Environment, Settings, load_settings
 
 
@@ -79,3 +79,11 @@ def test_logging_config_writes_json_with_the_requested_level() -> None:
     assert config["root"]["level"] == "WARNING"
     assert config["handlers"]["stdout"]["formatter"] == "json"
     json.dumps({k: v for k, v in config.items() if k != "filters"})
+
+
+def test_the_reload_factory_builds_the_app_from_the_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("APP_ENV", "local")
+
+    assert TestClient(create_app_from_env()).get("/docs").status_code == HTTPStatus.OK

@@ -1,0 +1,111 @@
+# Local development: `docker compose up`, then open http://localhost:5173.
+# Source folders are mounted, so backend, risk engine and frontend reload on change.
+# The production-like stack lives in compose.prod.yaml.
+
+name: grc-dev
+
+x-backend-env: &backend-env
+  APP_ENV: local
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY in .env}
+  ALLOWED_HOSTS: localhost,127.0.0.1,backend
+  CSRF_TRUSTED_ORIGINS: http://localhost:5173
+
+services:
+  postgres:
+    image: postgres:17-bookworm@sha256:858bb5e98eed02eb8cafbcdc007f9a65d1b613972028944a8ec2133ccaf80d27
+    # TLS with the image's self-signed certificate, so production settings (which
+    # require TLS) work against this database too.
+    command:
+      - -c
+      - ssl=on
+      - -c
+      - ssl_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+      - -c
+      - ssl_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+    environment:
+      POSTGRES_DB: grc
+      POSTGRES_USER: grc_owner
+      POSTGRES_PASSWORD: ${POSTGRES_OWNER_PASSWORD:?Set POSTGRES_OWNER_PASSWORD in .env}
+      APP_DB_USER: grc_app
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?Set APP_DB_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres/initdb:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      # Over TCP on purpose: during first initialization a temporary server answers on the
+      # local socket only, and checking the socket would report "ready" too early.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U grc_owner -d grc"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # One-off job: migrations run as the owner role, before the API starts.
+  migrate:
+    build: ./backend
+    command: ["python", "manage.py", "migrate", "--noinput"]
+    environment:
+      <<: *backend-env
+      DATABASE_URL: postgres://grc_owner:${POSTGRES_OWNER_PASSWORD}@postgres:5432/grc
+    volumes:
+      - ./backend/src:/app/src:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    build: ./backend
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    environment:
+      <<: *backend-env
+      DATABASE_URL: postgres://grc_app:${APP_DB_PASSWORD}@postgres:5432/grc
+    volumes:
+      - ./backend/src:/app/src:ro
+    ports:
+      - "127.0.0.1:8000:8000"
+    # The image probes gunicorn's port; the dev server listens on 8000.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  risk-engine:
+    build: ./services/risk-engine
+    command:
+      [
+        "uvicorn", "risk_engine.main:create_app_from_env", "--factory", "--reload",
+        "--host", "0.0.0.0", "--port", "8080",
+      ]
+    environment:
+      APP_ENV: local
+    volumes:
+      - ./services/risk-engine/src:/app/src:ro
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  frontend:
+    image: node:24-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53
+    working_dir: /app
+    command: ["sh", "-c", "corepack enable && pnpm install --frozen-lockfile && pnpm dev --host 0.0.0.0"]
+    environment:
+      API_PROXY_TARGET: http://backend:8000
+      VITE_API_MOCKING: disabled
+      VITE_USE_POLLING: "true"
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+    volumes:
+      - ./frontend:/app
+      # The container's own node_modules, so host-installed native modules never leak in.
+      - frontend-node-modules:/app/node_modules
+    ports:
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres-data:
+  frontend-node-modules:

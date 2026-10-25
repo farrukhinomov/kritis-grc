@@ -11,8 +11,10 @@ export default defineConfig({
   server: {
     port: 5173,
     // Same single-origin setup as production: the browser only ever talks to the SPA's
-    // origin, and /api is forwarded to Django.
-    proxy: { "/api": "http://localhost:8000" },
+    // origin, and /api is forwarded to Django (a different host inside docker compose).
+    proxy: { "/api": process.env.API_PROXY_TARGET ?? "http://localhost:8000" },
+    // File change events don't cross into containers from some hosts' bind mounts.
+    watch: { usePolling: process.env.VITE_USE_POLLING === "true" },
   },
   build: {
     sourcemap: true,

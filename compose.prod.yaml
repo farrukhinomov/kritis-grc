@@ -1,0 +1,91 @@
+# Production-like stack: `docker compose -f compose.prod.yaml up --build`, then open
+# http://localhost:8081. Same images and settings as a real deployment (production mode,
+# gunicorn, nginx in front, TLS to the database, S3-compatible storage), but nothing here
+# depends on a cloud vendor, which is what a sovereign or on-premises install needs.
+
+name: grc-prod
+
+x-backend-env: &backend-env
+  APP_ENV: production
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY in .env}
+  ALLOWED_HOSTS: localhost,backend
+  CSRF_TRUSTED_ORIGINS: http://localhost:8081
+
+services:
+  postgres:
+    extends:
+      file: compose.yaml
+      service: postgres
+    ports: !reset []
+
+  migrate:
+    build: ./backend
+    command: ["python", "manage.py", "migrate", "--noinput"]
+    environment:
+      <<: *backend-env
+      DATABASE_URL: postgres://grc_owner:${POSTGRES_OWNER_PASSWORD}@postgres:5432/grc
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    build: ./backend
+    environment:
+      <<: *backend-env
+      DATABASE_URL: postgres://grc_app:${APP_DB_PASSWORD}@postgres:5432/grc
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  risk-engine:
+    build: ./services/risk-engine
+    environment:
+      APP_ENV: production
+    restart: unless-stopped
+
+  storage:
+    image: chrislusf/seaweedfs:4.50@sha256:c2658820e763294a9e9de7b36c81e59b879e3459148351aee4e31a126ca64860
+    command: ["server", "-dir=/data", "-s3", "-s3.port=8333", "-s3.config=/etc/seaweedfs/s3.json"]
+    environment:
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:?Set S3_ACCESS_KEY in .env}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:?Set S3_SECRET_KEY in .env}
+    entrypoint:
+      - sh
+      - -c
+      - |
+        mkdir -p /etc/seaweedfs
+        printf '{"identities":[{"name":"app","credentials":[{"accessKey":"%s","secretKey":"%s"}],"actions":["Read","Write","List","Tagging"]}]}' \
+          "$$S3_ACCESS_KEY" "$$S3_SECRET_KEY" > /etc/seaweedfs/s3.json
+        exec /entrypoint.sh "$$@"
+      - --
+    volumes:
+      - storage-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9333/cluster/status"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_MOCKING: disabled
+    environment:
+      API_UPSTREAM: http://backend:8080
+    ports:
+      - "127.0.0.1:8081:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  storage-data:

@@ -69,10 +69,10 @@ As a developer, I want the SPA foundation with routing, i18n and theming hooks, 
 
 As a developer, I want one command to run everything locally, and a production-like setup that proves portability.
 
-- [ ] `docker compose up` starts Postgres, Django, the risk engine and the Vite dev server, with hot reload.
-- [ ] A `prod` profile runs nginx (serving the built SPA, proxying `/api` with the same headers as Vercel), Django, the risk engine, Postgres and SeaweedFS as the S3 store.
-- [ ] Postgres has two roles from the start: an owner for migrations, and an app role without table ownership or BYPASSRLS.
-- [ ] A README section "Run locally" covers the steps, the env vars and the R2 dev bucket.
+- [x] `docker compose up` starts Postgres, Django, the risk engine and the Vite dev server, with hot reload.
+- [x] A production-like stack (`compose.prod.yaml`, a separate file rather than a profile, so neither stack starts parts of the other) runs nginx (serving the built SPA, proxying `/api` with the same headers as Vercel), Django, the risk engine, Postgres and SeaweedFS as the S3 store.
+- [x] Postgres has two roles from the start: an owner for migrations, and an app role without table ownership or BYPASSRLS.
+- [x] A README section "Run locally" covers the steps, the env vars and the R2 dev bucket.
 
 ### M0-06 CI pipeline
 **Labels:** `ci`, `type:chore`, `prio:must` · **Estimate:** 3 h · **Depends on:** M0-02, M0-03, M0-04

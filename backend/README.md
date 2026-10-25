@@ -16,7 +16,7 @@ docker run -d --name grc-test-postgres -p 55432:5432 \
   -e POSTGRES_USER=grc -e POSTGRES_PASSWORD=grc -e POSTGRES_DB=grc postgres:17-alpine
 ```
 
-Point `DATABASE_URL` in `.env` at `localhost:55432`. Once M0-05 lands, `docker compose up` from the repository root replaces the manual container.
+Point `DATABASE_URL` in `.env` at `localhost:55432`. The tests use this throwaway database, the same way CI uses a service container. To run the whole system instead, use `docker compose up` from the repository root.
 
 ## Commands
 

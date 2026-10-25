@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from risk_engine import problems
 from risk_engine.middleware import RequestContextMiddleware
 from risk_engine.routers import health, risk_scores
-from risk_engine.settings import Settings
+from risk_engine.settings import Settings, load_settings
 
 VERSION = "0.1.0"
 
@@ -24,3 +24,8 @@ def create_app(settings: Settings) -> FastAPI:
     app.include_router(risk_scores.router)
     app.add_middleware(RequestContextMiddleware)
     return app
+
+
+def create_app_from_env() -> FastAPI:
+    """Factory for `uvicorn --factory --reload` in local development."""
+    return create_app(load_settings())
