@@ -78,7 +78,7 @@ function HistoryEntry({ entry }: { entry: ActivityEntry }) {
       <span>
         <strong>{entry.actor_name || t("dashboard.activity.unknownActor")}</strong>{" "}
         {t(`history.actions.${entry.action}`)}{" "}
-        <time dateTime={entry.occurred_at} className="grc-evidence-meta">
+        <time dateTime={entry.occurred_at} className="grc-meta">
           {formatRelative(entry.occurred_at, i18n.language)}
         </time>
       </span>

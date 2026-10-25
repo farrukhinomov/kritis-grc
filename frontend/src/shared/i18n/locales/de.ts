@@ -240,6 +240,57 @@ export const de = {
       commented: "hat kommentiert",
     },
   },
+  risk: {
+    description: "Wie Ihre Maßnahmen das Risikobild verändern.",
+    ratings: { inherent: "Ausgangsbewertung", residual: "Restrisiko", target: "Zielbewertung" },
+    matrix: {
+      title: "Risikomatrix",
+      caption: "Risikomatrix, {{rating}}: Anzahl der Risiken je Feld",
+      cellLabel:
+        "Eintrittswahrscheinlichkeit {{likelihood}}, Auswirkung {{impact}}: {{count}} Risiken",
+    },
+    filters: {
+      allScopes: "Alle Geltungsbereiche",
+      category: "Kategorie",
+      allCategories: "Alle Kategorien",
+      cell: "Feld Eintrittswahrscheinlichkeit {{likelihood}} × Auswirkung {{impact}}",
+      clearCell: "Alle Felder zeigen",
+    },
+    table: {
+      risk: "Risiko",
+      hazard: "Gefährdung",
+      empty: "Keine Risiken für diese Auswahl.",
+    },
+    hazardCategories: {
+      natural: "natürlich",
+      technical: "technisch",
+      human: "menschlich verursacht",
+    },
+    criticality: {
+      low: "geringe Kritikalität",
+      medium: "mittlere Kritikalität",
+      high: "hohe Kritikalität",
+    },
+    dimensions: { likelihood: "Eintrittswahrscheinlichkeit", impact: "Auswirkung" },
+    detail: {
+      title: "Risiko",
+      ratings: "Bewertungen",
+      rating: "{{category}} (Eintrittswahrscheinlichkeit {{likelihood}}, Auswirkung {{impact}})",
+      pending:
+        "Berechnung ausstehend: Die Risiko-Engine ist gerade nicht erreichbar. Das Restrisiko wird nachgeholt, sobald sie wieder antwortet.",
+      assets: "Betroffene Assets",
+      noAssets: "Keine einzelnen Assets zugeordnet.",
+      treatments: "Maßnahmen",
+      effectApplied_one: "senkt die {{dimension}} um {{count}} Stufe",
+      effectApplied_other: "senkt die {{dimension}} um {{count}} Stufen",
+      effectPlanned_one: "würde die {{dimension}} um {{count}} Stufe senken, sobald umgesetzt",
+      effectPlanned_other: "würde die {{dimension}} um {{count}} Stufen senken, sobald umgesetzt",
+      effectPartial:
+        "senkt die {{dimension}} derzeit um {{applied}} von {{count}} Stufen; voll umgesetzt um {{count}}",
+      markImplemented: "Als umgesetzt markieren",
+      method: "Berechnet nach Methode {{version}}.",
+    },
+  },
   implementationStatus: {
     open: "Offen",
     partial: "Teilweise umgesetzt",

@@ -139,7 +139,7 @@ function SuggestionCard({
         {scope && ` · ${scope.name}`} <StatusBadge status={candidate.status} />
       </p>
       {/* The Tenant's own reasoning, in German as it was approved. */}
-      <p lang="de" className="grc-evidence-meta">
+      <p lang="de" className="grc-meta">
         {mapping.justification_de}
       </p>
       {referenced ? (

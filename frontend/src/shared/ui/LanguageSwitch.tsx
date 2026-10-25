@@ -11,6 +11,9 @@ export function LanguageSwitch() {
 
   return (
     <Segmented<Language>
+      // Its own radio group name: without it, two segmented controls on one page could
+      // share a generated name and unselect each other.
+      name="ui-language"
       aria-label={t("app.language")}
       size="small"
       value={currentLanguage(i18n.resolvedLanguage)}

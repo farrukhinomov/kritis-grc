@@ -1,3 +1,5 @@
+import "./riskChip.css";
+
 import { useTranslation } from "react-i18next";
 
 import type { RiskCategory } from "@/shared/api/types";

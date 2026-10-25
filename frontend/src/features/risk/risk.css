@@ -1,0 +1,236 @@
+.grc-explorer-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.grc-explorer-select {
+  min-width: 200px;
+}
+
+@media (max-width: 767.98px) {
+  .grc-explorer-select {
+    flex: 1 1 100%;
+  }
+}
+
+.grc-explorer {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* The matrix sits above the table at every width: beside it, the table's three rating
+   columns never fit the content width. Capped, so its cells stay roughly square. */
+.grc-explorer-matrix-panel {
+  max-width: 560px;
+}
+
+.grc-explorer-panel {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 14px;
+  background: var(--grc-surface);
+}
+
+.grc-explorer-matrix {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 4px;
+  table-layout: fixed;
+}
+
+.grc-explorer-matrix th {
+  color: var(--grc-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.grc-explorer-matrix tbody th {
+  width: 24px;
+  text-align: end;
+}
+
+.grc-explorer-matrix td {
+  padding: 0;
+}
+
+.grc-explorer-cell {
+  display: grid;
+  place-content: center;
+  width: 100%;
+  height: 56px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--grc-surface-sunken);
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Phones get a compact matrix: smaller cells, the same information. */
+@media (max-width: 767.98px) {
+  .grc-explorer-cell {
+    height: 44px;
+  }
+}
+
+.grc-explorer-cell:disabled {
+  cursor: default;
+}
+
+.grc-explorer-cell[aria-pressed="true"] {
+  outline: 3px solid var(--grc-primary);
+  outline-offset: 1px;
+}
+
+.grc-explorer-cell-category {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.grc-explorer-axes {
+  margin: 4px 0 0;
+  color: var(--grc-text-secondary);
+  font-size: 12px;
+  text-align: center;
+}
+
+.grc-explorer-cell-filter {
+  margin: 0 0 8px;
+}
+
+.grc-risk-title.ant-btn {
+  justify-content: flex-start;
+  height: auto;
+  padding: 0;
+  white-space: normal;
+  text-align: start;
+}
+
+.grc-rating-pending {
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.grc-risk-card {
+  display: grid;
+  gap: 4px;
+}
+
+.grc-risk-pagination {
+  margin-top: 16px;
+}
+
+.grc-plain-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grc-cell-risks li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.grc-risk-detail {
+  display: grid;
+  gap: 20px;
+}
+
+.grc-risk-detail .grc-drawer-subtitle {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ---------- One risk's ratings ---------- */
+
+.grc-rating-matrix {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.grc-rating-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 280px;
+}
+
+.grc-rating-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  background: var(--grc-surface-sunken);
+}
+
+.grc-rating-marker {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+}
+
+/* Three markers told apart by shape as well as color. */
+.grc-rating-marker-inherent {
+  border: 2px solid var(--grc-text-secondary);
+}
+
+.grc-rating-marker-target {
+  border: 2px dashed var(--grc-status-success-solid);
+}
+
+.grc-rating-marker-residual {
+  background: var(--grc-primary);
+  box-shadow: 0 0 0 2px var(--grc-surface);
+}
+
+.grc-rating-legend {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.grc-rating-legend-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.grc-treatments {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.grc-treatment {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  padding: 10px 12px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 10px;
+}
+
+.grc-treatment-effect {
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+}

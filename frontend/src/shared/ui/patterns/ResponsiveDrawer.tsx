@@ -1,3 +1,5 @@
+import "./patterns.css";
+
 import { Button, Drawer } from "antd";
 import { type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";

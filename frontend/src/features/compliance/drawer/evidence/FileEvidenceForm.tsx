@@ -141,14 +141,14 @@ export function FileEvidenceForm({ target }: { target: EvidenceTarget }) {
           onChange={onPick}
         />
         <span className="grc-dropzone-label">{t("evidence.pickFile")}</span>
-        <span className="grc-evidence-meta">{t("evidence.fileRules")}</span>
+        <span className="grc-meta">{t("evidence.fileRules")}</span>
       </label>
       {/* Visitors use a public demo; the request is made where the decision is taken. */}
       <Typography.Text type="secondary">{t("evidence.noPersonalData")}</Typography.Text>
       {problem && <Alert type="error" showIcon title={t(problem)} />}
       {upload.phase !== "idle" && (
         <div>
-          <span className="grc-evidence-meta">
+          <span className="grc-meta">
             {upload.file.name} · {formatBytes(upload.file.size, i18n.language)}
           </span>
           <Progress

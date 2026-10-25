@@ -214,3 +214,18 @@ Each milestone gets one entry with four parts:
 ### Rejected
 - **"Use antd's Upload.Dragger."** Its file input has no label and its list duplicates our own. A native file input over the drop zone keeps keyboard access, and the browser accepts dropped files on it without extra handlers.
 - **"Show upload progress steps in the mock."** The mock's service worker receives the body locally in one step, so only 0 and 100 % appear. Faking intermediate steps would test the fake, not the code; against real storage XMLHttpRequest reports real progress.
+
+---
+
+## P-07 Risk explorer (2026-10-25)
+
+### Accepted
+- **The matrix and the list read the chosen rating on the server.** `/risk-matrix` and `/risks` take `rating`, a category and a cell, so the cell counts and the table always agree and no page has to be fetched whole to filter it.
+- **`pending` only for the Residual Rating.** The Inherent and Target Ratings are entered by people and never wait for the risk engine; the mock refuses `pending` for them with a 400 instead of returning an empty list that looks like an answer.
+- **The glide happens in the risk's own detail.** The explorer's matrix shows counts, not risks, so nothing could move there. In the detail each rating is a marker in a 4×4 grid, and marking a Treatment's Implementation as implemented moves the Residual marker to its new cell through a shared layout animation. Reduced motion turns it into a jump, and the legend says every rating as text.
+- **The status mutation moved to `shared/`.** The risk detail and the Implementation drawer change a status the same way: optimistic, rolled back on error, 412 dialog, then risks and the Activity Log refetched.
+- **Partial work has its own effect text.** The method counts partial work for half a level, so "planned 2" alone would overstate what is already in effect.
+
+### Changed
+- **The matrix sat beside the table.** In the browser check the six-column table pushed the page sideways even at 1920 px, because the content width is capped. The matrix now sits above the table, Scope and Hazard moved under the title, and every table scrolls inside its own box if it is still too wide.
+- **Fact lists and secondary text were styled per feature.** The risk detail used the cockpit's classes, whose sheet its chunk never loads, so the list showed browser defaults. Both moved to the shared pattern sheet.

@@ -1,3 +1,5 @@
+import "@/shared/ui/RiskChip/riskChip.css";
+
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 

@@ -107,7 +107,7 @@ function EvidenceList({
             <Icon size={18} aria-hidden className="grc-evidence-icon" />
             <span className="grc-evidence-text">
               <span>{item.title}</span>{" "}
-              <span className="grc-evidence-meta">
+              <span className="grc-meta">
                 <EvidenceMeta tenant={tenant} evidence={item} />
               </span>
             </span>
@@ -195,6 +195,7 @@ function AddEvidence({
         {t("evidence.addTitle")}
       </h3>
       <Segmented<Kind>
+        name="evidence-kind"
         block
         value={kind}
         onChange={setKind}
