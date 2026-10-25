@@ -5,10 +5,17 @@ import { RootLayout } from "./RootLayout";
 import { RouteError } from "./RouteError";
 import { titled } from "./routeHandle";
 import { SessionGate } from "./SessionGate";
-import { NAV_ITEMS } from "./shell/navigation";
+import { NAV_ITEMS, type NavEntry } from "./shell/navigation";
 
 const placeholder = async () => ({ Component: (await import("./pages")).PlaceholderPage });
 const notFound = async () => ({ Component: (await import("./pages")).NotFound });
+
+/** Screens that exist so far; the others keep the placeholder until their issue builds them. */
+const SCREENS: Partial<Record<NavEntry["key"], typeof placeholder>> = {
+  dashboard: async () => ({
+    Component: (await import("@/features/dashboard/DashboardPage")).DashboardPage,
+  }),
+};
 
 // Each page is its own chunk, loaded on first visit, so the initial download stays small
 // as screens are added.
@@ -55,7 +62,7 @@ export const routes: RouteObject[] = [
                   ...NAV_ITEMS.map((item) => ({
                     path: item.path,
                     ...titled(`nav.${item.key}`),
-                    lazy: placeholder,
+                    lazy: SCREENS[item.key] ?? placeholder,
                   })),
                   { path: "*", ...titled("notFound.title"), lazy: notFound },
                 ],

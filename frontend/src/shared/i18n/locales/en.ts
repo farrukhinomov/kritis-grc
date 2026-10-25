@@ -87,6 +87,73 @@ export const en: Translation = {
     prototypeHint:
       "This prototype has no accounts of its own. Please use one of the demo logins above.",
   },
+  dashboard: {
+    description: "Where your organization stands on the KRITIS-Dachgesetz and NIS2.",
+    loadError: "This area could not be loaded.",
+    statuses: {
+      open: "Open",
+      partial: "Partially implemented",
+      implemented: "Implemented",
+      not_applicable: "Not applicable",
+    },
+    riskCategories: {
+      low: "Low",
+      medium: "Medium",
+      high: "High",
+      critical: "Critical",
+    },
+    compliance: {
+      title: "Compliance by framework and facility",
+      counts: "{{implemented}} of {{applicable}} implemented, {{partial}} partially",
+      empty: "No implementations recorded yet.",
+    },
+    deadlines: {
+      title: "Deadlines",
+      inDays_one: "in {{count}} day",
+      inDays_other: "in {{count}} days",
+      overdue_one: "{{count}} day overdue",
+      overdue_other: "{{count}} days overdue",
+      projected: "projected",
+      projectedHint:
+        "Calculated from the planned registration. The deadline becomes binding only with the confirmed date.",
+      empty: "No critical facility with a registration recorded.",
+    },
+    matrix: {
+      title: "Residual risk matrix",
+      caption: "Number of risks by residual rating: impact (rows) and likelihood (columns)",
+      likelihood: "Likelihood",
+      impact: "Impact",
+      axes: "Rows: impact · Columns: likelihood",
+    },
+    topRisks: {
+      title: "Top 5 risks",
+    },
+    risks: {
+      empty: "No risks recorded yet.",
+      calculationPending: "Calculation pending",
+      pending_one: "{{count}} risk is still waiting for its residual rating.",
+      pending_other: "{{count}} risks are still waiting for their residual rating.",
+    },
+    mine: {
+      title: "My open implementations",
+      due: "due {{date}}",
+      more: "{{shown}} of {{total}} shown",
+      empty: "No open implementations are assigned to you.",
+    },
+    activity: {
+      title: "Recent activity",
+      unknownActor: "Unknown",
+      empty: "No activity yet.",
+      actions: {
+        created: "{{actor}} created {{object}}",
+        updated: "{{actor}} changed {{object}}",
+        deleted: "{{actor}} deleted {{object}}",
+        approved: "{{actor}} approved {{object}}",
+        rejected: "{{actor}} rejected {{object}}",
+        commented: "{{actor}} commented on {{object}}",
+      },
+    },
+  },
   patterns: {
     back: "Back",
     close: "Close",

@@ -152,6 +152,13 @@ export type ImplementationChange = Partial<
   Pick<Implementation, "status" | "owner_id" | "due_date" | "note_de">
 >;
 
+/** How many of one Scope's Implementations of one Framework are in each status. */
+export interface ComplianceSummary {
+  scope_id: string;
+  framework_id: string;
+  counts: Record<ImplementationStatus, number>;
+}
+
 export type EvidenceKind = "file" | "link" | "reference";
 
 export interface EvidenceFile {

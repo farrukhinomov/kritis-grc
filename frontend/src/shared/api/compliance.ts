@@ -3,6 +3,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { apiGet, apiRequest, tenantPath } from "./client";
 import { resourceKey } from "./keys";
 import type {
+  ComplianceSummary,
   Evidence,
   Framework,
   Implementation,
@@ -46,15 +47,29 @@ export interface ImplementationFilter extends PageParams {
   scope?: string;
   framework_version?: string;
   requirement?: string;
-  status?: ImplementationStatus;
+  owner?: string;
+  /** Several statuses match any of them. */
+  status?: ImplementationStatus | readonly ImplementationStatus[];
   ordering?: "due_date" | "-due_date" | "updated_at" | "-updated_at";
 }
 
 export const implementationsQuery = (tenant: string, filter: ImplementationFilter = {}) =>
   queryOptions({
     queryKey: resourceKey(tenant, "implementations", filter),
+    queryFn: ({ signal }) => {
+      const { status, ...rest } = filter;
+      // A comma-separated list, the form Django filters accept for "any of".
+      const query = { ...rest, status: typeof status === "string" ? status : status?.join(",") };
+      return apiGet<Page<Implementation>>(tenantPath(tenant, ["implementations"], query), signal);
+    },
+  });
+
+/** Counted by the server, so the dashboard never pages through every Implementation. */
+export const complianceSummaryQuery = (tenant: string) =>
+  queryOptions({
+    queryKey: resourceKey(tenant, "implementations", "summary"),
     queryFn: ({ signal }) =>
-      apiGet<Page<Implementation>>(tenantPath(tenant, ["implementations"], { ...filter }), signal),
+      apiGet<Page<ComplianceSummary>>(tenantPath(tenant, ["compliance-summary"]), signal),
   });
 
 export const implementationQuery = (tenant: string, id: string) =>

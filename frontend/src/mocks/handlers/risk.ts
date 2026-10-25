@@ -3,7 +3,7 @@ import { HttpResponse } from "msw";
 import type { Risk } from "@/shared/api/types";
 
 import type { TenantData } from "../db";
-import { listResponse, notFound, tenantRoute } from "../http";
+import { listResponse, notFound, problem, tenantRoute } from "../http";
 import { assess, rate } from "../riskMethod";
 import type { StoredRisk } from "../seed";
 import { getSimulation } from "../simulation";
@@ -26,16 +26,33 @@ function present(risk: StoredRisk, data: TenantData): Risk {
   };
 }
 
+/**
+ * Highest Residual Rating first. A risk the engine hasn't rated yet must not look
+ * harmless, so unrated risks come last but in inherent order, never mixed in at zero.
+ */
+function byResidualScore(a: Risk, b: Risk): number {
+  if (a.residual && b.residual) {
+    return b.residual.score - a.residual.score || b.inherent.score - a.inherent.score;
+  }
+  if (a.residual || b.residual) {
+    return a.residual ? -1 : 1;
+  }
+  return b.inherent.score - a.inherent.score;
+}
+
 export const riskHandlers = [
   tenantRoute("get", "/hazards", ({ data, url }) => listResponse(data.hazards, url)),
 
   tenantRoute("get", "/risks", ({ data, url }) => {
     const scope = url.searchParams.get("scope");
-    const risks = data.risks.filter((risk) => scope === null || risk.scope_id === scope);
-    return listResponse(
-      risks.map((risk) => present(risk, data)),
-      url,
-    );
+    const ordering = url.searchParams.get("ordering");
+    if (ordering !== null && ordering !== "-residual_score") {
+      return problem(400, "invalid_ordering", "Unknown ordering.");
+    }
+    const risks = data.risks
+      .filter((risk) => scope === null || risk.scope_id === scope)
+      .map((risk) => present(risk, data));
+    return listResponse(ordering === null ? risks : risks.toSorted(byResidualScore), url);
   }),
 
   tenantRoute("get", "/risks/:id", ({ data, params }) => {

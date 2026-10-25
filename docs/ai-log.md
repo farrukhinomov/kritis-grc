@@ -118,3 +118,18 @@ Each milestone gets one entry with four parts:
 
 ### Rejected
 - **"Let the password form accept the demo accounts with a published password."** A password printed on the login page teaches the wrong habit and duplicates the demo buttons. The form refuses every login with the same answer for known and unknown emails, and a hint in mock builds points to the demo logins.
+
+---
+
+## P-04 Dashboard (2026-10-25)
+
+### Accepted
+- **Aggregates on the server.** The first idea was to compute the compliance bars from the Implementation list. That works for 46 rows and breaks at the 100-item page cap, so the mock now offers the summary endpoint and the filters the backend will have to provide, and the contract tests pin them down.
+- **Only "implemented" counts.** Counting partial work as half would make a facility look further along than an auditor would accept. Partial work is shown as its own segment of the bar.
+- **Unrated risks never sort as harmless.** Without a Residual Rating a risk goes to the end of the top-five list in inherent order, and the matrix says how many risks are still waiting.
+
+### Changed
+- **Two layout bugs only a browser showed.** A `nowrap` in the "my Implementations" list made the page scroll sideways at 390 px and at 1440 px, and a generic table-cell rule hid the risk colors in the matrix. Both were found in headless screenshots, not in tests.
+
+### Rejected
+- **"Color empty matrix cells by the category they would have."** That needs the risk method's 4×4 table in the frontend, a copy of the risk engine's logic that could drift from it. Only occupied cells are colored, by the risks actually in them.

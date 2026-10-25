@@ -1,0 +1,239 @@
+/* One column on phones; the breakpoints match the shell's (768 px and 1200 px). */
+.grc-dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .grc-dashboard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .grc-dashboard {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .grc-widget-wide {
+    grid-column: span 2;
+  }
+}
+
+.grc-widget {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 14px;
+  background: var(--grc-surface);
+}
+
+.grc-widget .grc-widget-title {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.grc-widget-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grc-widget-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* The text takes the room and wraps; the chip, tag or time beside it keeps its size. */
+.grc-widget-row > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.grc-widget-row > :not(:first-child) {
+  flex-shrink: 0;
+  margin-inline-end: 0;
+}
+
+.grc-widget-muted {
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+}
+
+time.grc-widget-muted {
+  white-space: nowrap;
+}
+
+.grc-widget-note {
+  margin: 12px 0 0;
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+}
+
+/* ---------- Compliance ---------- */
+
+.grc-compliance {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px 32px;
+}
+
+.grc-compliance-scope {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.grc-compliance .grc-compliance-scope-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.grc-compliance-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.grc-compliance-percent {
+  font-variant-numeric: tabular-nums;
+}
+
+.grc-compliance-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--grc-surface-sunken);
+  box-shadow: inset 0 0 0 1px var(--grc-border-subtle);
+}
+
+.grc-compliance-fill {
+  display: flex;
+  height: 100%;
+  transform-origin: left center;
+}
+
+.grc-compliance-implemented {
+  background: var(--grc-status-success-solid);
+}
+
+.grc-compliance-partial {
+  background: var(--grc-status-warning-solid);
+  opacity: 0.6;
+}
+
+.grc-compliance .grc-compliance-counts {
+  margin: 4px 0 0;
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+}
+
+/* ---------- Deadlines ---------- */
+
+.grc-deadline {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+}
+
+.grc-deadline-days {
+  flex: 0 0 96px;
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.grc-deadline-days[data-overdue="true"] {
+  color: var(--grc-status-danger-text);
+}
+
+.grc-deadline-detail {
+  min-width: 0;
+}
+
+.grc-deadline .grc-deadline-projected {
+  margin-inline-start: 4px;
+  border-color: var(--grc-status-info-solid);
+  background: var(--grc-status-info-bg);
+  color: var(--grc-status-info-text);
+}
+
+/* ---------- Risks ---------- */
+
+.grc-risk-chip {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.grc-risk-low {
+  background: var(--grc-risk-low-bg);
+  color: var(--grc-risk-low-text);
+}
+
+.grc-risk-medium {
+  background: var(--grc-risk-medium-bg);
+  color: var(--grc-risk-medium-text);
+}
+
+.grc-risk-high {
+  background: var(--grc-risk-high-bg);
+  color: var(--grc-risk-high-text);
+}
+
+.grc-risk-critical {
+  background: var(--grc-risk-critical-bg);
+  color: var(--grc-risk-critical-text);
+}
+
+.grc-risk-matrix {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 4px;
+  table-layout: fixed;
+}
+
+.grc-risk-matrix th {
+  color: var(--grc-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.grc-risk-matrix thead th {
+  text-align: center;
+}
+
+.grc-risk-matrix tbody th {
+  width: 24px;
+  text-align: end;
+}
+
+.grc-risk-matrix td {
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Cells without risks stay neutral; occupied ones carry their category's class. */
+.grc-risk-matrix td:not([class]) {
+  background: var(--grc-surface-sunken);
+}
+
+.grc-risk-matrix-axes {
+  margin: 4px 0 0;
+  color: var(--grc-text-secondary);
+  font-size: 12px;
+  text-align: center;
+}
