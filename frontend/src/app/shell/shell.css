@@ -113,7 +113,7 @@
   background: var(--grc-sidebar-active-bg);
 }
 
-.grc-shell-nav-link > :not(.grc-shell-active-pill) {
+.grc-shell-nav-link > :not(.grc-shell-active-pill, .grc-visually-hidden) {
   position: relative;
   z-index: 1;
 }
@@ -367,4 +367,22 @@
   margin-inline-start: 22px;
   min-width: 18px;
   line-height: 18px;
+}
+
+/* On the active item the pill has the primary colour already; the count inverts. */
+.grc-shell-nav-link[aria-current="page"] .grc-nav-count {
+  background: var(--grc-on-primary);
+  color: var(--grc-primary);
+}
+
+/* The collapsed rail has room for the icon only; the count sits on it. */
+.grc-shell-sidebar[data-collapsed="true"] .grc-nav-count {
+  position: absolute;
+  top: 4px;
+  right: 10px;
+  min-width: 16px;
+  margin: 0;
+  padding: 0 4px;
+  font-size: 10px;
+  line-height: 16px;
 }

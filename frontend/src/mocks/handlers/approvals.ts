@@ -73,12 +73,8 @@ function inbox(data: TenantData, role: Parameters<typeof can>[0] | undefined): A
   );
 }
 
-function decide(
-  data: TenantData,
-  id: string,
-  status: "approved" | "rejected",
-  note: string | null,
-) {
+/** Why an assessment can't be decided by the current user, or null when it can. */
+function undecidable(data: TenantData, id: string) {
   const assessment = data.riskAssessments.find((item) => item.id === id);
   if (!assessment) {
     return notFound();
@@ -89,6 +85,20 @@ function decide(
   // Four eyes: whoever wrote the assessment can't also be the one who approves it.
   if (assessment.submitted_by_id === actor()) {
     return problem(403, "own_submission", "A Risk Assessment can't be decided by its author.");
+  }
+  return null;
+}
+
+function decide(
+  data: TenantData,
+  id: string,
+  status: "approved" | "rejected",
+  note: string | null,
+) {
+  const blocked = undecidable(data, id);
+  const assessment = data.riskAssessments.find((item) => item.id === id);
+  if (blocked || !assessment) {
+    return blocked ?? notFound();
   }
   assessment.status = status;
   assessment.decided_by_id = actor();
@@ -145,6 +155,11 @@ export const approvalHandlers = [
     "post",
     "/risk-assessments/:id/reject",
     async ({ data, params, request }) => {
+      // What can't be decided at all is said first; a missing reason only after that.
+      const blocked = undecidable(data, String(params.id));
+      if (blocked) {
+        return blocked;
+      }
       const body = await jsonBody(request);
       const note = isRecord(body) && typeof body.note_de === "string" ? body.note_de.trim() : "";
       if (note === "") {

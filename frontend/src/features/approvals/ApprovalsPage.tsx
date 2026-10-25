@@ -15,10 +15,10 @@ import {
 import { ApiError } from "@/shared/api/client";
 import { approveSuggestion, rejectSuggestion } from "@/shared/api/compliance";
 import { resourceKey } from "@/shared/api/keys";
-import type { ApprovalItem, ApprovalKind } from "@/shared/api/types";
+import type { ApprovalItem, ApprovalKind, Approvals } from "@/shared/api/types";
 import { useIsWideScreen } from "@/shared/lib/breakpoints";
 import { combine } from "@/shared/lib/combineQueries";
-import { formatDate } from "@/shared/lib/format";
+import { formatLocalDate } from "@/shared/lib/format";
 import { useCan, useCurrentMembership } from "@/shared/session/sessionContext";
 import { duration, ease } from "@/shared/theme/motion";
 import { PageHeader } from "@/shared/ui/PageHeader";
@@ -65,14 +65,26 @@ export function ApprovalsPage() {
           : rejectSuggestion(tenant, item.id));
       }
     },
-    onSuccess: (_, { item, decision }) => {
+    onSuccess: (_, { item, decision, next }) => {
+      // The item leaves the inbox and the count at once, in the same render; the
+      // refetch below only confirms it. Until then it could be decided a second time.
+      client.setQueryData<Approvals>(approvalsQuery(tenant).queryKey, (current) =>
+        current
+          ? {
+              items: current.items.filter(
+                (other) => !(other.kind === item.kind && other.id === item.id),
+              ),
+              total: current.total - 1,
+            }
+          : current,
+      );
       setAnnouncement(t(`approvals.announce.${decision}`, { title: item.title }));
+      setFocusTarget({ id: next });
     },
     onError: (error) => {
       setFailure(error instanceof ApiError && error.status === 409 ? "conflict" : "failed");
     },
-    onSettled: (_, __, { next }) => {
-      setFocusTarget({ id: next });
+    onSettled: () => {
       // The decision reaches every list that shows the item, and the log records it.
       for (const resource of [
         "approvals",
@@ -154,6 +166,7 @@ export function ApprovalsPage() {
                     key={`${item.kind}-${item.id}`}
                     layout
                     exit={{ opacity: 0, height: 0 }}
+                    className="grc-approval-item"
                     transition={{ duration: duration.base, ease: ease.standard }}
                   >
                     <ApprovalCard
@@ -180,6 +193,9 @@ export function ApprovalsPage() {
         okText={t(`approvals.confirm.${dialogKey}.ok`)}
         okButtonProps={{ danger: asked?.decision === "reject" }}
         cancelText={t("approvals.confirm.cancel")}
+        // Focus moves to the next item once decided; giving it back to the decided
+        // card's button, which leaves with the card, would drop it on the page.
+        focusable={{ focusTriggerAfterClose: false }}
         onOk={confirm}
         onCancel={() => {
           setAsked(null);
@@ -244,12 +260,14 @@ function ApprovalCard({
         {item.submitted_by_name
           ? t("approvals.submittedBy", {
               name: item.submitted_by_name,
-              date: formatDate(item.submitted_at, i18n.language),
+              date: formatLocalDate(item.submitted_at, i18n.language),
             })
-          : t("approvals.proposedOn", { date: formatDate(item.submitted_at, i18n.language) })}
+          : t("approvals.proposedOn", { date: formatLocalDate(item.submitted_at, i18n.language) })}
       </p>
       <div className="grc-approval-actions">
-        <Link to={link}>{t(`approvals.open.${item.kind}`)}</Link>
+        <Link to={link} className="grc-approval-link">
+          {t(`approvals.open.${item.kind}`)}
+        </Link>
         {wide && (
           <>
             <Button
@@ -259,7 +277,7 @@ function ApprovalCard({
                 onAsk("approve");
               }}
             >
-              {t("approvals.approve")}
+              {t(`approvals.approveAction.${item.kind}`)}
             </Button>
             <Button
               disabled={busy}
@@ -289,7 +307,7 @@ function ApprovalCard({
           actions={[
             {
               key: "approve",
-              label: t("approvals.approve"),
+              label: t(`approvals.approveAction.${item.kind}`),
               icon: "check",
               disabled: busy,
               onSelect: () => {

@@ -61,3 +61,16 @@
   color: var(--grc-status-danger-text);
   font-size: 13px;
 }
+
+/* Collapsing on exit must not let the card spill over its neighbour. */
+.grc-approval-item {
+  overflow: hidden;
+}
+
+@media (pointer: coarse), (max-width: 767.98px) {
+  .grc-approval-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}

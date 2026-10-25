@@ -24,6 +24,7 @@ const OBJECT_TYPES = [
   "risk",
   "mapping",
   "mapping_suggestion",
+  "risk_assessment",
   "scope",
   "tenant",
 ] as const;
@@ -173,7 +174,7 @@ function Entry({ entry }: { entry: ActivityEntry }) {
         <ul className="grc-plain-list grc-activity-changes">
           {changes.map((change) => (
             <li key={change.field}>
-              <ChangeText change={change} />
+              <ChangeText change={change} objectType={entry.object_type} />
             </li>
           ))}
         </ul>

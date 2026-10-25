@@ -5,7 +5,7 @@ import type { FieldChange } from "@/shared/api/types";
 import { display, isShownField } from "./changes";
 
 /** "Status: offen → teilweise umgesetzt", for one changed field. */
-export function ChangeText({ change }: { change: FieldChange }) {
+export function ChangeText({ change, objectType }: { change: FieldChange; objectType: string }) {
   const { t, i18n } = useTranslation();
   if (!isShownField(change.field)) {
     return null;
@@ -14,8 +14,8 @@ export function ChangeText({ change }: { change: FieldChange }) {
 
   return (
     <>
-      {t(`history.fields.${field}`)}: {display(field, change.from, t, i18n.language)} →{" "}
-      {display(field, change.to, t, i18n.language)}
+      {t(`history.fields.${field}`)}: {display(field, change.from, objectType, t, i18n.language)} →{" "}
+      {display(field, change.to, objectType, t, i18n.language)}
     </>
   );
 }
