@@ -304,6 +304,59 @@ export const de = {
     implemented: "Umgesetzt",
     not_applicable: "Nicht anwendbar",
   },
+  suggestions: {
+    description:
+      "Von der KI vorgeschlagene Mappings zwischen KRITIS-Dachgesetz und NIS2. Ein Vorschlag gilt erst, wenn Sie ihn annehmen.",
+    hint: "Die Einschätzung des Modells ist ein Hinweis, kein Beleg. Prüfen Sie die Begründung am Gesetzestext.",
+    target: "Ziel",
+    source: "Quelle",
+    nameSource: "Quelle: {{citation}}",
+    coverage: {
+      full: "Vollständige Abdeckung",
+      partial: "Teilweise Abdeckung",
+    },
+    confidence: "Einschätzung des Modells: {{value}}",
+    proposed: "KI-Vorschlag ({{model}}) vom {{date}}",
+    decided: {
+      approved: "Angenommen von {{name}} am {{date}}",
+      rejected: "Abgelehnt von {{name}} am {{date}}",
+    },
+    someone: "unbekannt",
+    approve: "Annehmen",
+    reject: "Ablehnen",
+    lists: {
+      pending: "Offen",
+      approved: "Angenommen",
+      rejected: "Abgelehnt",
+    },
+    empty: {
+      pending: "Keine offenen Vorschläge. Neue erscheinen hier, sobald die KI sie erstellt hat.",
+      approved: "Noch keine angenommenen Vorschläge.",
+      rejected: "Noch keine abgelehnten Vorschläge.",
+    },
+    confirm: {
+      approved: {
+        title: "Vorschlag annehmen?",
+        ok: "Annehmen",
+        body: "Danach gilt das Mapping {{source}} → {{target}} für Ihren Mandanten. Die Entscheidung wird im Aktivitätsprotokoll festgehalten und lässt sich hier nicht rückgängig machen.",
+      },
+      rejected: {
+        title: "Vorschlag ablehnen?",
+        ok: "Ablehnen",
+        body: "Das Mapping {{source}} → {{target}} wird nicht übernommen. Die Entscheidung wird im Aktivitätsprotokoll festgehalten und lässt sich hier nicht rückgängig machen.",
+      },
+      cancel: "Abbrechen",
+    },
+    announce: {
+      approved: "Vorschlag zu {{citation}} angenommen. Er steht jetzt unter „Angenommen“.",
+      rejected: "Vorschlag zu {{citation}} abgelehnt. Er steht jetzt unter „Abgelehnt“.",
+    },
+    errors: {
+      conflict:
+        "Dieser Vorschlag wurde bereits entschieden, vermutlich von einer anderen Person. Die Listen zeigen jetzt den aktuellen Stand.",
+      failed: "Die Entscheidung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    },
+  },
   patterns: {
     back: "Zurück",
     close: "Schließen",

@@ -1,0 +1,88 @@
+.grc-suggestions-hint {
+  margin: -8px 0 16px;
+}
+
+.grc-suggestions-alert {
+  margin-bottom: 16px;
+}
+
+.grc-suggestions {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+@media (min-width: 992px) {
+  .grc-suggestions {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.grc-suggestions-decided {
+  display: grid;
+  gap: 24px;
+}
+
+.grc-suggestion-list-title {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.grc-suggestion-items {
+  gap: 12px;
+}
+
+.grc-suggestion-items article:focus-visible {
+  border-radius: 14px;
+  outline: 3px solid var(--grc-primary);
+  outline-offset: 2px;
+}
+
+.grc-suggestion-frame {
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 14px;
+  background: var(--grc-surface);
+}
+
+.grc-suggestion-card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+
+/* The swipe card brings its own padding on phones. */
+.grc-swipe-content .grc-suggestion-card {
+  padding: 0;
+}
+
+.grc-suggestion-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.grc-suggestion-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.grc-suggestion-rationale {
+  margin: 0;
+}
+
+.grc-suggestion-card > .grc-meta {
+  margin: 0;
+}
+
+.grc-suggestion-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.grc-suggestion-pagination {
+  margin-top: 12px;
+}

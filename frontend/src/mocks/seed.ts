@@ -68,6 +68,15 @@ export type StoredRisk = Omit<
   treatments: Treatment[];
 };
 
+/** Names are joined in on read; the decision is only stored once it is taken. */
+export type StoredSuggestion = Omit<
+  MappingSuggestion,
+  "target" | "source" | "decided_by_id" | "decided_by_name" | "decided_at"
+> & {
+  decided_by_id?: string;
+  decided_at?: string;
+};
+
 export interface SeedData {
   tenant: Tenant;
   members: Member[];
@@ -76,7 +85,7 @@ export interface SeedData {
   scopes: StoredScope[];
   assets: Asset[];
   mappings: Mapping[];
-  mappingSuggestions: MappingSuggestion[];
+  mappingSuggestions: StoredSuggestion[];
   implementations: StoredImplementation[];
   evidence: Evidence[];
   hazards: Hazard[];

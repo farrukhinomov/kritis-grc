@@ -242,8 +242,8 @@ As a GRC Manager, I want to see how my measures change the risk picture.
 ### P-08 Mapping-suggestion review
 **Labels:** `module:frontend`, `module:compliance`, `type:feature`, `prio:must` · **Estimate:** 2 h · **Depends on:** P-02
 
-- [ ] A list of suggestions showing source → target, coverage, rationale and confidence.
-- [ ] Approve or reject. On approval the item moves into the accepted list. Phones use swipe actions.
+- [x] A list of suggestions showing source → target, coverage, rationale and confidence.
+- [x] Approve or reject. On approval the item moves into the accepted list. Phones use swipe actions.
 
 ### P-09 Applicability Check
 **Labels:** `module:frontend`, `type:feature`, `prio:should` · **Estimate:** 2 h · **Depends on:** P-02

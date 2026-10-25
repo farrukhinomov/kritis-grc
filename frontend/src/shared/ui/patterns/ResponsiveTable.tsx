@@ -18,6 +18,8 @@ export interface RowAction {
   label: string;
   icon: IconPreset;
   danger?: boolean;
+  /** Shown but unavailable, e.g. while another change is being saved. */
+  disabled?: boolean;
   onSelect: () => void;
 }
 
@@ -109,6 +111,7 @@ function RowActionsMenu({ actions }: { actions: RowAction[] }) {
           key: action.key,
           label: action.label,
           danger: action.danger ?? false,
+          disabled: action.disabled ?? false,
           icon: <AnimatedIcon preset={action.icon} />,
           onClick: action.onSelect,
         })),
@@ -126,7 +129,14 @@ function RowActionsMenu({ actions }: { actions: RowAction[] }) {
 const SWIPE_ACTION_WIDTH = 80;
 const settle = { duration: duration.base, ease: ease.standard };
 
-function SwipeableCard({ actions, children }: { actions: RowAction[]; children: ReactNode }) {
+/** A card that swipes left to reveal its actions, which its "Actions" menu offers too. */
+export function SwipeableCard({
+  actions,
+  children,
+}: {
+  actions: RowAction[];
+  children: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const x = useMotionValue(0);
   const revealed = actions.length * SWIPE_ACTION_WIDTH;
@@ -152,6 +162,7 @@ function SwipeableCard({ actions, children }: { actions: RowAction[]; children: 
               key={action.key}
               type="button"
               className="grc-swipe-action"
+              disabled={action.disabled ?? false}
               data-danger={action.danger ?? false}
               style={{ width: SWIPE_ACTION_WIDTH }}
               onClick={() => {
