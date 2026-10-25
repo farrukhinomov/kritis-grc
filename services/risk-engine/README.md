@@ -9,12 +9,12 @@ Requires [uv](https://docs.astral.sh/uv/). Run everything from this folder.
 | Task | Command |
 |---|---|
 | Install | `uv sync` |
-| Run locally | `APP_ENV=local uv run python -m risk_engine` (docs at `http://localhost:8080/docs`) |
-| Run with auto-reload | `APP_ENV=local uv run uvicorn risk_engine.main:create_app_from_env --factory --reload --port 8080` |
+| Run locally | `APP_ENV=local PYTHONPATH=src uv run python -m risk_engine` (docs at `http://localhost:8080/docs`) |
+| Run with auto-reload | `APP_ENV=local uv run uvicorn risk_engine.main:create_app_from_env --factory --reload --app-dir src --port 8080` |
 | Tests with coverage (≥ 80 % enforced) | `uv run pytest` |
 | Lint and format | `uv run ruff check . && uv run ruff format --check .` |
 | Type-check (strict) | `uv run mypy src tests` |
-| Export the OpenAPI schema | `uv run python -m risk_engine.export_openapi openapi.json` |
+| Export the OpenAPI schema | `PYTHONPATH=src uv run python -m risk_engine.export_openapi openapi.json` |
 | Container image | `docker build -t grc-risk-engine .` |
 
 ## Configuration
