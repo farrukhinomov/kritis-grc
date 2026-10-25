@@ -1,4 +1,4 @@
-import { Select } from "antd";
+import { Select, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router";
 
@@ -31,11 +31,14 @@ export function ShellHeader({ membership, wide }: { membership: Membership; wide
           {t(wide ? "app.prototypeBadge" : "app.prototypeBadgeShort")}
         </span>
       )}
-      {/* Says up front why no edit controls appear, instead of leaving users to wonder. */}
+      {/* Says up front why no edit controls appear, instead of leaving users to wonder.
+          A button, so keyboard and touch users can reach the explanation too. */}
       {readOnly && (
-        <span className="grc-shell-read-only-badge" title={t("shell.readOnlyHint")}>
-          {t("shell.readOnly")}
-        </span>
+        <Tooltip title={t("shell.readOnlyHint")} trigger={["hover", "focus"]}>
+          <button type="button" className="grc-shell-read-only-badge">
+            {t(wide ? "shell.readOnly" : "shell.readOnlyShort")}
+          </button>
+        </Tooltip>
       )}
       {wide && <LanguageSwitch />}
       <UserMenu role={membership.role} includeLanguage={!wide} showName={wide} />

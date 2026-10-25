@@ -7,6 +7,7 @@ export const de = {
     prototypeBadge: "Prototyp – Demodaten",
     prototypeBadgeShort: "Demo",
     openDemo: "Demo öffnen",
+    openApp: "Zur Anwendung",
   },
   nav: {
     main: "Hauptnavigation",
@@ -45,6 +46,7 @@ export const de = {
       description: "Dieser Mandant existiert nicht, oder Sie haben keinen Zugriff darauf.",
     },
     readOnly: "Nur Lesezugriff",
+    readOnlyShort: "Nur Lesen",
     readOnlyHint: "In diesem Mandanten können Sie als Auditor alles einsehen, aber nichts ändern.",
     placeholder: "Dieser Bereich wird im Prototyp ausgebaut.",
   },
@@ -75,6 +77,7 @@ export const de = {
       password: {
         label: "Passwort",
         required: "Bitte geben Sie Ihr Passwort ein.",
+        invalid: "Dieses Passwort wird nicht akzeptiert.",
       },
     },
     submit: "Mit E-Mail anmelden",

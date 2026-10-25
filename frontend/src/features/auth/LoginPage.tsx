@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router";
 
 import { type Credentials, demoLogin, login, sessionKey } from "@/shared/api/auth";
-import { ApiError } from "@/shared/api/client";
+import { ApiError, type FieldError } from "@/shared/api/client";
 import { RETURN_PARAM } from "@/shared/session/paths";
 import type { Role, Session } from "@/shared/session/session";
 
@@ -94,11 +94,22 @@ function DemoLogin() {
   );
 }
 
+const FORM_FIELDS: readonly string[] = ["email", "password"] satisfies (keyof Credentials)[];
+
+/** The server's field errors this form can show on a field; the rest need the general alert. */
+function fieldErrors(error: unknown): FieldError[] {
+  return error instanceof ApiError
+    ? error.errors.filter(({ field }) => FORM_FIELDS.includes(field))
+    : [];
+}
+
 function PasswordLogin() {
   const { t } = useTranslation();
   const [form] = Form.useForm<Credentials>();
   const signIn = useSignIn(login);
   const error = signIn.error;
+  const placed = fieldErrors(error);
+  const unplaced = error instanceof ApiError ? error.errors.length - placed.length : 0;
 
   return (
     <Form
@@ -110,19 +121,21 @@ function PasswordLogin() {
         signIn.mutate(credentials, {
           onError: (failure) => {
             // Field errors from the server land on their fields, like the local checks.
-            if (failure instanceof ApiError && failure.errors.length > 0) {
-              form.setFields(
-                failure.errors.map(({ field }) => ({
-                  name: field as keyof Credentials,
-                  errors: [t(`auth.fields.${field === "email" ? "email" : "password"}.required`)],
-                })),
-              );
-            }
+            form.setFields(
+              fieldErrors(failure).map(({ field, code }) => ({
+                name: field as keyof Credentials,
+                errors: [
+                  t(
+                    `auth.fields.${field === "email" ? "email" : "password"}.${code === "required" ? "required" : "invalid"}`,
+                  ),
+                ],
+              })),
+            );
           },
         });
       }}
     >
-      {error && !(error instanceof ApiError && error.errors.length > 0) && (
+      {error && (placed.length === 0 || unplaced > 0) && (
         <Alert
           type="error"
           showIcon

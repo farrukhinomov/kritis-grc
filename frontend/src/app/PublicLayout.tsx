@@ -36,6 +36,9 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
   );
 }
 
+/** Decided at build time, like the mock API itself. */
+const SHOWS_DEMO_DATA = import.meta.env.VITE_API_MOCKING === "enabled";
+
 /** Into the app: straight to the first Tenant when signed in, else to the login page. */
 function EntryButton() {
   const { t } = useTranslation();
@@ -47,7 +50,7 @@ function EntryButton() {
   if (first) {
     return (
       <Button type="primary" onClick={() => void navigate(`/t/${first.tenant.slug}`)}>
-        {t("app.openDemo")}
+        {t(SHOWS_DEMO_DATA ? "app.openDemo" : "app.openApp")}
       </Button>
     );
   }

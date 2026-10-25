@@ -191,7 +191,10 @@
 .grc-shell-read-only-badge {
   flex-shrink: 0;
   padding: 4px 10px;
+  border: 0;
   border-radius: 999px;
+  font-family: inherit;
+  cursor: help;
   background: var(--grc-status-info-bg);
   color: var(--grc-status-info-text);
   font-size: 12px;

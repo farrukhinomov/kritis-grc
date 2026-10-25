@@ -8,6 +8,7 @@ export const en: Translation = {
     prototypeBadge: "Prototype – demo data",
     prototypeBadgeShort: "Demo",
     openDemo: "Open demo",
+    openApp: "Open the app",
   },
   nav: {
     main: "Main navigation",
@@ -46,6 +47,7 @@ export const en: Translation = {
       description: "This tenant doesn't exist, or you don't have access to it.",
     },
     readOnly: "Read-only",
+    readOnlyShort: "Read-only",
     readOnlyHint: "As an Auditor in this tenant you can view everything but change nothing.",
     placeholder: "This area is being built out in the prototype.",
   },
@@ -76,6 +78,7 @@ export const en: Translation = {
       password: {
         label: "Password",
         required: "Please enter your password.",
+        invalid: "This password is not accepted.",
       },
     },
     submit: "Sign in with email",
