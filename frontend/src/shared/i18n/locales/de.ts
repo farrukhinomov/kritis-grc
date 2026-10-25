@@ -88,6 +88,7 @@ export const de = {
   },
   dashboard: {
     description: "Wo Ihre Organisation bei KRITIS-Dachgesetz und NIS2 steht.",
+    stale: "Nicht aktuell: die Aktualisierung ist fehlgeschlagen.",
     loadError: "Dieser Bereich konnte nicht geladen werden.",
     statuses: {
       open: "Offen",
@@ -108,13 +109,14 @@ export const de = {
     },
     deadlines: {
       title: "Fristen",
+      inDays_zero: "heute fällig",
       inDays_one: "in {{count}} Tag",
       inDays_other: "in {{count}} Tagen",
       overdue_one: "{{count}} Tag überfällig",
       overdue_other: "{{count}} Tage überfällig",
       projected: "prognostiziert",
       projectedHint:
-        "Berechnet aus der geplanten Registrierung. Verbindlich wird die Frist erst mit dem bestätigten Datum.",
+        "Prognostiziert: berechnet aus der geplanten Registrierung. Verbindlich werden die Fristen erst mit dem bestätigten Datum.",
       empty: "Keine kritische Anlage mit Registrierung erfasst.",
     },
     matrix: {

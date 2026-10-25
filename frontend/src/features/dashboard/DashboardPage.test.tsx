@@ -56,7 +56,7 @@ describe("the dashboard", () => {
     expect(deadlines.getAllByText(/^§ 12 KRITIS-DachG/)).not.toHaveLength(0);
   });
 
-  it("places every rated risk in the matrix", async () => {
+  it("places every rated risk in the matrix and names each cell's category", async () => {
     await openDashboard();
 
     const matrix = await widget("Restrisiko-Matrix").findByRole("table");
@@ -64,6 +64,15 @@ describe("the dashboard", () => {
       .getAllByRole("cell")
       .reduce((sum, cell) => sum + (Number.parseInt(cell.textContent, 10) || 0), 0);
     expect(total).toBe(SEED.risks.length);
+    expect(within(matrix).getAllByText("Kritisch")).toHaveLength(1);
+  });
+
+  it("explains what projected means in plain text, not only on hover", async () => {
+    await openDashboard();
+
+    expect(
+      await widget("Fristen").findByText(/^Prognostiziert: berechnet aus der geplanten/),
+    ).toBeVisible();
   });
 
   it("lists the five highest residual risks, highest first", async () => {
@@ -144,22 +153,45 @@ describe("each widget on its own", () => {
     expect(widget("Top-5-Risiken").getAllByRole("listitem")).toHaveLength(5);
   });
 
-  it("contains a rendering error to its own card", async () => {
-    // A response the widget can't render, as a broken deploy might send.
+  it("contains a rendering error to its own card and recovers on retry", async () => {
+    // A response the widget can't render, as a broken deploy might send it once.
     server.use(
-      http.get("/api/v1/tenants/:tenant/compliance-summary", () =>
-        HttpResponse.json({ items: [{ scope_id: "sc-nord", framework_id: "fw-kritisdachg" }] }),
+      http.get(
+        "/api/v1/tenants/:tenant/compliance-summary",
+        () => HttpResponse.json({ rows: [{ scope_id: "sc-nord", framework_id: "fw-x" }] }),
+        { once: true },
       ),
     );
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     await openDashboard();
 
+    const compliance = widget("Compliance je Framework und Anlage");
     expect(
-      await widget("Compliance je Framework und Anlage").findByText(
-        "Dieser Bereich konnte nicht angezeigt werden.",
-      ),
+      await compliance.findByText("Dieser Bereich konnte nicht angezeigt werden."),
     ).toBeVisible();
     expect(await widget("Fristen").findAllByText("prognostiziert")).toHaveLength(4);
+
+    await userEvent.click(compliance.getByRole("button", { name: "Erneut versuchen" }));
+
+    expect(
+      await compliance.findByRole("progressbar", { name: "Wasserwerk Nord · KRITIS-Dachgesetz" }),
+    ).toBeVisible();
+  });
+
+  it("keeps showing its data when a refresh fails, marked as not current", async () => {
+    const { client } = await openDashboard();
+    const activity = widget("Letzte Aktivitäten");
+    await activity.findAllByRole("listitem");
+    server.use(
+      http.get("/api/v1/tenants/:tenant/activity", () =>
+        problem(503, "service_unavailable", "Down."),
+      ),
+    );
+
+    await client.invalidateQueries();
+
+    expect(await activity.findByText(/Nicht aktuell/)).toBeVisible();
+    expect(activity.getAllByRole("listitem")).toHaveLength(5);
   });
 
   it("says when the risk engine hasn't rated the risks yet", async () => {

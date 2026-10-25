@@ -11,9 +11,12 @@ export function daysUntil(isoDate: string, now: Date = new Date()): number {
   return Math.round((due - today) / DAY_MS);
 }
 
-/** Share of the applicable Implementations that are fully implemented, in whole percent. */
+/**
+ * Share of the applicable Implementations that are fully implemented, in whole percent.
+ * Rounded down: 199 of 200 must never read as 100 %.
+ */
 export function implementedPercent(implemented: number, applicable: number): number {
-  return applicable === 0 ? 0 : Math.round((implemented / applicable) * 100);
+  return applicable === 0 ? 0 : Math.floor((implemented / applicable) * 100);
 }
 
 export function formatDate(isoDate: string, language: string): string {

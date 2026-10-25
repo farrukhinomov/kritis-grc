@@ -128,6 +128,14 @@ Each milestone gets one entry with four parts:
 - **Only "implemented" counts.** Counting partial work as half would make a facility look further along than an auditor would accept. Partial work is shown as its own segment of the bar.
 - **Unrated risks never sort as harmless.** Without a Residual Rating a risk goes to the end of the top-five list in inherent order, and the matrix says how many risks are still waiting.
 
+- **Review findings that were real defects**, each with a test:
+  - Numbers that go silently wrong past the seed's size: the matrix and the compliance summary were built from the first page of a list (25 or 100 items), and the activity and "my Implementations" widgets named people and Requirements from the first page of the member and Requirement lists. Both aggregates are now unpaged server objects, the activity entry carries `actor_name`, and the five Implementations look up their own Requirement and Scope.
+  - 199 of 200 implemented showed "100 %". The percentage now rounds down.
+  - A failed background refresh replaced good numbers with an error. The widget now keeps its data and says it is not current.
+  - "Try again" after a render error re-rendered the same cached data and failed forever. It now drops that card's queries first.
+  - The matrix category was color only, and the "projected" caveat lived in a hover title. Both are now written out.
+  - "in 0 Tagen" now reads "heute fällig"; an empty status filter is ignored as in Django; unrated risks sorting among rated ones has its own test.
+
 ### Changed
 - **Two layout bugs only a browser showed.** A `nowrap` in the "my Implementations" list made the page scroll sideways at 390 px and at 1440 px, and a generic table-cell rule hid the risk colors in the matrix. Both were found in headless screenshots, not in tests.
 

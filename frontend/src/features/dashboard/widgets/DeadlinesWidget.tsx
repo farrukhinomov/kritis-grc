@@ -37,40 +37,42 @@ export function DeadlinesWidget() {
           .toSorted((a, b) => a.due_date.localeCompare(b.due_date))
           .slice(0, SHOWN);
         return (
-          <ul className="grc-widget-list">
-            {deadlines.map((deadline) => {
-              const days = daysUntil(deadline.due_date);
-              return (
-                <li key={deadline.key} className="grc-deadline">
-                  <span className="grc-deadline-days" data-overdue={days < 0}>
-                    {days < 0 ? (
-                      t("dashboard.deadlines.overdue", { count: -days })
-                    ) : (
-                      <CountUp
-                        value={days}
-                        format={(value) => t("dashboard.deadlines.inDays", { count: value })}
-                      />
-                    )}
-                  </span>
-                  <span className="grc-deadline-detail">
-                    <strong>{deadline.citation} KRITIS-DachG</strong> · {deadline.facility}
-                    <br />
-                    {formatDate(deadline.due_date, i18n.language)}{" "}
-                    {/* Planned Registrations only project deadlines; saying so prevents
-                        anyone from treating the date as legally fixed. */}
-                    {!deadline.binding && (
-                      <Tag
-                        className="grc-deadline-projected"
-                        title={t("dashboard.deadlines.projectedHint")}
-                      >
-                        {t("dashboard.deadlines.projected")}
-                      </Tag>
-                    )}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+          <>
+            <ul className="grc-widget-list">
+              {deadlines.map((deadline) => {
+                const days = daysUntil(deadline.due_date);
+                return (
+                  <li key={deadline.key} className="grc-deadline">
+                    <span className="grc-deadline-days" data-overdue={days < 0}>
+                      {days < 0 ? (
+                        t("dashboard.deadlines.overdue", { count: -days })
+                      ) : (
+                        <CountUp
+                          value={days}
+                          format={(value) => t("dashboard.deadlines.inDays", { count: value })}
+                        />
+                      )}
+                    </span>
+                    <span className="grc-deadline-detail">
+                      <strong>{deadline.citation} KRITIS-DachG</strong> · {deadline.facility}
+                      <br />
+                      {formatDate(deadline.due_date, i18n.language)}{" "}
+                      {!deadline.binding && (
+                        <Tag className="grc-deadline-projected">
+                          {t("dashboard.deadlines.projected")}
+                        </Tag>
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+            {/* Planned Registrations only project deadlines. The explanation is written out,
+              not hidden in a tooltip, so nobody takes the date as legally fixed. */}
+            {deadlines.some((deadline) => !deadline.binding) && (
+              <p className="grc-widget-note">{t("dashboard.deadlines.projectedHint")}</p>
+            )}
+          </>
         );
       }}
     </WidgetContent>

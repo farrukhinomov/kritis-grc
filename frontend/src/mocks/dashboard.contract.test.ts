@@ -6,8 +6,10 @@ import {
   implementationsQuery,
   updateImplementation,
 } from "@/shared/api/compliance";
-import { risksQuery } from "@/shared/api/risk";
+import { activityQuery } from "@/shared/api/activity";
+import { riskMatrixQuery, risksQuery } from "@/shared/api/risk";
 
+import { SEED } from "./seed";
 import { setSimulation } from "./simulation";
 
 /** The reads the dashboard needs, exercised through the real typed client. */
@@ -20,9 +22,9 @@ describe("compliance summary", () => {
   it("counts Implementations per Scope and Framework by status", async () => {
     const summary = await client().query(complianceSummaryQuery(DEMO));
 
-    const pairs = summary.items.map((row) => `${row.scope_id}/${row.framework_id}`);
+    const pairs = summary.rows.map((row) => `${row.scope_id}/${row.framework_id}`);
     expect(new Set(pairs).size).toBe(pairs.length);
-    const nord = summary.items.filter((row) => row.scope_id === "sc-nord");
+    const nord = summary.rows.filter((row) => row.scope_id === "sc-nord");
     const total = (status: "open" | "partial" | "implemented" | "not_applicable") =>
       nord.reduce((sum, row) => sum + row.counts[status], 0);
     expect([
@@ -42,17 +44,56 @@ describe("compliance summary", () => {
     await updateImplementation(DEMO, open!.id, open!.version, { status: "implemented" });
 
     const after = await client().query(complianceSummaryQuery(DEMO));
-    const implemented = (rows: typeof before.items) =>
+    const implemented = (rows: typeof before.rows) =>
       rows
         .filter((row) => row.scope_id === "sc-nord")
         .reduce((sum, row) => sum + row.counts.implemented, 0);
-    expect(implemented(after.items)).toBe(implemented(before.items) + 1);
+    expect(implemented(after.rows)).toBe(implemented(before.rows) + 1);
   });
 
   it("is empty for a Tenant without Implementations", async () => {
     const summary = await client().query(complianceSummaryQuery("wasserverband-musterland"));
 
-    expect(summary.items).toEqual([]);
+    expect(summary.rows).toEqual([]);
+  });
+
+  it("is one aggregate with names, never a page that could cut rows off", async () => {
+    const summary = await client().query(complianceSummaryQuery(DEMO));
+
+    expect(summary).not.toHaveProperty("page");
+    expect(summary.rows.find((row) => row.scope_id === "sc-nord")).toMatchObject({
+      scope_name: "Wasserwerk Nord",
+      scope_kind: "critical_facility",
+      framework_name: "KRITIS-Dachgesetz",
+    });
+  });
+});
+
+describe("risk matrix", () => {
+  it("counts every risk by its residual cell", async () => {
+    const matrix = await client().query(riskMatrixQuery(DEMO));
+
+    expect(matrix.cells.reduce((sum, cell) => sum + cell.count, 0)).toBe(SEED.risks.length);
+    expect(matrix).toMatchObject({ total: SEED.risks.length, pending: 0 });
+    expect(matrix.cells.find((cell) => cell.likelihood === 3 && cell.impact === 3)).toMatchObject({
+      worst_category: "critical",
+    });
+  });
+
+  it("counts risks the engine hasn't rated as pending, not as low", async () => {
+    setSimulation({ riskEngineDown: true });
+
+    const matrix = await client().query(riskMatrixQuery(DEMO));
+
+    expect(matrix).toEqual({ cells: [], pending: SEED.risks.length, total: SEED.risks.length });
+  });
+});
+
+describe("activity", () => {
+  it("names the actor, so clients needn't page through every member", async () => {
+    const activity = await client().infiniteQuery(activityQuery(DEMO, { limit: 1 }));
+
+    expect(activity.pages[0]?.items[0]).toMatchObject({ actor_name: "Tobias Wolff" });
   });
 });
 
@@ -67,6 +108,14 @@ describe("implementations of one owner", () => {
     expect(page.items.every((item) => item.status === "open" || item.status === "partial")).toBe(
       true,
     );
+  });
+
+  it("ignore an empty status, as Django filters do", async () => {
+    const all = await client().query(implementationsQuery(DEMO, { limit: 1 }));
+
+    const page = await client().query(implementationsQuery(DEMO, { status: [], limit: 1 }));
+
+    expect(page.page.total).toBe(all.page.total);
   });
 
   it("reject an unknown status in the list", async () => {

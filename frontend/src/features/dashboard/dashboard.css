@@ -70,6 +70,12 @@ time.grc-widget-muted {
   white-space: nowrap;
 }
 
+.grc-widget-stale {
+  margin: 0 0 12px;
+  color: var(--grc-status-warning-text);
+  font-size: 13px;
+}
+
 .grc-widget-note {
   margin: 12px 0 0;
   color: var(--grc-text-secondary);
@@ -220,10 +226,18 @@ time.grc-widget-muted {
 }
 
 .grc-risk-matrix td {
-  height: 40px;
+  height: 44px;
+  padding: 2px;
   border-radius: 8px;
   font-weight: 700;
   text-align: center;
+}
+
+.grc-risk-matrix-category {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 /* Cells without risks stay neutral; occupied ones carry their category's class. */

@@ -107,8 +107,10 @@ describe("a signed-in session", () => {
   });
 
   it("treats a session that already expired as signed out", async () => {
-    const { router } = renderRoute("/t/muster-stadtwerke/dashboard");
-    await screen.findByRole("heading", { level: 1, name: "Übersicht" });
+    // A screen without data requests: on the dashboard, the widgets' 401s would already
+    // have signed the user out before the menu opens.
+    const { router } = renderRoute("/t/muster-stadtwerke/risks");
+    await screen.findByRole("heading", { level: 1, name: "Risiken" });
     setMockSession(null);
     server.use(http.post("/api/v1/auth/logout", () => notAuthenticated()));
 

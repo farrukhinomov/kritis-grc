@@ -89,6 +89,7 @@ export const en: Translation = {
   },
   dashboard: {
     description: "Where your organization stands on the KRITIS-Dachgesetz and NIS2.",
+    stale: "Not current: the refresh failed.",
     loadError: "This area could not be loaded.",
     statuses: {
       open: "Open",
@@ -109,13 +110,14 @@ export const en: Translation = {
     },
     deadlines: {
       title: "Deadlines",
+      inDays_zero: "due today",
       inDays_one: "in {{count}} day",
       inDays_other: "in {{count}} days",
       overdue_one: "{{count}} day overdue",
       overdue_other: "{{count}} days overdue",
       projected: "projected",
       projectedHint:
-        "Calculated from the planned registration. The deadline becomes binding only with the confirmed date.",
+        "Projected: calculated from the planned registration. The deadlines become binding only with the confirmed date.",
       empty: "No critical facility with a registration recorded.",
     },
     matrix: {

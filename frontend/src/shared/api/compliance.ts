@@ -59,7 +59,9 @@ export const implementationsQuery = (tenant: string, filter: ImplementationFilte
     queryFn: ({ signal }) => {
       const { status, ...rest } = filter;
       // A comma-separated list, the form Django filters accept for "any of".
-      const query = { ...rest, status: typeof status === "string" ? status : status?.join(",") };
+      // An empty list means no status filter, as for Django; "status=" would match nothing.
+      const statuses = typeof status === "string" ? status : status?.join(",");
+      const query = { ...rest, status: statuses === "" ? undefined : statuses };
       return apiGet<Page<Implementation>>(tenantPath(tenant, ["implementations"], query), signal);
     },
   });
@@ -69,7 +71,7 @@ export const complianceSummaryQuery = (tenant: string) =>
   queryOptions({
     queryKey: resourceKey(tenant, "implementations", "summary"),
     queryFn: ({ signal }) =>
-      apiGet<Page<ComplianceSummary>>(tenantPath(tenant, ["compliance-summary"]), signal),
+      apiGet<ComplianceSummary>(tenantPath(tenant, ["compliance-summary"]), signal),
   });
 
 export const implementationQuery = (tenant: string, id: string) =>
