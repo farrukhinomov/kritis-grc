@@ -1,0 +1,41 @@
+name: Bug report
+description: Something behaves differently from what the docs or acceptance criteria say.
+title: "[Bug] "
+labels: ["type:bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Security issues must not be reported here.** Use "Report a vulnerability" under the repository's Security tab instead.
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should have happened
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Log in as …
+        2. Open …
+        3. …
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: demo / local · browser · device width · Theme · language
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, request ID, screenshots
+      description: Include the request ID from the response headers if you have it. Never paste secrets or personal data.

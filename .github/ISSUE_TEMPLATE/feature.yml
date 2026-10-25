@@ -1,0 +1,50 @@
+name: Feature / user story
+description: A slice of user-visible behavior that fits into one PR.
+title: "[Feature] "
+labels: ["type:feature"]
+body:
+  - type: textarea
+    id: story
+    attributes:
+      label: User story
+      description: Use the terms from GLOSSARY.md.
+      placeholder: As a <role>, I want <capability>, so that <benefit>.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Testable checkboxes. Each one should map to at least one test.
+      placeholder: |
+        - [ ] …
+        - [ ] …
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      multiple: true
+      options:
+        - organization
+        - assets
+        - compliance
+        - risk
+        - activity
+        - demo
+        - risk-engine
+        - frontend
+        - infra
+        - ci
+        - docs
+    validations:
+      required: true
+  - type: input
+    id: estimate
+    attributes:
+      label: Estimate (hours)
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes, dependencies, out of scope

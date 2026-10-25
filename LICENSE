@@ -1,0 +1,32 @@
+Copyright (c) 2026 Farrukh Inomov. All rights reserved.
+
+PROPRIETARY AND CONFIDENTIAL SOFTWARE — SOURCE AVAILABLE FOR EVALUATION ONLY
+
+This repository and all files in it (the "Software") are the exclusive property
+of the copyright holder. The source code is published solely so that it can be
+read and evaluated, for example by prospective employers or business partners.
+
+You MAY:
+  - view and read the Software, including through the hosting platform's
+    interface, and clone it for the sole purpose of evaluating it.
+
+You MAY NOT, without prior written permission from the copyright holder:
+  - use, run, deploy or host the Software, in whole or in part, for any
+    purpose other than evaluation, including any commercial purpose;
+  - copy, modify, merge, publish, distribute, sublicense or sell copies of
+    the Software or any derivative work;
+  - offer the Software, or any service based on it, to third parties;
+  - use the Software, or any part of it, to train machine-learning models.
+
+No license or other right is granted by implication, estoppel or otherwise,
+except as expressly stated above. Third-party components included in the
+Software remain subject to their own licenses.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
+
+For permission requests, contact the copyright holder through the repository
+owner's GitHub profile.

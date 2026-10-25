@@ -1,0 +1,20 @@
+# Source of truth for repository labels. Applied with scripts/sync-labels.sh.
+- { name: "type:feature", color: "1f6feb", description: "User-visible behavior" }
+- { name: "type:bug", color: "d73a4a", description: "Behaves differently from what is specified" }
+- { name: "type:chore", color: "8b949e", description: "Tooling, setup, maintenance" }
+- { name: "type:test", color: "a371f7", description: "Tests only" }
+- { name: "type:docs", color: "0e8a16", description: "Documentation only" }
+- { name: "prio:must", color: "b60205", description: "Required for the milestone" }
+- { name: "prio:should", color: "fbca04", description: "Planned, can slip to the next milestone" }
+- { name: "module:organization", color: "c5def5", description: "Tenants, Scopes, Memberships" }
+- { name: "module:assets", color: "c5def5", description: "Assets and Critical Facilities" }
+- { name: "module:compliance", color: "c5def5", description: "Frameworks, Requirements, Implementations, Evidence, Mappings" }
+- { name: "module:risk", color: "c5def5", description: "Hazards, Risks, Treatments, Risk Assessments" }
+- { name: "module:activity", color: "c5def5", description: "Activity Log" }
+- { name: "module:demo", color: "c5def5", description: "Demo Tenant, seed and reset" }
+- { name: "module:backend", color: "bfd4f2", description: "Django project-wide" }
+- { name: "module:risk-engine", color: "bfd4f2", description: "FastAPI service" }
+- { name: "module:frontend", color: "bfd4f2", description: "React SPA" }
+- { name: "infra", color: "5319e7", description: "Cloud, compose, infrastructure as code" }
+- { name: "ci", color: "5319e7", description: "CI/CD workflows" }
+- { name: "docs", color: "0e8a16", description: "GLOSSARY, ADRs, conventions, plans" }
