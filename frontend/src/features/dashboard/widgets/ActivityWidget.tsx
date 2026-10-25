@@ -2,11 +2,11 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
 import { activityQuery } from "@/shared/api/activity";
+import { combine } from "@/shared/lib/combineQueries";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
+import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 
 import { formatRelative } from "../format";
-import { combine } from "../combine";
-import { WidgetContent } from "../Widget";
 
 const SHOWN = 5;
 
@@ -16,7 +16,7 @@ export function ActivityWidget() {
   const query = combine([useInfiniteQuery(activityQuery(tenant, { limit: SHOWN }))] as const);
 
   return (
-    <WidgetContent
+    <QueryContent
       query={query}
       rows={5}
       isEmpty={([activity]) => (activity.pages[0]?.items.length ?? 0) === 0}
@@ -42,6 +42,6 @@ export function ActivityWidget() {
           })}
         </ul>
       )}
-    </WidgetContent>
+    </QueryContent>
   );
 }

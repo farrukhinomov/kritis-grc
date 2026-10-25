@@ -212,9 +212,9 @@ As a GRC Manager, I want to see where I stand at a glance.
 
 As a GRC Manager, I want to drill from a paragraph to a single Implementation without losing my place.
 
-- [ ] Framework and Critical Facility selectors. Columns run paragraph → Requirement → Implementation, each with a status badge and counts, and slide in on drill-down.
-- [ ] Requirements show their legal citation, and a "Pending Legal Detail" marker where applicable.
-- [ ] Arrow-key navigation between and within columns. On phones the columns become stacked screens with a back gesture.
+- [x] Framework and Critical Facility selectors. Columns run paragraph → Requirement → Implementation, each with a status badge and counts, and slide in on drill-down.
+- [x] Requirements show their legal citation, and a "Pending Legal Detail" marker where applicable.
+- [x] Arrow-key navigation between and within columns. On phones the columns become stacked screens with a back gesture.
 
 ### P-06 Implementation drawer
 **Labels:** `module:frontend`, `module:compliance`, `type:feature`, `prio:must` · **Estimate:** 4 h · **Depends on:** P-05

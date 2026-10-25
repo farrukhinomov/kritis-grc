@@ -90,14 +90,6 @@ export const de = {
   },
   dashboard: {
     description: "Wo Ihre Organisation bei KRITIS-Dachgesetz und NIS2 steht.",
-    stale: "Nicht aktuell: die Aktualisierung ist fehlgeschlagen.",
-    loadError: "Dieser Bereich konnte nicht geladen werden.",
-    statuses: {
-      open: "Offen",
-      partial: "Teilweise umgesetzt",
-      implemented: "Umgesetzt",
-      not_applicable: "Nicht anwendbar",
-    },
     riskCategories: {
       low: "Niedrig",
       medium: "Mittel",
@@ -158,12 +150,48 @@ export const de = {
       },
     },
   },
+  compliance: {
+    description: "Vom Paragraphen bis zur einzelnen Umsetzung, je Framework und Geltungsbereich.",
+    framework: "Framework",
+    scope: "Geltungsbereich",
+    drill: "Compliance-Cockpit",
+    columns: {
+      paragraphs: "Paragraphen",
+      requirements: "Anforderungen",
+      implementation: "Umsetzung",
+    },
+    summary:
+      "{{requirements}} Anforderungen · {{implemented}} umgesetzt · {{partial}} teilweise · {{open}} offen",
+    implementedOf: "{{implemented}} von {{total}} umgesetzt",
+    pendingLegalDetail: "Rechtsdetail ausstehend",
+    status: "Status",
+    owner: "Verantwortlich",
+    unassigned: "Nicht zugewiesen",
+    due: "Fällig",
+    noDue: "Kein Termin",
+    note: "Notiz",
+    updated: "Zuletzt geändert",
+    statuteText: "Gesetzestext",
+    noImplementation: "Für diesen Geltungsbereich ist keine Umsetzung erfasst.",
+    empty: "Noch keine Umsetzungen erfasst.",
+    emptyParagraphs:
+      "Für diesen Geltungsbereich sind in diesem Framework keine Umsetzungen erfasst.",
+    emptyRequirements: "Dieser Paragraph enthält keine Anforderungen.",
+  },
+  implementationStatus: {
+    open: "Offen",
+    partial: "Teilweise umgesetzt",
+    implemented: "Umgesetzt",
+    not_applicable: "Nicht anwendbar",
+  },
   patterns: {
     back: "Zurück",
     close: "Schließen",
     expandSheet: "Auf volle Höhe vergrößern",
     shrinkSheet: "Auf halbe Höhe verkleinern",
     actions: "Aktionen",
+    loadError: "Dieser Bereich konnte nicht geladen werden.",
+    stale: "Nicht aktuell: die Aktualisierung ist fehlgeschlagen.",
     loading: "Wird geladen …",
   },
   errors: {

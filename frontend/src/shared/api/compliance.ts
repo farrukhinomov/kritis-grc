@@ -4,6 +4,7 @@ import { apiGet, apiRequest, tenantPath } from "./client";
 import { resourceKey } from "./keys";
 import type {
   ComplianceSummary,
+  ParagraphSummary,
   Evidence,
   Framework,
   Implementation,
@@ -48,6 +49,8 @@ export interface ImplementationFilter extends PageParams {
   framework_version?: string;
   requirement?: string;
   owner?: string;
+  /** The paragraph of the Implementation's Requirement, such as "§ 13". */
+  paragraph?: string;
   /** Several statuses match any of them. */
   status?: ImplementationStatus | readonly ImplementationStatus[];
   ordering?: "due_date" | "-due_date" | "updated_at" | "-updated_at";
@@ -64,6 +67,22 @@ export const implementationsQuery = (tenant: string, filter: ImplementationFilte
       const query = { ...rest, status: statuses === "" ? undefined : statuses };
       return apiGet<Page<Implementation>>(tenantPath(tenant, ["implementations"], query), signal);
     },
+  });
+
+export interface ParagraphFilter {
+  framework_version: string;
+  scope: string;
+}
+
+/** Paragraphs in statute order with their counts; the cockpit's first column. */
+export const complianceParagraphsQuery = (tenant: string, filter: ParagraphFilter) =>
+  queryOptions({
+    queryKey: resourceKey(tenant, "implementations", "paragraphs", filter),
+    queryFn: ({ signal }) =>
+      apiGet<ParagraphSummary>(
+        tenantPath(tenant, ["compliance-paragraphs"], { ...filter }),
+        signal,
+      ),
   });
 
 /** Counted by the server, so the dashboard never pages through every Implementation. */

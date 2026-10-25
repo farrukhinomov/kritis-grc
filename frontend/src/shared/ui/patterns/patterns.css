@@ -88,6 +88,14 @@
   font-size: 18px;
 }
 
+/* ---------- Server data ---------- */
+
+.grc-query-stale {
+  margin: 0 0 12px;
+  color: var(--grc-status-warning-text);
+  font-size: 13px;
+}
+
 /* ---------- Skeletons ---------- */
 
 .grc-skeleton-page,

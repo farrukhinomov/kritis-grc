@@ -1,0 +1,122 @@
+.grc-cockpit-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.grc-cockpit-select {
+  min-width: 220px;
+}
+
+@media (max-width: 767.98px) {
+  .grc-cockpit-select {
+    flex: 1 1 100%;
+  }
+}
+
+.grc-cockpit-summary {
+  margin: 0 0 12px;
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+}
+
+.grc-drill-list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grc-drill-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.grc-drill-item:hover {
+  background: var(--grc-surface-sunken);
+}
+
+/* The open path stays marked in every column, so the user always sees where they are. */
+.grc-drill-item[aria-current="true"] {
+  background: var(--grc-surface-sunken);
+  box-shadow: inset 3px 0 0 var(--grc-primary);
+  font-weight: 500;
+}
+
+.grc-drill-item-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.grc-drill-item-meta {
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+}
+
+.grc-pending-legal-detail {
+  justify-self: start;
+  margin-top: 2px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--grc-status-info-bg);
+  color: var(--grc-status-info-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.grc-cockpit-detail {
+  display: grid;
+  gap: 16px;
+}
+
+.grc-cockpit-detail .grc-cockpit-detail-title {
+  margin: 0;
+}
+
+.grc-cockpit-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.grc-cockpit-facts dt {
+  color: var(--grc-text-secondary);
+}
+
+.grc-cockpit-facts dd {
+  margin: 0;
+}
+
+.grc-cockpit-detail .grc-cockpit-statute-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.grc-cockpit-detail .grc-cockpit-summary-en {
+  margin: 0;
+  color: var(--grc-text-secondary);
+}
+
+.grc-cockpit-statute {
+  margin: 0;
+  padding: 12px 16px;
+  border-inline-start: 3px solid var(--grc-border-subtle);
+  background: var(--grc-surface-sunken);
+  white-space: pre-line;
+}

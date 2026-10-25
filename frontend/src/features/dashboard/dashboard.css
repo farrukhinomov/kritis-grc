@@ -70,12 +70,6 @@ time.grc-widget-muted {
   white-space: nowrap;
 }
 
-.grc-widget-stale {
-  margin: 0 0 12px;
-  color: var(--grc-status-warning-text);
-  font-size: 13px;
-}
-
 .grc-widget-note {
   margin: 12px 0 0;
   color: var(--grc-text-secondary);

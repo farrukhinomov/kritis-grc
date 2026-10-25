@@ -4,13 +4,13 @@ import { useTranslation } from "react-i18next";
 
 import { complianceSummaryQuery } from "@/shared/api/compliance";
 import type { ComplianceSummaryRow } from "@/shared/api/types";
+import { combine } from "@/shared/lib/combineQueries";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
 import { duration, ease } from "@/shared/theme/motion";
+import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 
-import { combine } from "../combine";
 import { CountUp } from "../CountUp";
 import { implementedPercent } from "../format";
-import { WidgetContent } from "../Widget";
 
 /** One block per Scope: Critical Facilities first, as the KRITIS duties attach to them. */
 function byScope(rows: ComplianceSummaryRow[]) {
@@ -30,7 +30,7 @@ export function ComplianceWidget() {
   const query = combine([useQuery(complianceSummaryQuery(tenant))] as const);
 
   return (
-    <WidgetContent
+    <QueryContent
       query={query}
       rows={6}
       isEmpty={([summary]) => summary.rows.length === 0}
@@ -48,7 +48,7 @@ export function ComplianceWidget() {
           ))}
         </div>
       )}
-    </WidgetContent>
+    </QueryContent>
   );
 }
 

@@ -1,15 +1,15 @@
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { Tag } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { implementationsQuery, requirementQuery } from "@/shared/api/compliance";
 import { scopeQuery } from "@/shared/api/organization";
 import type { Implementation, Requirement, Scope } from "@/shared/api/types";
+import { combine } from "@/shared/lib/combineQueries";
 import { useCurrentMembership, useSession } from "@/shared/session/sessionContext";
+import { QueryContent } from "@/shared/ui/patterns/QueryContent";
+import { StatusBadge } from "@/shared/ui/StatusBadge/StatusBadge";
 
-import { combine } from "../combine";
 import { formatDate } from "../format";
-import { WidgetContent } from "../Widget";
 
 const SHOWN = 5;
 
@@ -29,7 +29,7 @@ export function MyImplementationsWidget() {
   ] as const);
 
   return (
-    <WidgetContent
+    <QueryContent
       query={query}
       rows={5}
       isEmpty={([implementations]) => implementations.items.length === 0}
@@ -48,7 +48,7 @@ export function MyImplementationsWidget() {
           )}
         </>
       )}
-    </WidgetContent>
+    </QueryContent>
   );
 }
 
@@ -113,7 +113,7 @@ function ImplementationRow({
             ` · ${t("dashboard.mine.due", { date: formatDate(implementation.due_date, i18n.language) })}`}
         </span>
       </span>
-      <Tag>{t(`dashboard.statuses.${implementation.status}`)}</Tag>
+      <StatusBadge status={implementation.status} />
     </li>
   );
 }

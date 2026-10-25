@@ -3,12 +3,12 @@ import { Tag } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { scopesQuery } from "@/shared/api/organization";
+import { combine } from "@/shared/lib/combineQueries";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
+import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 
 import { CountUp } from "../CountUp";
 import { daysUntil, formatDate } from "../format";
-import { combine } from "../combine";
-import { WidgetContent } from "../Widget";
 
 /** Enough to see what's next for both facilities without turning into a calendar. */
 const SHOWN = 4;
@@ -19,7 +19,7 @@ export function DeadlinesWidget() {
   const query = combine([useQuery(scopesQuery(tenant, { kind: "critical_facility" }))] as const);
 
   return (
-    <WidgetContent
+    <QueryContent
       query={query}
       rows={4}
       isEmpty={([scopes]) => !scopes.items.some((scope) => scope.critical_facility)}
@@ -75,6 +75,6 @@ export function DeadlinesWidget() {
           </>
         );
       }}
-    </WidgetContent>
+    </QueryContent>
   );
 }

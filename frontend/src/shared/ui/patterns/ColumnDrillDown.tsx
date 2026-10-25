@@ -72,14 +72,21 @@ function StackedColumns({ label, columns, onBack }: ColumnDrillDownProps) {
     setPreviousDepth(depth);
   }
   const titleId = `${headingId}-${String(depth)}`;
-  useFocusTitleOnDepthChange(depth, titleId);
+  const interacted = useFocusTitleOnDepthChange(depth, titleId);
 
   if (!current) {
     return null;
   }
 
   return (
-    <div className="grc-drill-stack" role="group" aria-label={label}>
+    // Capturing marks that the next level change was the user's doing, not data loading.
+    <div
+      className="grc-drill-stack"
+      role="group"
+      aria-label={label}
+      onClickCapture={interacted}
+      onKeyDownCapture={interacted}
+    >
       <AnimatePresence mode="popLayout" initial={false} custom={direction}>
         <m.section
           key={current.key}
@@ -111,22 +118,33 @@ function StackedColumns({ label, columns, onBack }: ColumnDrillDownProps) {
 /**
  * Drilling in or back replaces the screen, and the button that was used disappears with
  * it. Focus moves to the new level's title, so keyboard and screen reader users continue
- * there instead of at the top of the page. The first render is left alone.
+ * there instead of at the top of the page. Only a change the user caused moves focus:
+ * levels that appear while a deep link loads must not pull focus away from the page.
+ * Returns the handler that records such a user action.
  */
 function useFocusTitleOnDepthChange(depth: number, titleId: string) {
   const previousDepth = useRef(depth);
+  const userActed = useRef(false);
 
   useEffect(() => {
     if (previousDepth.current === depth) {
       return;
     }
     previousDepth.current = depth;
+    if (!userActed.current) {
+      return;
+    }
+    userActed.current = false;
     const title = document.getElementById(titleId);
     if (title) {
       title.tabIndex = -1;
       title.focus();
     }
   }, [depth, titleId]);
+
+  return () => {
+    userActed.current = true;
+  };
 }
 
 function ColumnTitle({ id, title }: { id: string; title: string }) {
