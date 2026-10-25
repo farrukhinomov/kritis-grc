@@ -1,6 +1,6 @@
 import type { ActivityEntry, Evidence } from "@/shared/api/types";
-import { DEMO_SESSION } from "@/shared/session/session";
 
+import { DEMO_ACCOUNTS, SHOWCASE_TENANTS } from "./accounts";
 import { SEED, type SeedData } from "./seed";
 
 interface StoredResponse {
@@ -36,18 +36,14 @@ function empty(slug: string, name: string, theme: SeedData["tenant"]["theme"]): 
 
 /**
  * Back to the fixtures, like the nightly reset of the Demo Tenant. The Demo Tenant gets
- * the full seed; the other Tenants of the demo session exist with the shared catalogues
- * (Frameworks, Platform Mappings, Hazards) but none of their own data, which shows the
- * empty states.
+ * the full seed; the showcase Tenants exist with the shared catalogues (Frameworks,
+ * Platform Mappings, Hazards) but none of their own data, which shows the empty states.
  */
 export function resetDb(): void {
   tenants.clear();
-  for (const { tenant } of DEMO_SESSION.memberships) {
-    const data =
-      tenant.slug === SEED.tenant.slug
-        ? structuredClone(SEED)
-        : structuredClone(empty(tenant.slug, tenant.name, tenant.theme));
-    tenants.set(tenant.slug, { ...data, idempotency: new Map() });
+  tenants.set(SEED.tenant.slug, { ...structuredClone(SEED), idempotency: new Map() });
+  for (const { slug, name, theme } of SHOWCASE_TENANTS) {
+    tenants.set(slug, { ...structuredClone(empty(slug, name, theme)), idempotency: new Map() });
   }
 }
 
@@ -55,8 +51,11 @@ export function tenantData(slug: string): TenantData | undefined {
   return tenants.get(slug);
 }
 
-/** The signed-in user, who performs every write in the mock. */
-export const ACTOR_ID = DEMO_SESSION.user.id;
+/**
+ * Who performs the mock's writes. Only GRC Managers may write, and the demo signs in as
+ * one of them, so this stays fixed rather than following the session.
+ */
+export const ACTOR_ID = DEMO_ACCOUNTS.grc_manager;
 
 let sequence = 0;
 

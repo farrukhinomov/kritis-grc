@@ -2,7 +2,7 @@ import { Select } from "antd";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router";
 
-import { useSession } from "@/shared/session/sessionContext";
+import { useCan, useSession } from "@/shared/session/sessionContext";
 import type { Membership } from "@/shared/session/session";
 import { AnimatedIcon } from "@/shared/ui/AnimatedIcon/AnimatedIcon";
 import { LanguageSwitch } from "@/shared/ui/LanguageSwitch";
@@ -15,6 +15,7 @@ const SHOWS_DEMO_DATA = import.meta.env.VITE_API_MOCKING === "enabled";
 
 export function ShellHeader({ membership, wide }: { membership: Membership; wide: boolean }) {
   const { t } = useTranslation();
+  const readOnly = !useCan("change");
 
   return (
     <header className="grc-shell-header">
@@ -28,6 +29,12 @@ export function ShellHeader({ membership, wide }: { membership: Membership; wide
       {SHOWS_DEMO_DATA && (
         <span className="grc-shell-prototype-badge">
           {t(wide ? "app.prototypeBadge" : "app.prototypeBadgeShort")}
+        </span>
+      )}
+      {/* Says up front why no edit controls appear, instead of leaving users to wonder. */}
+      {readOnly && (
+        <span className="grc-shell-read-only-badge" title={t("shell.readOnlyHint")}>
+          {t("shell.readOnly")}
         </span>
       )}
       {wide && <LanguageSwitch />}

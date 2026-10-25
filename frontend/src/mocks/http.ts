@@ -3,11 +3,16 @@ import { delay, http, HttpResponse, type PathParams } from "msw";
 import type { FieldError } from "@/shared/api/client";
 import type { Page } from "@/shared/api/types";
 
+import { can, type Permission } from "@/shared/session/permissions";
+
+import { currentSession } from "./accounts";
 import { type TenantData, tenantData } from "./db";
 import { getSimulation, LATENCIES } from "./simulation";
 
 const TITLES: Record<number, string> = {
   400: "Bad Request",
+  401: "Unauthorized",
+  403: "Forbidden",
   404: "Not Found",
   409: "Conflict",
   412: "Precondition Failed",
@@ -99,24 +104,39 @@ function stringParams(params: PathParams): Record<string, string> {
   );
 }
 
+export const notAuthenticated = () =>
+  problem(401, "not_authenticated", "Sign in to use this endpoint.");
+
 /**
  * A route under `/api/v1/tenants/:tenant`. A Tenant without a Membership answers 404,
  * exactly like one that doesn't exist, so other Tenants' existence is never revealed.
+ * Reads need `view`; every other method needs `change` unless the route says otherwise.
+ * The role check comes before any lookup, so a refused write learns nothing about the
+ * object it named.
  */
 export function tenantRoute(
   method: "get" | "post" | "patch" | "delete",
   path: string,
   resolve: Resolver,
+  permission: Permission = method === "get" ? "view" : "change",
 ) {
   return http[method](`/api/v1/tenants/:tenant${path}`, async ({ params, request }) => {
     const failure = await simulate();
     if (failure) {
       return failure;
     }
+    const session = currentSession();
+    if (!session) {
+      return notAuthenticated();
+    }
     const values = stringParams(params);
+    const membership = session.memberships.find(({ tenant }) => tenant.slug === values.tenant);
     const data = tenantData(values.tenant ?? "");
-    if (!data) {
+    if (!membership || !data) {
       return notFound();
+    }
+    if (!can(membership.role, permission)) {
+      return problem(403, "permission_denied", "Your role in this tenant does not allow this.");
     }
     return resolve({ data, params: values, request, url: new URL(request.url) });
   });

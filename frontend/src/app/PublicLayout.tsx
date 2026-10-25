@@ -1,20 +1,20 @@
 import "./shell/shell.css";
 
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "antd";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate } from "react-router";
 
-import { useSession } from "@/shared/session/sessionContext";
+import { sessionQuery } from "@/shared/api/auth";
+import { LOGIN_PATH } from "@/shared/session/paths";
 import { LanguageSwitch } from "@/shared/ui/LanguageSwitch";
 
 import { MAIN_CONTENT_ID } from "./RootLayout";
 
-/** Pages outside any Tenant: system status, not-found, and later sign-in. */
+/** Pages outside any Tenant: system status, sign-in and not-found. */
 export function PublicLayout({ children }: { children?: ReactNode }) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [first] = useSession().memberships;
 
   return (
     <div className="grc-shell">
@@ -26,16 +26,37 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
           <span className="grc-shell-tenant-name">{t("app.name")}</span>
           <span className="grc-shell-header-spacer" />
           <LanguageSwitch />
-          {first && (
-            <Button type="primary" onClick={() => void navigate(`/t/${first.tenant.slug}`)}>
-              {t("app.openDemo")}
-            </Button>
-          )}
+          <EntryButton />
         </header>
         <main id={MAIN_CONTENT_ID} tabIndex={-1} className="grc-shell-main" data-narrow>
           {children ?? <Outlet />}
         </main>
       </div>
     </div>
+  );
+}
+
+/** Into the app: straight to the first Tenant when signed in, else to the login page. */
+function EntryButton() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { data: session, isPending } = useQuery(sessionQuery);
+  const first = session?.memberships[0];
+
+  if (first) {
+    return (
+      <Button type="primary" onClick={() => void navigate(`/t/${first.tenant.slug}`)}>
+        {t("app.openDemo")}
+      </Button>
+    );
+  }
+  if (isPending || pathname === LOGIN_PATH) {
+    return null;
+  }
+  return (
+    <Button type="primary" onClick={() => void navigate(LOGIN_PATH)}>
+      {t("auth.signIn")}
+    </Button>
   );
 }

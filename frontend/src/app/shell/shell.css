@@ -188,6 +188,17 @@
   white-space: nowrap;
 }
 
+.grc-shell-read-only-badge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--grc-status-info-bg);
+  color: var(--grc-status-info-text);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /* ---------- Content ---------- */
 
 .grc-shell-main {

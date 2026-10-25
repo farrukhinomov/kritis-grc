@@ -1,7 +1,12 @@
-import { Button, Dropdown, type MenuProps } from "antd";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { App, Button, Dropdown, type MenuProps } from "antd";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
+
+import { logout } from "@/shared/api/auth";
 
 import { currentLanguage, SUPPORTED_LANGUAGES } from "@/shared/i18n";
+import { LOGIN_PATH } from "@/shared/session/paths";
 import { useSession } from "@/shared/session/sessionContext";
 import type { Role } from "@/shared/session/session";
 import { COLOR_MODE_PREFERENCES, type ColorModePreference } from "@/shared/theme/colorMode";
@@ -17,6 +22,7 @@ const MODE_ICONS: Record<ColorModePreference, IconPreset> = {
 
 const MODE_KEY = "mode:";
 const LANGUAGE_KEY = "language:";
+const LOGOUT_KEY = "logout";
 
 interface UserMenuProps {
   role: Role;
@@ -31,6 +37,7 @@ export function UserMenu({ role, includeLanguage, showName }: UserMenuProps) {
   const { user } = useSession();
   const { preference, setPreference } = useColorMode();
   const language = currentLanguage(i18n.resolvedLanguage);
+  const signOut = useSignOut();
 
   const items: MenuProps["items"] = [
     {
@@ -38,7 +45,7 @@ export function UserMenu({ role, includeLanguage, showName }: UserMenuProps) {
       type: "group",
       label: (
         <>
-          <strong>{user.displayName}</strong>
+          <strong>{user.display_name}</strong>
           <br />
           {t(`shell.roles.${role}`)}
         </>
@@ -76,6 +83,13 @@ export function UserMenu({ role, includeLanguage, showName }: UserMenuProps) {
           },
         ]
       : []),
+    { type: "divider" },
+    {
+      key: LOGOUT_KEY,
+      icon: <AnimatedIcon preset="logout" />,
+      label: t("auth.signOut"),
+      disabled: signOut.isPending,
+    },
   ];
 
   const onClick: MenuProps["onClick"] = ({ key }) => {
@@ -86,6 +100,8 @@ export function UserMenu({ role, includeLanguage, showName }: UserMenuProps) {
       }
     } else if (key.startsWith(LANGUAGE_KEY)) {
       void i18n.changeLanguage(key.slice(LANGUAGE_KEY.length));
+    } else if (key === LOGOUT_KEY) {
+      signOut.mutate();
     }
   };
 
@@ -96,8 +112,30 @@ export function UserMenu({ role, includeLanguage, showName }: UserMenuProps) {
         aria-label={showName ? undefined : t("shell.userMenu")}
         icon={<AnimatedIcon preset="user" size={20} />}
       >
-        {showName ? user.displayName : null}
+        {showName ? user.display_name : null}
       </Button>
     </Dropdown>
   );
+}
+
+/**
+ * Everything cached belongs to the user who signed out, so it's all dropped before the
+ * login page shows; the next user on this browser starts from nothing.
+ */
+function useSignOut() {
+  const { t } = useTranslation();
+  const client = useQueryClient();
+  const navigate = useNavigate();
+  const { message } = App.useApp();
+
+  return useMutation({
+    mutationFn: logout,
+    onSuccess: async () => {
+      await navigate(LOGIN_PATH, { replace: true });
+      client.clear();
+    },
+    onError: () => {
+      void message.error(t("auth.signOutFailed"));
+    },
+  });
 }

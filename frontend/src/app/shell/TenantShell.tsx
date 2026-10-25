@@ -5,7 +5,7 @@ import { Outlet, useParams } from "react-router";
 
 import { ROOMY_SCREEN_QUERY, useIsWideScreen } from "@/shared/lib/breakpoints";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
-import { useMembership } from "@/shared/session/sessionContext";
+import { MembershipContext, useMembership } from "@/shared/session/sessionContext";
 import { DEFAULT_THEME } from "@/shared/theme/semantic";
 import { useTenantTheme } from "@/shared/theme/themeContext";
 
@@ -31,22 +31,24 @@ export function TenantShell() {
   const collapsed = collapsedByUser ?? !roomy;
 
   return (
-    <div className="grc-shell">
-      {wide && (
-        <SideNav
-          collapsed={collapsed}
-          onToggle={() => {
-            setCollapsedByUser(!collapsed);
-          }}
-        />
-      )}
-      <div className="grc-shell-column">
-        <ShellHeader membership={membership} wide={wide} />
-        <main id={MAIN_CONTENT_ID} tabIndex={-1} className="grc-shell-main">
-          <Outlet />
-        </main>
+    <MembershipContext value={membership}>
+      <div className="grc-shell">
+        {wide && (
+          <SideNav
+            collapsed={collapsed}
+            onToggle={() => {
+              setCollapsedByUser(!collapsed);
+            }}
+          />
+        )}
+        <div className="grc-shell-column">
+          <ShellHeader membership={membership} wide={wide} />
+          <main id={MAIN_CONTENT_ID} tabIndex={-1} className="grc-shell-main">
+            <Outlet />
+          </main>
+        </div>
+        {!wide && <BottomTabBar />}
       </div>
-      {!wide && <BottomTabBar />}
-    </div>
+    </MembershipContext>
   );
 }

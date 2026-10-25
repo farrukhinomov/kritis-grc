@@ -4,6 +4,7 @@ import "@/shared/i18n";
 import { cleanup, configure } from "@testing-library/react";
 import i18n from "i18next";
 
+import { setMockSession } from "@/mocks/accounts";
 import { resetDb } from "@/mocks/db";
 import { server } from "@/mocks/server";
 import { resetSimulation } from "@/mocks/simulation";
@@ -21,12 +22,17 @@ configure({ asyncUtilTimeout: 3000 });
 beforeAll(() => {
   server.listen({ onUnhandledFrame: "error" });
 });
+// Most tests look at the signed-in app; the ones about signing in start signed out.
+beforeEach(() => {
+  setMockSession("grc_manager");
+});
 afterEach(async () => {
   cleanup();
   resetMediaQueries();
   resetSimulation();
   resetDb();
   localStorage.clear();
+  sessionStorage.clear();
   server.resetHandlers();
   await i18n.changeLanguage("de");
 });
