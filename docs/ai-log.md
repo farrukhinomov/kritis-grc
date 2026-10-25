@@ -238,3 +238,18 @@ Each milestone gets one entry with four parts:
 ### Changed
 - **The matrix sat beside the table.** In the browser check the six-column table pushed the page sideways even at 1920 px, because the content width is capped. The matrix now sits above the table, Scope and Hazard moved under the title, and every table scrolls inside its own box if it is still too wide.
 - **Fact lists and secondary text were styled per feature.** The risk detail used the cockpit's classes, whose sheet its chunk never loads, so the list showed browser defaults. Both moved to the shared pattern sheet.
+
+---
+
+## P-08 Mapping-suggestion review (2026-10-25)
+
+### Accepted
+- **No optimistic decision.** Approving creates a Tenant Mapping, a statement about the Tenant's compliance. The card moves only once the server has agreed; until then its button shows that the decision is being saved.
+- **A confirmation for both decisions.** Neither can be undone from the UI, and on phones a decision sits one swipe away.
+- **The move happens in one batch.** In the browser check the card jumped instead of gliding, because each cached list notified on its own and the card left one list a render before it reached the other. Updating all lists in one notification batch fixed it; a test holds the refetch back to prove the card moves on the confirmation alone.
+- **Pending suggestions in statute order.** A reviewer works through the law; ordering by the model's confidence would present a hint as a ranking.
+- **Suggestions name both Requirements and who decided.** The review then needs no catalogue lists, and a decision states its author, as the Activity Log does.
+
+### Changed
+- **Focus moved to the next card with scrolling.** The scroll pulled the gliding card out of view. Focus now moves without scrolling; the neighbour is already in view.
+- **The plain-list style lived in the risk explorer's sheet.** The review page showed bullets. It moved to the shared pattern sheet.

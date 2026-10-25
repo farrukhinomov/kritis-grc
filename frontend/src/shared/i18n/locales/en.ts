@@ -292,6 +292,58 @@ export const en: Translation = {
     implemented: "Implemented",
     not_applicable: "Not applicable",
   },
+  suggestions: {
+    description:
+      "Mappings between the KRITIS-Dachgesetz and NIS2 proposed by the AI. A suggestion only counts once you approve it.",
+    hint: "The model's estimate is a hint, not proof. Check the rationale against the statute.",
+    target: "Target",
+    source: "Source",
+    coverage: {
+      full: "Full coverage",
+      partial: "Partial coverage",
+    },
+    confidence: "Model's estimate: {{value}}",
+    proposed: "AI suggestion ({{model}}) of {{date}}",
+    decided: {
+      approved: "Approved by {{name}} on {{date}}",
+      rejected: "Rejected by {{name}} on {{date}}",
+    },
+    someone: "unknown",
+    approve: "Approve",
+    reject: "Reject",
+    lists: {
+      pending: "Pending",
+      approved: "Approved",
+      rejected: "Rejected",
+    },
+    empty: {
+      pending: "No pending suggestions. New ones appear here once the AI has made them.",
+      approved: "No approved suggestions yet.",
+      rejected: "No rejected suggestions yet.",
+    },
+    confirm: {
+      approved: {
+        title: "Approve suggestion?",
+        ok: "Approve",
+        body: "The mapping {{source}} → {{target}} will then apply to your tenant. The decision is recorded in the activity log and can't be undone here.",
+      },
+      rejected: {
+        title: "Reject suggestion?",
+        ok: "Reject",
+        body: "The mapping {{source}} → {{target}} won't be adopted. The decision is recorded in the activity log and can't be undone here.",
+      },
+      cancel: "Cancel",
+    },
+    announce: {
+      approved: "Suggestion approved. It is now listed under “Approved”.",
+      rejected: "Suggestion rejected. It is now listed under “Rejected”.",
+    },
+    errors: {
+      conflict:
+        "This suggestion was already decided, probably by someone else. The lists now show the current state.",
+      failed: "The decision couldn't be saved. Please try again.",
+    },
+  },
   patterns: {
     back: "Back",
     close: "Close",

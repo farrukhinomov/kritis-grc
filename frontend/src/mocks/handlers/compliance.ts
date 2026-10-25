@@ -11,10 +11,13 @@ import type {
   UploadSlot,
   ImplementationChange,
   Mapping,
+  MappingSuggestion,
+  RequirementRef,
+  SuggestionStatus,
 } from "@/shared/api/types";
 
 import { ACTOR_ID, logActivity, nextId, type TenantData, tenantData } from "../db";
-import type { StoredImplementation } from "../seed";
+import type { StoredImplementation, StoredSuggestion } from "../seed";
 import {
   canonicalJson,
   etag,
@@ -437,26 +440,93 @@ const catalogueRoutes = [
   }),
 ];
 
+const SUGGESTION_STATUSES: readonly SuggestionStatus[] = ["pending", "approved", "rejected"];
+
+function requirementRef(data: TenantData, id: string): RequirementRef {
+  const requirement = data.requirements.find((item) => item.id === id)!;
+  const framework = data.frameworks.find((item) =>
+    item.versions.some((version) => version.id === requirement.framework_version_id),
+  );
+  return {
+    id: requirement.id,
+    citation: requirement.citation,
+    title_de: requirement.title_de,
+    title_en: requirement.title_en,
+    framework_name: framework?.name ?? "",
+  };
+}
+
+/** A Suggestion as the API returns it, with both Requirements and the decider named. */
+function presentSuggestion(data: TenantData, suggestion: StoredSuggestion): MappingSuggestion {
+  return {
+    ...suggestion,
+    target: requirementRef(data, suggestion.target_requirement_id),
+    source: requirementRef(data, suggestion.source_requirement_id),
+    decided_by_id: suggestion.decided_by_id ?? null,
+    decided_by_name:
+      data.members.find((member) => member.id === suggestion.decided_by_id)?.display_name ?? null,
+    decided_at: suggestion.decided_at ?? null,
+  };
+}
+
+/**
+ * Pending ones come first, in the order of the statute they would map to, as a reviewer
+ * works through the law; decided ones follow with the latest decision first.
+ */
+function suggestionOrder(data: TenantData) {
+  const position = (id: string) => data.requirements.findIndex((item) => item.id === id);
+  return (a: StoredSuggestion, b: StoredSuggestion) => {
+    if (a.decided_at && b.decided_at) {
+      return b.decided_at.localeCompare(a.decided_at);
+    }
+    if (a.decided_at || b.decided_at) {
+      return a.decided_at ? 1 : -1;
+    }
+    return position(a.target_requirement_id) - position(b.target_requirement_id);
+  };
+}
+
+function decide(data: TenantData, id: string, status: "approved" | "rejected") {
+  const suggestion = data.mappingSuggestions.find((item) => item.id === id);
+  if (!suggestion) {
+    return notFound();
+  }
+  if (suggestion.status !== "pending") {
+    return problem(409, "suggestion_already_decided", "This suggestion was already decided.");
+  }
+  suggestion.status = status;
+  suggestion.decided_by_id = ACTOR_ID;
+  suggestion.decided_at = new Date().toISOString();
+  logActivity(data, {
+    action: status,
+    object_type: "mapping_suggestion",
+    object_id: suggestion.id,
+    object_label: `${suggestion.target_requirement_id} ← ${suggestion.source_requirement_id}`,
+    changes: [{ field: "status", from: "pending", to: status }],
+  });
+  return suggestion;
+}
+
 const suggestionRoutes = [
-  tenantRoute("get", "/mapping-suggestions", ({ data, url }) =>
-    listResponse(
-      byParam(data.mappingSuggestions, url.searchParams.get("status"), (s) => s.status),
-      url,
-    ),
-  ),
+  tenantRoute("get", "/mapping-suggestions", ({ data, url }) => {
+    const status = url.searchParams.get("status");
+    if (status !== null && !SUGGESTION_STATUSES.some((item) => item === status)) {
+      return problem(400, "invalid_filter", `Unknown status "${status}".`);
+    }
+    const items = byParam(data.mappingSuggestions, status, (s) => s.status)
+      .toSorted(suggestionOrder(data))
+      .map((suggestion) => presentSuggestion(data, suggestion));
+    return listResponse(items, url);
+  }),
 
   tenantRoute(
     "post",
     "/mapping-suggestions/:id/approve",
     ({ data, params }) => {
-      const suggestion = data.mappingSuggestions.find((s) => s.id === params.id);
-      if (!suggestion) {
-        return notFound();
+      const suggestion = decide(data, String(params.id), "approved");
+      if (suggestion instanceof Response) {
+        return suggestion;
       }
-      if (suggestion.status !== "pending") {
-        return problem(409, "suggestion_already_decided", "This suggestion was already decided.");
-      }
-      suggestion.status = "approved";
       const mapping: Mapping = {
         id: nextId("map"),
         kind: "tenant",
@@ -466,16 +536,9 @@ const suggestionRoutes = [
         justification_de: suggestion.rationale_de,
         gap_note_de: null,
         approved_by_id: ACTOR_ID,
-        approved_at: new Date().toISOString(),
+        approved_at: suggestion.decided_at ?? new Date().toISOString(),
       };
       data.mappings.push(mapping);
-      logActivity(data, {
-        action: "approved",
-        object_type: "mapping_suggestion",
-        object_id: suggestion.id,
-        object_label: `${suggestion.target_requirement_id} ← ${suggestion.source_requirement_id}`,
-        changes: [{ field: "status", from: "pending", to: "approved" }],
-      });
       return HttpResponse.json(mapping, { status: 201 });
     },
     "approve",
@@ -485,22 +548,10 @@ const suggestionRoutes = [
     "post",
     "/mapping-suggestions/:id/reject",
     ({ data, params }) => {
-      const suggestion = data.mappingSuggestions.find((s) => s.id === params.id);
-      if (!suggestion) {
-        return notFound();
-      }
-      if (suggestion.status !== "pending") {
-        return problem(409, "suggestion_already_decided", "This suggestion was already decided.");
-      }
-      suggestion.status = "rejected";
-      logActivity(data, {
-        action: "rejected",
-        object_type: "mapping_suggestion",
-        object_id: suggestion.id,
-        object_label: `${suggestion.target_requirement_id} ← ${suggestion.source_requirement_id}`,
-        changes: [{ field: "status", from: "pending", to: "rejected" }],
-      });
-      return HttpResponse.json(suggestion);
+      const suggestion = decide(data, String(params.id), "rejected");
+      return suggestion instanceof Response
+        ? suggestion
+        : HttpResponse.json(presentSuggestion(data, suggestion));
     },
     "approve",
   ),

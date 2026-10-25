@@ -127,14 +127,6 @@
   margin-top: 16px;
 }
 
-.grc-plain-list {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
 .grc-cell-risks li {
   display: flex;
   gap: 12px;

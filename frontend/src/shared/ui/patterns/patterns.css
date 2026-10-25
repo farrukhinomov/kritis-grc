@@ -23,6 +23,15 @@
   font-size: 13px;
 }
 
+/* A list read as a stack of items, without bullets. */
+.grc-plain-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 /* ---------- Card list with swipe actions ---------- */
 
 .grc-card-list {

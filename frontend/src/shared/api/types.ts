@@ -232,10 +232,17 @@ export interface Mapping {
 
 export type SuggestionStatus = "pending" | "approved" | "rejected";
 
+/** A Requirement as another object names it: enough to read, without the statute text. */
+export type RequirementRef = Pick<Requirement, "id" | "citation" | "title_de" | "title_en"> & {
+  framework_name: string;
+};
+
 export interface MappingSuggestion {
   id: string;
   target_requirement_id: string;
   source_requirement_id: string;
+  target: RequirementRef;
+  source: RequirementRef;
   coverage: Coverage;
   /** The model's own estimate between 0 and 1, shown as a hint, never as proof. */
   confidence: number;
@@ -244,6 +251,10 @@ export interface MappingSuggestion {
   status: SuggestionStatus;
   model: string;
   created_at: string;
+  /** Who approved or rejected it, and when; null while it is pending. */
+  decided_by_id: string | null;
+  decided_by_name: string | null;
+  decided_at: string | null;
 }
 
 // ---------- Risk ----------

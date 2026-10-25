@@ -126,7 +126,14 @@ function RowActionsMenu({ actions }: { actions: RowAction[] }) {
 const SWIPE_ACTION_WIDTH = 80;
 const settle = { duration: duration.base, ease: ease.standard };
 
-function SwipeableCard({ actions, children }: { actions: RowAction[]; children: ReactNode }) {
+/** A card that swipes left to reveal its actions, which its "Actions" menu offers too. */
+export function SwipeableCard({
+  actions,
+  children,
+}: {
+  actions: RowAction[];
+  children: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const x = useMotionValue(0);
   const revealed = actions.length * SWIPE_ACTION_WIDTH;
