@@ -298,6 +298,7 @@ export const en: Translation = {
     hint: "The model's estimate is a hint, not proof. Check the rationale against the statute.",
     target: "Target",
     source: "Source",
+    nameSource: "Source: {{citation}}",
     coverage: {
       full: "Full coverage",
       partial: "Partial coverage",
@@ -335,8 +336,8 @@ export const en: Translation = {
       cancel: "Cancel",
     },
     announce: {
-      approved: "Suggestion approved. It is now listed under “Approved”.",
-      rejected: "Suggestion rejected. It is now listed under “Rejected”.",
+      approved: "Suggestion for {{citation}} approved. It is now listed under “Approved”.",
+      rejected: "Suggestion for {{citation}} rejected. It is now listed under “Rejected”.",
     },
     errors: {
       conflict:

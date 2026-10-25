@@ -310,6 +310,7 @@ export const de = {
     hint: "Die Einschätzung des Modells ist ein Hinweis, kein Beleg. Prüfen Sie die Begründung am Gesetzestext.",
     target: "Ziel",
     source: "Quelle",
+    nameSource: "Quelle: {{citation}}",
     coverage: {
       full: "Vollständige Abdeckung",
       partial: "Teilweise Abdeckung",
@@ -347,8 +348,8 @@ export const de = {
       cancel: "Abbrechen",
     },
     announce: {
-      approved: "Vorschlag angenommen. Er steht jetzt unter „Angenommen“.",
-      rejected: "Vorschlag abgelehnt. Er steht jetzt unter „Abgelehnt“.",
+      approved: "Vorschlag zu {{citation}} angenommen. Er steht jetzt unter „Angenommen“.",
+      rejected: "Vorschlag zu {{citation}} abgelehnt. Er steht jetzt unter „Abgelehnt“.",
     },
     errors: {
       conflict:

@@ -11,7 +11,10 @@ interface SuggestionCardProps {
   suggestion: MappingSuggestion;
   /** Absent when the Suggestion is decided or the role may not decide. */
   onAsk?: ((decision: Decision) => void) | undefined;
+  /** This card's decision is being saved. */
   busy: boolean;
+  /** Some decision is being saved, so none can be started. */
+  locked: boolean;
 }
 
 /**
@@ -19,11 +22,12 @@ interface SuggestionCardProps {
  * and why the model thinks so. On phones the decisions sit behind a swipe and in the
  * card's actions menu; on wide screens they are buttons.
  */
-export function SuggestionCard({ suggestion, onAsk, busy }: SuggestionCardProps) {
+export function SuggestionCard({ suggestion, onAsk, busy, locked }: SuggestionCardProps) {
   const { t, i18n } = useTranslation();
   const wide = useIsWideScreen();
   const english = i18n.language === "en";
   const headingId = `${suggestion.id}-title`;
+  const sourceId = `${suggestion.id}-source`;
   const dateFormat = new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" });
 
   const content = (
@@ -31,6 +35,10 @@ export function SuggestionCard({ suggestion, onAsk, busy }: SuggestionCardProps)
       <h3 id={headingId} className="grc-suggestion-title">
         <RequirementName requirement={suggestion.target} english={english} />
       </h3>
+      {/* Several Suggestions can share a target; the source tells their names apart. */}
+      <span id={sourceId} className="grc-visually-hidden">
+        {t("suggestions.nameSource", { citation: suggestion.source.citation })}
+      </span>
       <dl className="grc-facts">
         <dt>{t("suggestions.target")}</dt>
         <dd>{suggestion.target.framework_name}</dd>
@@ -70,6 +78,7 @@ export function SuggestionCard({ suggestion, onAsk, busy }: SuggestionCardProps)
           <Button
             type="primary"
             loading={busy}
+            disabled={locked && !busy}
             onClick={() => {
               onAsk("approved");
             }}
@@ -77,7 +86,7 @@ export function SuggestionCard({ suggestion, onAsk, busy }: SuggestionCardProps)
             {t("suggestions.approve")}
           </Button>
           <Button
-            disabled={busy}
+            disabled={locked}
             onClick={() => {
               onAsk("rejected");
             }}
@@ -91,7 +100,11 @@ export function SuggestionCard({ suggestion, onAsk, busy }: SuggestionCardProps)
 
   return (
     // Focusable so focus can move here after a decision elsewhere in the list.
-    <article aria-labelledby={headingId} tabIndex={-1} data-suggestion={suggestion.id}>
+    <article
+      aria-labelledby={`${headingId} ${sourceId}`}
+      tabIndex={-1}
+      data-suggestion={suggestion.id}
+    >
       {onAsk && !wide ? (
         <SwipeableCard
           actions={[
@@ -99,6 +112,7 @@ export function SuggestionCard({ suggestion, onAsk, busy }: SuggestionCardProps)
               key: "approve",
               label: t("suggestions.approve"),
               icon: "check",
+              disabled: locked,
               onSelect: () => {
                 onAsk("approved");
               },
@@ -108,6 +122,7 @@ export function SuggestionCard({ suggestion, onAsk, busy }: SuggestionCardProps)
               label: t("suggestions.reject"),
               icon: "close",
               danger: true,
+              disabled: locked,
               onSelect: () => {
                 onAsk("rejected");
               },

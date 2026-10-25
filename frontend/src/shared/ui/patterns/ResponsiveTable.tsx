@@ -18,6 +18,8 @@ export interface RowAction {
   label: string;
   icon: IconPreset;
   danger?: boolean;
+  /** Shown but unavailable, e.g. while another change is being saved. */
+  disabled?: boolean;
   onSelect: () => void;
 }
 
@@ -109,6 +111,7 @@ function RowActionsMenu({ actions }: { actions: RowAction[] }) {
           key: action.key,
           label: action.label,
           danger: action.danger ?? false,
+          disabled: action.disabled ?? false,
           icon: <AnimatedIcon preset={action.icon} />,
           onClick: action.onSelect,
         })),
@@ -159,6 +162,7 @@ export function SwipeableCard({
               key={action.key}
               type="button"
               className="grc-swipe-action"
+              disabled={action.disabled ?? false}
               data-danger={action.danger ?? false}
               style={{ width: SWIPE_ACTION_WIDTH }}
               onClick={() => {

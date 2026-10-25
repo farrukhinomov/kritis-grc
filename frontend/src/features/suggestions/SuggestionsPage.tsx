@@ -3,7 +3,7 @@ import "./suggestions.css";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Modal, Pagination } from "antd";
 import { LayoutGroup, m } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ApiError } from "@/shared/api/client";
@@ -19,6 +19,7 @@ import { SuggestionCard } from "./SuggestionCard";
 import { type Decision, useDecideSuggestion } from "./useDecideSuggestion";
 
 const PAGE_SIZE = 25;
+const PENDING_HEADING = "suggestions-pending";
 
 interface Asked {
   suggestion: MappingSuggestion;
@@ -36,20 +37,34 @@ export function SuggestionsPage() {
   const { t } = useTranslation();
   const tenant = useCurrentMembership().tenant.slug;
   const canDecide = useCan("approve");
-  const decide = useDecideSuggestion(tenant);
   const [asked, setAsked] = useState<Asked | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const [failure, setFailure] = useState<"conflict" | "failed" | null>(null);
-  const [focusTarget, setFocusTarget] = useState<string | null>(null);
+  const [focusTarget, setFocusTarget] = useState<{ id: string } | null>(null);
+  const nextAfter = useRef(new Map<string, string | null>());
+
+  const decide = useDecideSuggestion(tenant, {
+    onDecided: ({ suggestion, decision }) => {
+      setAnnouncement(
+        t(`suggestions.announce.${decision}`, { citation: suggestion.target.citation }),
+      );
+      setFocusTarget({ id: nextAfter.current.get(suggestion.id) ?? suggestion.id });
+    },
+    onFailed: (error, { suggestion }) => {
+      setFailure(error instanceof ApiError && error.status === 409 ? "conflict" : "failed");
+      setFocusTarget({ id: nextAfter.current.get(suggestion.id) ?? suggestion.id });
+    },
+  });
 
   // The decided card has left the list and took focus with it. Focus moves to its
-  // neighbour without scrolling, which would pull the gliding card out of view.
+  // neighbour without scrolling, which would pull the gliding card out of view; when
+  // that card isn't on screen, to the pending list's heading.
   useEffect(() => {
-    if (focusTarget) {
-      document
-        .querySelector<HTMLElement>(`[data-suggestion="${focusTarget}"]`)
-        ?.focus({ preventScroll: true });
+    if (!focusTarget) {
+      return;
     }
+    const card = document.querySelector<HTMLElement>(`[data-suggestion="${focusTarget.id}"]`);
+    (card ?? document.getElementById(PENDING_HEADING))?.focus({ preventScroll: true });
   }, [focusTarget]);
 
   const confirm = () => {
@@ -57,24 +72,16 @@ export function SuggestionsPage() {
       return;
     }
     const { suggestion, decision, next } = asked;
+    nextAfter.current.set(suggestion.id, next);
     setAsked(null);
     setFailure(null);
-    decide.mutate(
-      { suggestion, decision },
-      {
-        onSuccess: () => {
-          setAnnouncement(t(`suggestions.announce.${decision}`));
-          setFocusTarget(next ?? suggestion.id);
-        },
-        onError: (error) => {
-          setFailure(error instanceof ApiError && error.status === 409 ? "conflict" : "failed");
-        },
-      },
-    );
+    decide.mutate({ suggestion, decision });
   };
 
   const listProps = {
     tenant,
+    // One decision at a time: a second one would race the first in the lists.
+    locked: decide.isPending,
     busyId: decide.isPending ? decide.variables.suggestion.id : null,
   };
 
@@ -144,12 +151,13 @@ export function SuggestionsPage() {
 interface SuggestionListProps {
   tenant: string;
   status: SuggestionStatus;
+  locked: boolean;
   busyId: string | null;
   onAsk?:
     ((suggestion: MappingSuggestion, decision: Decision, next: string | null) => void) | undefined;
 }
 
-function SuggestionList({ tenant, status, busyId, onAsk }: SuggestionListProps) {
+function SuggestionList({ tenant, status, locked, busyId, onAsk }: SuggestionListProps) {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const query = combine([
@@ -158,54 +166,61 @@ function SuggestionList({ tenant, status, busyId, onAsk }: SuggestionListProps) 
   const headingId = `suggestions-${status}`;
   const total = query.data?.[0].page.total;
 
+  // A decision can empty the page being shown; it then moves back to the last page left,
+  // rather than claiming the whole list is empty. Adjusted while rendering, as React
+  // recommends for state that follows other data, so no empty frame is committed.
+  const lastPage = total === undefined ? page : Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (page > lastPage) {
+    setPage(lastPage);
+  }
+
   return (
     <section aria-labelledby={headingId} className="grc-suggestion-list">
-      <h2 id={headingId} className="grc-suggestion-list-title">
+      <h2 id={headingId} tabIndex={-1} className="grc-suggestion-list-title">
         {t(`suggestions.lists.${status}`)}
         {total !== undefined && <span className="grc-meta"> ({total})</span>}
       </h2>
       <QueryContent
         query={query}
         rows={4}
-        isEmpty={([result]) => result.items.length === 0}
+        isEmpty={([result]) => result.items.length === 0 && page === 1}
         empty={t(`suggestions.empty.${status}`)}
       >
         {([result]) => (
-          <>
-            <ul className="grc-plain-list grc-suggestion-items">
-              {result.items.map((suggestion, index) => (
-                <m.li
-                  key={suggestion.id}
-                  layoutId={suggestion.id}
-                  transition={{ duration: duration.slow, ease: ease.standard }}
-                >
-                  <SuggestionCard
-                    suggestion={suggestion}
-                    busy={busyId === suggestion.id}
-                    onAsk={
-                      onAsk &&
-                      ((decision) => {
-                        const neighbour = result.items[index + 1] ?? result.items[index - 1];
-                        onAsk(suggestion, decision, neighbour?.id ?? null);
-                      })
-                    }
-                  />
-                </m.li>
-              ))}
-            </ul>
-            {result.page.total > PAGE_SIZE && (
-              <Pagination
-                className="grc-suggestion-pagination"
-                current={page}
-                pageSize={PAGE_SIZE}
-                total={result.page.total}
-                showSizeChanger={false}
-                onChange={setPage}
-              />
-            )}
-          </>
+          <ul className="grc-plain-list grc-suggestion-items">
+            {result.items.map((suggestion, index) => (
+              <m.li
+                key={suggestion.id}
+                layoutId={suggestion.id}
+                transition={{ duration: duration.slow, ease: ease.standard }}
+              >
+                <SuggestionCard
+                  suggestion={suggestion}
+                  busy={busyId === suggestion.id}
+                  locked={locked}
+                  onAsk={
+                    onAsk &&
+                    ((decision) => {
+                      const neighbour = result.items[index + 1] ?? result.items[index - 1];
+                      onAsk(suggestion, decision, neighbour?.id ?? null);
+                    })
+                  }
+                />
+              </m.li>
+            ))}
+          </ul>
         )}
       </QueryContent>
+      {total !== undefined && total > PAGE_SIZE && (
+        <Pagination
+          className="grc-suggestion-pagination"
+          current={page}
+          pageSize={PAGE_SIZE}
+          total={total}
+          showSizeChanger={false}
+          onChange={setPage}
+        />
+      )}
     </section>
   );
 }
