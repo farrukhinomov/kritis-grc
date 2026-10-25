@@ -1,7 +1,9 @@
 import { Button, Form, Input } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { type EvidenceTarget, useAddEvidence, useIdempotencyKey } from "./useAddEvidence";
+import { useIdempotencyKey } from "@/shared/lib/useIdempotencyKey";
+
+import { type EvidenceTarget, useAddEvidence } from "./useAddEvidence";
 import { SaveError } from "./SaveError";
 
 export function LinkEvidenceForm({ target }: { target: EvidenceTarget }) {

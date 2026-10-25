@@ -357,6 +357,90 @@ export const de = {
       failed: "Die Entscheidung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
     },
   },
+  applicability: {
+    description:
+      "Prüfen Sie, ob Ihre Anlage als kritische Anlage im Sinne des KRITIS-Dachgesetzes gilt.",
+    steps: {
+      sector: "Sektor",
+      service: "Kritische Dienstleistung",
+      supply: "Versorgungsgrad",
+      result: "Ergebnis",
+    },
+    stepOf: "Schritt {{number}} von {{total}}: {{title}}",
+    next: "Weiter",
+    back: "Zurück",
+    check: "Prüfen",
+    sector: {
+      question: "In welchem Sektor betreiben Sie die Anlage?",
+      notAvailable: "Schwellenwerte sind in diesem Prototyp nur für den Sektor Wasser hinterlegt.",
+      basis: "Die Sektoren nennt § 4 Abs. 1 KRITIS-DachG.",
+    },
+    sectors: {
+      energy: "Energie",
+      transport: "Transport und Verkehr",
+      finance: "Finanzwesen",
+      social_security: "Sozialversicherung und Grundsicherung",
+      health: "Gesundheit",
+      water: "Wasser",
+      food: "Ernährung",
+      it_telecom: "Informationstechnik und Telekommunikation",
+      space: "Weltraum",
+      municipal_waste: "Siedlungsabfallentsorgung",
+    },
+    service: {
+      question: "Welche kritische Dienstleistung erbringt die Anlage?",
+    },
+    services: {
+      drinking_water_supply: {
+        name: "Trinkwasserversorgung",
+        measure: "Maßstab: Anzahl der versorgten Personen",
+        hint: "Zählen Sie alle Personen, die die Anlage mit Trinkwasser versorgt.",
+      },
+    },
+    supply: {
+      label: "Anzahl versorgter Personen",
+    },
+    result: {
+      title: "Ergebnis",
+      applies: "Voraussichtlich betroffen",
+      doesNotApply: "Voraussichtlich nicht betroffen",
+      above:
+        "Mit {{people}} versorgten Personen erreicht die Anlage den Regelschwellenwert von {{threshold}} Personen nach {{thresholdCitation}} KRITIS-DachG. Sie gilt damit voraussichtlich als kritische Anlage nach {{definitionCitation}} KRITIS-DachG.",
+      below:
+        "Mit {{people}} versorgten Personen liegt die Anlage unter dem Regelschwellenwert von {{threshold}} Personen nach {{thresholdCitation}} KRITIS-DachG. Sie gilt damit voraussichtlich nicht als kritische Anlage nach {{definitionCitation}} KRITIS-DachG.",
+      registration:
+        "Sobald die Anlage als kritische Anlage gilt, ist sie innerhalb von {{months}} Monaten beim Bundesamt für Bevölkerungsschutz und Katastrophenhilfe zu registrieren ({{registrationCitation}} KRITIS-DachG).",
+      preliminaryTitle: "Vorläufiges Ergebnis",
+      preliminary:
+        "Die konkreten Schwellenwerte legt eine Rechtsverordnung fest, die noch nicht in Kraft ist. Bis dahin ist der Regelschwellenwert ein Anhaltspunkt, und es besteht noch keine Pflicht zur Registrierung.",
+      change: "Angaben ändern",
+    },
+    create: {
+      title: "Kritische Anlage anlegen",
+      name: "Name der Anlage",
+      location: "Standort",
+      date: "Geplante Registrierung",
+      dateHint:
+        "Vorbelegt mit heute plus {{months}} Monaten. Daraus berechnen sich die prognostizierten Fristen.",
+      nameMissing: "Bitte geben Sie einen Namen an.",
+      locationMissing: "Bitte geben Sie den Standort an.",
+      dateMissing: "Bitte geben Sie ein Datum an.",
+      submit: "Als kritische Anlage anlegen",
+      failed: "Die Anlage konnte nicht angelegt werden. Bitte versuchen Sie es erneut.",
+      readOnly: "Nur GRC-Manager können eine kritische Anlage anlegen.",
+    },
+    created: {
+      title: "{{name}} angelegt",
+      registration: "Geplante Registrierung am {{date}}. Daraus ergeben sich diese Fristen:",
+    },
+    obligations: {
+      riskAnalysis: "Risikoanalyse und Risikobewertung",
+      measures: "Resilienzmaßnahmen und Resilienzplan",
+      incidents: "Meldung von Vorfällen",
+      management: "Pflichten der Geschäftsleitung",
+      other: "Pflicht",
+    },
+  },
   patterns: {
     back: "Zurück",
     close: "Schließen",

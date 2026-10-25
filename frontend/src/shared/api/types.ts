@@ -33,8 +33,52 @@ export interface PageParams {
 
 // ---------- Organization ----------
 
-export type Sector = "water";
+/** The ten sectors the KRITIS-Dachgesetz names. */
+export type Sector =
+  | "energy"
+  | "transport"
+  | "finance"
+  | "social_security"
+  | "health"
+  | "water"
+  | "food"
+  | "it_telecom"
+  | "space"
+  | "municipal_waste";
 export type CriticalService = "drinking_water_supply";
+
+/**
+ * Where a threshold comes from: the law's default value, or the ordinance that sets the
+ * specific values. Only an ordinance threshold makes a result binding.
+ */
+export type ThresholdBasis = "statutory_default" | "ordinance";
+
+export interface CriticalServiceDefinition {
+  sector: Sector;
+  critical_service: CriticalService;
+  measure: "people_supplied";
+  threshold: number;
+  threshold_basis: ThresholdBasis;
+  /** The KRITIS-Dachgesetz citation the threshold rests on. */
+  citation: string;
+}
+
+export interface ApplicabilityQuestion {
+  sector: Sector;
+  critical_service: CriticalService;
+  people_supplied: number;
+}
+
+export interface ApplicabilityResult extends ApplicabilityQuestion {
+  applies: boolean;
+  threshold: number;
+  threshold_basis: ThresholdBasis;
+  binding: boolean;
+  not_binding_reason: "ordinance_pending" | null;
+  /** Months the operator has to register once a facility counts as critical. */
+  registration_within_months: number;
+  citations: { definition: string; threshold: string; registration: string };
+}
 
 export interface Tenant {
   slug: string;

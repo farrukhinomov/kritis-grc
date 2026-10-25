@@ -1,0 +1,104 @@
+.grc-applicability-steps {
+  margin-bottom: 24px;
+}
+
+.grc-applicability-panel {
+  max-width: 720px;
+  padding: 24px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 14px;
+  background: var(--grc-surface);
+}
+
+@media (max-width: 767.98px) {
+  .grc-applicability-panel {
+    padding: 16px;
+  }
+}
+
+.grc-applicability-fieldset {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.grc-applicability-fieldset legend,
+.grc-applicability-label {
+  margin-bottom: 4px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.grc-applicability-options.ant-radio-group {
+  display: grid;
+  gap: 8px;
+}
+
+/* Every option is a full-width tap target of at least 44 px. */
+.grc-applicability-options .ant-radio-wrapper {
+  align-items: center;
+  min-height: 44px;
+  margin: 0;
+}
+
+.grc-applicability-option {
+  display: grid;
+}
+
+.grc-applicability-number.ant-input-number {
+  width: 100%;
+  max-width: 280px;
+}
+
+.grc-applicability-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.grc-applicability-result,
+.grc-applicability-explanation,
+.grc-applicability-created {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+.grc-applicability-result-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.grc-applicability-verdict {
+  margin: 0;
+  font-size: 16px;
+}
+
+.grc-applicability-verdict[data-applies="true"] {
+  color: var(--grc-status-warning-text);
+}
+
+.grc-applicability-explanation p {
+  margin: 0;
+}
+
+.grc-applicability-form {
+  width: 100%;
+  max-width: 480px;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--grc-border-subtle);
+}
+
+.grc-applicability-form-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.grc-applicability-error {
+  margin-bottom: 12px;
+}

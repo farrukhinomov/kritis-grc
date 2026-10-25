@@ -1,5 +1,6 @@
 import type { FieldError } from "@/shared/api/client";
 import { EVIDENCE_FILE_TYPES, MAX_EVIDENCE_BYTES } from "@/shared/api/compliance";
+import type { NewCriticalFacility } from "@/shared/api/organization";
 import type {
   ImplementationChange,
   ImplementationStatus,
@@ -7,6 +8,7 @@ import type {
   UploadRequest,
 } from "@/shared/api/types";
 
+import { serviceFor } from "./applicability";
 import type { TenantData } from "./db";
 import { isRecord } from "./http";
 
@@ -189,4 +191,40 @@ export function validateUploadRequest(body: unknown): Result<UploadRequest> {
 export function parseIfMatch(header: string | null): number | null {
   const match = header === null ? null : /^(?:W\/)?"(\d+)"$/.exec(header.trim());
   return match ? Number(match[1]) : null;
+}
+
+const MAX_NAME = 200;
+
+/** A new Critical Facility, as the Applicability Check sends it. */
+export function validateNewFacility(body: unknown): Result<NewCriticalFacility> {
+  if (!isRecord(body) || !isRecord(body.critical_facility)) {
+    return { ok: false, errors: [{ field: "non_field_errors", code: "invalid" }] };
+  }
+  const errors: FieldError[] = [];
+  for (const field of ["name", "location"] as const) {
+    const value = body[field];
+    if (typeof value !== "string" || value.trim() === "") {
+      errors.push({ field, code: "required" });
+    } else if (value.length > MAX_NAME) {
+      errors.push({ field, code: "too_long" });
+    }
+  }
+  const facility = body.critical_facility;
+  if (!serviceFor(facility.sector, facility.critical_service)) {
+    errors.push({ field: "critical_facility.critical_service", code: "invalid_choice" });
+  }
+  const people = facility.people_supplied;
+  if (typeof people !== "number" || !Number.isInteger(people) || people <= 0) {
+    errors.push({ field: "critical_facility.people_supplied", code: "invalid" });
+  }
+  const registration = facility.registration;
+  if (!isRecord(registration) || !["planned", "confirmed"].includes(String(registration.status))) {
+    errors.push({ field: "critical_facility.registration.status", code: "invalid_choice" });
+  }
+  if (!isRecord(registration) || !isIsoDate(registration.date)) {
+    errors.push({ field: "critical_facility.registration.date", code: "invalid_date" });
+  }
+  return errors.length > 0
+    ? { ok: false, errors }
+    : { ok: true, value: body as unknown as NewCriticalFacility };
 }

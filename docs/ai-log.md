@@ -265,3 +265,20 @@ Each milestone gets one entry with four parts:
 ### Changed
 - **Focus moved to the next card with scrolling.** The scroll pulled the gliding card out of view. Focus now moves without scrolling; the neighbour is already in view.
 - **The plain-list style lived in the risk explorer's sheet.** The review page showed bullets. It moved to the shared pattern sheet.
+
+---
+
+## P-09 Applicability Check (2026-10-25)
+
+### Accepted
+- **The rule lives on the server.** The wizard sends Sector, Critical Service and the number of people supplied, and words the structured answer. A threshold compared in the browser would be a second copy of a legal rule.
+- **Only verified law is cited.** The research note gives § 2 Nr. 3 (definition), § 4 Abs. 1 (sectors), § 5 Abs. 2 (default threshold of 500,000) and § 8 Abs. 1 (registration within three months). A suggested reference to a designation in individual cases came from secondary sources only and was left out.
+- **Every result is preliminary.** The thresholds ordinance is a draft, so the default threshold is a guide and there is no duty to register yet; the result says so in its own box, which is a note, not an alert.
+- **All ten sectors are shown, only water is selectable.** The law's list stays visible, and one sentence says the prototype has thresholds for water only, instead of a hint under every option.
+- **The facility is created with a planned Registration.** Its deadlines come from the server and are labelled as projected.
+- **One Idempotency-Key helper for every creating POST in the mock**, shared by Evidence and Critical Facilities, and one key hook in `shared/lib`.
+
+### Changed
+- **The four steps took a phone's whole first screen.** Phones get one line instead ("Schritt 2 von 4: …").
+- **"§" broke from its number at line ends.** Citations in the explanation keep their spaces unbreakable.
+- **Focus fell to the page after creating the facility.** It moves to the heading that replaced the form.

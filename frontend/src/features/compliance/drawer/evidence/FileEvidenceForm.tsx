@@ -11,7 +11,9 @@ import {
 } from "@/shared/api/compliance";
 
 import { formatBytes } from "../formatBytes";
-import { type EvidenceTarget, useAddEvidence, useIdempotencyKey } from "./useAddEvidence";
+import { useIdempotencyKey } from "@/shared/lib/useIdempotencyKey";
+
+import { type EvidenceTarget, useAddEvidence } from "./useAddEvidence";
 import { SaveError } from "./SaveError";
 
 const ACCEPT = ".pdf,.png,.jpg,.jpeg,.docx,.xlsx";

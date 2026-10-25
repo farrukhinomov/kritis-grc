@@ -17,16 +17,9 @@ import type {
 } from "@/shared/api/types";
 
 import { ACTOR_ID, logActivity, nextId, type TenantData, tenantData } from "../db";
+import { idempotency } from "../idempotency";
 import type { StoredImplementation, StoredSuggestion } from "../seed";
-import {
-  canonicalJson,
-  etag,
-  jsonBody,
-  listResponse,
-  notFound,
-  problem,
-  tenantRoute,
-} from "../http";
+import { etag, jsonBody, listResponse, notFound, problem, tenantRoute } from "../http";
 import { getSimulation, setSimulation } from "../simulation";
 import {
   parseIfMatch,
@@ -335,16 +328,9 @@ const evidenceRoutes = [
       return notFound();
     }
     const body = await jsonBody(request);
-    const key = request.headers.get("Idempotency-Key");
-    const fingerprint = `POST ${new URL(request.url).pathname} ${canonicalJson(body)}`;
-    const replay = key === null ? undefined : data.idempotency.get(key);
+    const { replay, remember } = idempotency(data, request, body);
     if (replay) {
-      return replay.fingerprint === fingerprint
-        ? HttpResponse.json(replay.body, {
-            status: replay.status,
-            headers: { "Idempotent-Replayed": "true" },
-          })
-        : problem(422, "idempotency_key_reused", "This key was already used for another request.");
+      return replay;
     }
     const result = validateEvidence(body, implementationId, data);
     if (!result.ok) {
@@ -371,9 +357,7 @@ const evidenceRoutes = [
         upload.used = true;
       }
     }
-    if (key !== null) {
-      data.idempotency.set(key, { status: 201, body: evidence, fingerprint });
-    }
+    remember(201, evidence);
     logActivity(data, {
       action: "created",
       object_type: "evidence",

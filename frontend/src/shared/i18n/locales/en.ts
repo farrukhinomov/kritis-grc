@@ -345,6 +345,89 @@ export const en: Translation = {
       failed: "The decision couldn't be saved. Please try again.",
     },
   },
+  applicability: {
+    description:
+      "Check whether your facility counts as a critical facility under the KRITIS-Dachgesetz.",
+    steps: {
+      sector: "Sector",
+      service: "Critical service",
+      supply: "Level of supply",
+      result: "Result",
+    },
+    stepOf: "Step {{number}} of {{total}}: {{title}}",
+    next: "Next",
+    back: "Back",
+    check: "Check",
+    sector: {
+      question: "In which sector do you operate the facility?",
+      notAvailable: "This prototype has thresholds for the water sector only.",
+      basis: "The sectors are listed in § 4 Abs. 1 KRITIS-DachG.",
+    },
+    sectors: {
+      energy: "Energy",
+      transport: "Transport",
+      finance: "Finance",
+      social_security: "Social security and basic income support",
+      health: "Health",
+      water: "Water",
+      food: "Food",
+      it_telecom: "Information technology and telecommunications",
+      space: "Space",
+      municipal_waste: "Municipal waste disposal",
+    },
+    service: {
+      question: "Which critical service does the facility provide?",
+    },
+    services: {
+      drinking_water_supply: {
+        name: "Drinking water supply",
+        measure: "Measured by the number of people supplied",
+        hint: "Count everyone the facility supplies with drinking water.",
+      },
+    },
+    supply: {
+      label: "Number of people supplied",
+    },
+    result: {
+      title: "Result",
+      applies: "Probably affected",
+      doesNotApply: "Probably not affected",
+      above:
+        "Supplying {{people}} people, the facility reaches the default threshold of {{threshold}} people under {{thresholdCitation}} KRITIS-DachG. It therefore probably counts as a critical facility under {{definitionCitation}} KRITIS-DachG.",
+      below:
+        "Supplying {{people}} people, the facility stays below the default threshold of {{threshold}} people under {{thresholdCitation}} KRITIS-DachG. It therefore probably doesn't count as a critical facility under {{definitionCitation}} KRITIS-DachG.",
+      registration:
+        "Once the facility counts as critical, it has to be registered with the Federal Office of Civil Protection and Disaster Assistance within {{months}} months ({{registrationCitation}} KRITIS-DachG).",
+      preliminaryTitle: "Preliminary result",
+      preliminary:
+        "The specific thresholds are set by an ordinance that isn't in force yet. Until then the default threshold is a guide, and there is no duty to register yet.",
+      change: "Change answers",
+    },
+    create: {
+      title: "Create critical facility",
+      name: "Facility name",
+      location: "Location",
+      date: "Planned registration",
+      dateHint: "Set to today plus {{months}} months. The projected deadlines follow from it.",
+      nameMissing: "Please enter a name.",
+      locationMissing: "Please enter the location.",
+      dateMissing: "Please enter a date.",
+      submit: "Create as critical facility",
+      failed: "The facility couldn't be created. Please try again.",
+      readOnly: "Only GRC managers can create a critical facility.",
+    },
+    created: {
+      title: "{{name}} created",
+      registration: "Planned registration on {{date}}. These deadlines follow from it:",
+    },
+    obligations: {
+      riskAnalysis: "Risk analysis and assessment",
+      measures: "Resilience measures and resilience plan",
+      incidents: "Incident reporting",
+      management: "Management duties",
+      other: "Duty",
+    },
+  },
   patterns: {
     back: "Back",
     close: "Close",
