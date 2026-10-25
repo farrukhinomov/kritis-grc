@@ -1,0 +1,11 @@
+# Copy to demo.tfvars (git-ignored) and fill in. No secrets belong here: secret values go
+# into Secret Manager, and the Cloudflare token comes from CLOUDFLARE_API_TOKEN.
+
+project_id         = "your-gcp-project-id"
+github_repository  = "your-github-user/kritis-grc"
+billing_account_id = "000000-000000-000000"
+budget_currency    = "EUR"
+# budget_alert_emails = ["you@example.com"]
+
+cloudflare_account_id = "your-cloudflare-account-id"
+cloudflare_zone_id    = "your-inomov-online-zone-id"

@@ -19,6 +19,8 @@ env:
   TRIVY_IMAGE: aquasec/trivy:0.76.1@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c
   GITLEAKS_IMAGE: zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
   OSV_SCANNER_IMAGE: ghcr.io/google/osv-scanner:v2.7.0@sha256:4f3b7e2c64b9d38a5febc5a7e4a3dfef1d1362f726dea7a2ef4762b46469fcd0
+  TOFU_IMAGE: ghcr.io/opentofu/opentofu:1.13.2@sha256:25bdfbe87000b8a88d44c7ef0cca53381da95f6203f7aed1e8cf5b81ecbe18eb
+  TFLINT_IMAGE: ghcr.io/terraform-linters/tflint:v0.65.0@sha256:2788f4d4fc663c0e953b011b01bf443fe5bfce7587ee916e588e6057b85d6359
 
 jobs:
   changes:
@@ -31,6 +33,7 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       risk-engine: ${{ steps.filter.outputs.risk-engine }}
       frontend: ${{ steps.filter.outputs.frontend }}
+      infra: ${{ steps.filter.outputs.infra }}
       stack: ${{ steps.filter.outputs.stack }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -53,6 +56,9 @@ jobs:
             frontend:
               - *shared
               - frontend/**
+            infra:
+              - *shared
+              - infra/tofu/**
             stack:
               - *shared
               - backend/**
@@ -173,6 +179,33 @@ jobs:
       - name: Production dependency licenses
         run: pnpm licenses list --prod --json | node ../scripts/check-node-licenses.mjs
 
+  infra:
+    name: Infrastructure code
+    needs: changes
+    if: needs.changes.outputs.infra == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Checks that need no cloud credentials. Plans against the real project run once
+      # deployments authenticate through Workload Identity Federation.
+      - name: Format, initialize and validate
+        run: |
+          docker run --rm -v "$PWD/infra/tofu:/work" -w /work "$TOFU_IMAGE" fmt -check -recursive
+          docker run --rm -v "$PWD/infra/tofu:/work" -w /work "$TOFU_IMAGE" init -backend=false -input=false -lockfile=readonly
+          docker run --rm -v "$PWD/infra/tofu:/work" -w /work "$TOFU_IMAGE" validate
+      - name: Lint
+        run: |
+          docker run --rm -v "$PWD/infra/tofu:/work" -w /work --entrypoint sh "$TFLINT_IMAGE" \
+            -c "tflint --init && tflint --recursive"
+      - name: Scan for insecure configuration
+        run: |
+          docker run --rm -v "$PWD/infra/tofu:/src:ro" "$TRIVY_IMAGE" \
+            config --severity HIGH,CRITICAL --exit-code 1 /src
+
   images:
     name: Image ${{ matrix.name }}
     needs: changes
@@ -280,7 +313,7 @@ jobs:
   ci-passed:
     name: CI passed
     if: always()
-    needs: [changes, backend, risk-engine, frontend, images, dependencies, secrets, stack]
+    needs: [changes, backend, risk-engine, frontend, infra, images, dependencies, secrets, stack]
     runs-on: ubuntu-24.04
     permissions: {}
     steps:

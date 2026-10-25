@@ -92,7 +92,7 @@ As a maintainer, I want every PR checked automatically, so that `main` stays rel
 
 As a maintainer, I want the cloud setup reproducible from code, so that it can be rebuilt, reviewed and moved.
 
-- [ ] `infra/` with OpenTofu (MPL-2.0) for GCP and Cloudflare:
+- [x] `infra/` with OpenTofu (MPL-2.0) for GCP and Cloudflare:
   - Artifact Registry.
   - Two Cloud Run services in `europe-west3` (min 0 / max 1). Only Django's service account may invoke the risk engine.
   - The migration Job and the demo-reset Job.
@@ -101,9 +101,11 @@ As a maintainer, I want the cloud setup reproducible from code, so that it can b
   - Workload Identity Federation for this repository only.
   - A €1 budget alert.
   - An R2 bucket under EU jurisdiction (private, CORS limited to the app origin), plus the `grc.inomov.online` DNS record (DNS only).
-- [ ] State is stored remotely, in a GCS bucket with versioning.
-- [ ] Supabase (`eu-central-1`, Data API off, the two roles) and Vercel (project, domain, Git integration off) are set up by hand, following a documented checklist in `infra/README.md`.
-- [ ] `tofu plan` runs in CI on infra changes. `apply` is done by hand.
+- [x] State is stored remotely, in a GCS bucket with versioning (configured; the bucket is created once by hand).
+- [x] Supabase (`eu-central-1`, Data API off, the two roles) and Vercel (project, domain, Git integration off) are set up by hand, following a documented checklist in `infra/README.md`.
+- [x] CI runs `tofu fmt`, `validate`, TFLint and Trivy's configuration scan on infra changes.
+- [ ] `tofu plan` against the real project runs in CI (needs the cloud accounts and Workload Identity Federation). `apply` is done by hand.
+- [ ] First `tofu apply` against the demo project (needs the cloud accounts).
 
 ### M0-08 CD pipeline
 **Labels:** `ci`, `infra`, `type:chore`, `prio:must` · **Estimate:** 3 h · **Depends on:** M0-06, M0-07

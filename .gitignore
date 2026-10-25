@@ -35,3 +35,11 @@ Thumbs.db
 
 # Local editor/assistant launch settings
 .claude/launch.json
+
+# OpenTofu: local state, plans and variable files with real account IDs
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example

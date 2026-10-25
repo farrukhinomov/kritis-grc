@@ -54,6 +54,12 @@ docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.12   # workflow sy
 uvx zizmor .github/workflows                                      # workflow security
 ```
 
+Infrastructure (details and bootstrap in [infra/README.md](infra/README.md)):
+
+```bash
+cd infra/tofu && tofu fmt -check && tofu init -backend=false && tofu validate
+```
+
 ## Non-negotiable rules
 
 - **Tenant isolation:**
