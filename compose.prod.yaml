@@ -71,6 +71,8 @@ services:
   web:
     build:
       context: ./frontend
+      additional_contexts:
+        seed: ./seed
       args:
         VITE_API_MOCKING: disabled
     environment:

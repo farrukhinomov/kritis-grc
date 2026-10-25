@@ -1,0 +1,40 @@
+[
+  {
+    "id": "sc-org",
+    "name": "Muster-Stadtwerke Saar GmbH (gesamt)",
+    "kind": "organization",
+    "critical_facility": null
+  },
+  {
+    "id": "sc-nord",
+    "name": "Wasserwerk Nord",
+    "kind": "critical_facility",
+    "critical_facility": {
+      "sector": "water",
+      "critical_service": "drinking_water_supply",
+      "people_supplied": 620000,
+      "threshold": 500000,
+      "location": "Musterstadt-Nord",
+      "registration": {
+        "status": "planned",
+        "date": "2027-01-15"
+      }
+    }
+  },
+  {
+    "id": "sc-sued",
+    "name": "Wasserwerk Süd",
+    "kind": "critical_facility",
+    "critical_facility": {
+      "sector": "water",
+      "critical_service": "drinking_water_supply",
+      "people_supplied": 540000,
+      "threshold": 500000,
+      "location": "Musterstadt-Süd",
+      "registration": {
+        "status": "planned",
+        "date": "2027-03-01"
+      }
+    }
+  }
+]

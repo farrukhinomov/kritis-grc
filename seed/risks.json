@@ -1,0 +1,200 @@
+[
+  {
+    "id": "rk-n-power",
+    "scope_id": "sc-nord",
+    "hazard_id": "hz-power",
+    "asset_ids": [
+      "as-n-power",
+      "as-n-pumps"
+    ],
+    "title_de": "Längerer Stromausfall legt Pumpwerk Nord still",
+    "inherent": {
+      "likelihood": 3,
+      "impact": 4
+    },
+    "target": {
+      "likelihood": 2,
+      "impact": 2
+    },
+    "treatments": [
+      {
+        "implementation_id": "im-015",
+        "dimension": "impact",
+        "levels": 2
+      },
+      {
+        "implementation_id": "im-009",
+        "dimension": "likelihood",
+        "levels": 1
+      }
+    ],
+    "owner_id": "u-yilmaz"
+  },
+  {
+    "id": "rk-n-flood",
+    "scope_id": "sc-nord",
+    "hazard_id": "hz-flood",
+    "asset_ids": [
+      "as-n-wells"
+    ],
+    "title_de": "Hochwasser verunreinigt Brunnenfeld Nord",
+    "inherent": {
+      "likelihood": 2,
+      "impact": 3
+    },
+    "target": {
+      "likelihood": 1,
+      "impact": 2
+    },
+    "treatments": [
+      {
+        "implementation_id": "im-011",
+        "dimension": "impact",
+        "levels": 1
+      },
+      {
+        "implementation_id": "im-009",
+        "dimension": "likelihood",
+        "levels": 1
+      }
+    ],
+    "owner_id": "u-yilmaz"
+  },
+  {
+    "id": "rk-n-sabotage",
+    "scope_id": "sc-nord",
+    "hazard_id": "hz-sabotage",
+    "asset_ids": [
+      "as-n-wells",
+      "as-n-reservoir"
+    ],
+    "title_de": "Unbefugter Zutritt zum Brunnenfeld und Hochbehälter",
+    "inherent": {
+      "likelihood": 2,
+      "impact": 4
+    },
+    "target": {
+      "likelihood": 1,
+      "impact": 3
+    },
+    "treatments": [
+      {
+        "implementation_id": "im-011",
+        "dimension": "likelihood",
+        "levels": 1
+      },
+      {
+        "implementation_id": "im-017",
+        "dimension": "likelihood",
+        "levels": 1
+      }
+    ],
+    "owner_id": "u-becker"
+  },
+  {
+    "id": "rk-n-supply",
+    "scope_id": "sc-nord",
+    "hazard_id": "hz-supply",
+    "asset_ids": [
+      "as-chlorine",
+      "as-n-plant"
+    ],
+    "title_de": "Ausfall des einzigen Chemikalienlieferanten",
+    "inherent": {
+      "likelihood": 2,
+      "impact": 3
+    },
+    "target": {
+      "likelihood": 1,
+      "impact": 2
+    },
+    "treatments": [
+      {
+        "implementation_id": "im-015",
+        "dimension": "impact",
+        "levels": 1
+      }
+    ],
+    "owner_id": "u-kramer"
+  },
+  {
+    "id": "rk-s-cyber",
+    "scope_id": "sc-sued",
+    "hazard_id": "hz-cyber",
+    "asset_ids": [
+      "as-s-scada"
+    ],
+    "title_de": "Cyberangriff auf Prozessleitsystem Süd",
+    "inherent": {
+      "likelihood": 3,
+      "impact": 3
+    },
+    "target": {
+      "likelihood": 2,
+      "impact": 2
+    },
+    "treatments": [
+      {
+        "implementation_id": "im-043",
+        "dimension": "likelihood",
+        "levels": 1
+      },
+      {
+        "implementation_id": "im-035",
+        "dimension": "impact",
+        "levels": 1
+      }
+    ],
+    "owner_id": "u-becker"
+  },
+  {
+    "id": "rk-s-drought",
+    "scope_id": "sc-sued",
+    "hazard_id": "hz-drought",
+    "asset_ids": [
+      "as-s-wells"
+    ],
+    "title_de": "Niedrigwasser der Talsperre im Hitzesommer",
+    "inherent": {
+      "likelihood": 3,
+      "impact": 3
+    },
+    "target": {
+      "likelihood": 2,
+      "impact": 2
+    },
+    "treatments": [
+      {
+        "implementation_id": "im-010",
+        "dimension": "impact",
+        "levels": 1
+      }
+    ],
+    "owner_id": "u-yilmaz"
+  },
+  {
+    "id": "rk-s-staff",
+    "scope_id": "sc-sued",
+    "hazard_id": "hz-staff",
+    "asset_ids": [
+      "as-s-plant"
+    ],
+    "title_de": "Ausfall des Schichtpersonals der Leitwarte Süd",
+    "inherent": {
+      "likelihood": 2,
+      "impact": 3
+    },
+    "target": {
+      "likelihood": 2,
+      "impact": 2
+    },
+    "treatments": [
+      {
+        "implementation_id": "im-020",
+        "dimension": "impact",
+        "levels": 1
+      }
+    ],
+    "owner_id": "u-yilmaz"
+  }
+]

@@ -1,0 +1,90 @@
+[
+  {
+    "id": "map-p-1",
+    "kind": "platform",
+    "target_requirement_id": "req-k-12-1",
+    "source_requirement_id": "req-b-30-2-1",
+    "coverage": "partial",
+    "justification_de": "Beide fordern eine dokumentierte Risikoanalyse. Das BSIG betrachtet nur die IT-Sicherheit; physische Gefahren und sektorübergreifende Abhängigkeiten nach § 12 KRITIS-DachG fehlen.",
+    "gap_note_de": "Physische Gefahren, Naturgefahren und Abhängigkeiten von anderen Sektoren ergänzen.",
+    "approved_by_id": null,
+    "approved_at": null
+  },
+  {
+    "id": "map-p-2",
+    "kind": "platform",
+    "target_requirement_id": "req-k-13-3-4",
+    "source_requirement_id": "req-b-30-2-3",
+    "coverage": "partial",
+    "justification_de": "Aufrechterhaltung des Betriebs und Krisenmanagement nach § 30 Abs. 2 Nr. 3 BSIG decken die IT-Seite ab, nicht aber Notstrom und alternative Lieferketten für die Anlage selbst.",
+    "gap_note_de": "Notstromversorgung und alternative Lieferketten der Anlage ergänzen.",
+    "approved_by_id": null,
+    "approved_at": null
+  },
+  {
+    "id": "map-p-3",
+    "kind": "platform",
+    "target_requirement_id": "req-k-13-3-5",
+    "source_requirement_id": "req-b-30-2-9",
+    "coverage": "partial",
+    "justification_de": "Personalsicherheit ist in beiden Gesetzen gefordert; das BSIG zielt auf Zugriffe auf IT-Systeme, das KRITIS-Dachgesetz auch auf Personal externer Dienstleister vor Ort.",
+    "gap_note_de": "Zutrittsrelevantes Personal externer Dienstleister einbeziehen.",
+    "approved_by_id": null,
+    "approved_at": null
+  },
+  {
+    "id": "map-p-4",
+    "kind": "platform",
+    "target_requirement_id": "req-k-13-3-6",
+    "source_requirement_id": "req-b-30-2-7",
+    "coverage": "partial",
+    "justification_de": "Schulungen nach § 30 Abs. 2 Nr. 7 BSIG behandeln IT-Sicherheit; Übungen zu physischen Vorfällen und zur Wiederherstellung fehlen.",
+    "gap_note_de": "Übungen zu physischen Szenarien und Wiederanlauf ergänzen.",
+    "approved_by_id": null,
+    "approved_at": null
+  },
+  {
+    "id": "map-p-5",
+    "kind": "platform",
+    "target_requirement_id": "req-k-18-1",
+    "source_requirement_id": "req-b-32-1",
+    "coverage": "partial",
+    "justification_de": "Beide Meldungen gehen an die gemeinsame Meldestelle von BSI und BBK, mit Erstmeldung binnen 24 Stunden und Bericht nach einem Monat. Das KRITIS-Dachgesetz erfasst auch Vorfälle ohne IT-Bezug.",
+    "gap_note_de": "Meldeprozess auf physische Vorfälle erweitern.",
+    "approved_by_id": null,
+    "approved_at": null
+  },
+  {
+    "id": "map-p-6",
+    "kind": "platform",
+    "target_requirement_id": "req-k-8-1",
+    "source_requirement_id": "req-b-33-1",
+    "coverage": "partial",
+    "justification_de": "Beide Registrierungen laufen über die gemeinsame Registrierungsmöglichkeit; § 33 Abs. 2 BSIG verweist für kritische Anlagen ausdrücklich auf § 8 KRITIS-DachG. Anlagenbezogene Angaben kommen hinzu.",
+    "gap_note_de": "Anlagenbezogene Angaben (Versorgungsgrad, Standort, kritische Komponenten) ergänzen.",
+    "approved_by_id": null,
+    "approved_at": null
+  },
+  {
+    "id": "map-p-7",
+    "kind": "platform",
+    "target_requirement_id": "req-k-16-3",
+    "source_requirement_id": "req-b-39-1",
+    "coverage": "partial",
+    "justification_de": "§ 16 Abs. 1 KRITIS-DachG erlaubt ausdrücklich, Nachweise nach § 39 BSIG heranzuziehen. Sie decken jedoch nur die IT-Maßnahmen ab.",
+    "gap_note_de": "Nachweise zu physischen Resilienzmaßnahmen ergänzen.",
+    "approved_by_id": null,
+    "approved_at": null
+  },
+  {
+    "id": "map-t-1",
+    "kind": "tenant",
+    "target_requirement_id": "req-k-13-3-3",
+    "source_requirement_id": "req-b-30-2-2",
+    "coverage": "partial",
+    "justification_de": "Unser Krisenstab ist für IT- und physische Vorfälle derselbe; das Verfahren nach § 30 Abs. 2 Nr. 2 BSIG gilt hausweit.",
+    "gap_note_de": "Alarmabläufe für Objektschutz-Vorfälle separat dokumentieren.",
+    "approved_by_id": "u-kramer",
+    "approved_at": "2026-10-08T10:12:00Z"
+  }
+]

@@ -56,6 +56,7 @@ jobs:
             frontend:
               - *shared
               - frontend/**
+              - seed/**
             infra:
               - *shared
               - infra/tofu/**
@@ -64,6 +65,7 @@ jobs:
               - backend/**
               - services/risk-engine/**
               - frontend/**
+              - seed/**
               - infra/**
               - compose*.yaml
 
@@ -239,6 +241,8 @@ jobs:
             context: services/risk-engine
           - name: frontend
             context: frontend
+            # The demo fixtures sit outside the frontend's build context.
+            build-contexts: seed=seed
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -247,6 +251,7 @@ jobs:
       - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ${{ matrix.context }}
+          build-contexts: ${{ matrix.build-contexts }}
           load: true
           tags: grc-${{ matrix.name }}:ci
           cache-from: type=gha,scope=${{ matrix.name }}

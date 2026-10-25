@@ -1,0 +1,30 @@
+[
+  {
+    "id": "u-kramer",
+    "display_name": "Alex Kramer",
+    "email": "alex.kramer@example.com",
+    "role": "grc_manager",
+    "job_title": "GRC-Manager"
+  },
+  {
+    "id": "u-becker",
+    "display_name": "Jana Becker",
+    "email": "jana.becker@example.com",
+    "role": "grc_manager",
+    "job_title": "Informationssicherheitsbeauftragte"
+  },
+  {
+    "id": "u-yilmaz",
+    "display_name": "Deniz Yılmaz",
+    "email": "deniz.yilmaz@example.com",
+    "role": "grc_manager",
+    "job_title": "Betriebsleitung Wasserwerke"
+  },
+  {
+    "id": "u-wolff",
+    "display_name": "Tobias Wolff",
+    "email": "tobias.wolff@example.com",
+    "role": "auditor",
+    "job_title": "Interne Revision"
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "fw-kritisdachg",
+    "key": "kritis_dachg",
+    "name": "KRITIS-Dachgesetz",
+    "versions": [
+      {
+        "id": "fv-kritisdachg-2026-07",
+        "label": "Fassung vom 29.07.2026",
+        "effective_from": "2026-07-29",
+        "source_url": "https://www.gesetze-im-internet.de/kritisdachg/",
+        "retrieved_at": "2026-10-25"
+      }
+    ]
+  },
+  {
+    "id": "fw-bsig",
+    "key": "bsig",
+    "name": "NIS2 (BSIG 2025)",
+    "versions": [
+      {
+        "id": "fv-bsig-2025-12",
+        "label": "Fassung vom 06.12.2025",
+        "effective_from": "2025-12-06",
+        "source_url": "https://www.gesetze-im-internet.de/bsig_2025/",
+        "retrieved_at": "2026-10-25"
+      }
+    ]
+  }
+]

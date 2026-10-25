@@ -14,6 +14,9 @@ RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 
 COPY . .
+# The demo fixtures live in the repository's seed/ folder, outside this build context,
+# and come in as the named context "seed" (compose: additional_contexts, CI: build-contexts).
+COPY --from=seed . /seed
 # Baked in at build time: "enabled" produces the prototype that runs on mock data.
 ARG VITE_API_MOCKING=disabled
 ENV VITE_API_MOCKING=${VITE_API_MOCKING}

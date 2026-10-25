@@ -1,0 +1,344 @@
+[
+  {
+    "id": "req-k-8-1",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 8",
+    "citation": "§ 8 Abs. 1",
+    "title_de": "Registrierung der kritischen Anlage",
+    "title_en": "Register the critical facility",
+    "text_de": "(1) Ein Betreiber kritischer Anlagen ist verpflichtet, spätestens drei Monate, nachdem eine Anlage als kritische Anlage gilt, dem Bundesamt für Bevölkerungsschutz und Katastrophenhilfe über eine gemeinsam vom Bundesamt für Sicherheit in der Informationstechnik und dem Bundesamt für Bevölkerungsschutz und Katastrophenhilfe eingerichtete Registrierungsmöglichkeit folgende Angaben zu übermitteln:\n1. den Namen des Betreibers kritischer Anlagen, einschließlich der Rechtsform und, falls einschlägig, die Handelsregisternummer,\n2. die Anschrift und aktuelle Kontaktdaten des Betreibers kritischer Anlagen, einschließlich der E-Mail-Adresse und der Telefonnummer,\n3. den Namen oder eine referenzierbare Bezeichnung der kritischen Anlage,\n4. den Sektor und, falls einschlägig, die Branche, zu dem oder zu der die kritische Anlage gehört, sowie die kritische Dienstleistung, für deren Erbringung die Anlage erheblich ist,\n5. soweit einschlägig, die Kategorie der kritischen Anlage und deren Werte zum Versorgungsgrad gemäß der Rechtsverordnung nach § 5 Absatz 1 Satz 1, den Standort der kritischen Anlagen und deren Versorgungsgebiet sowie deren öffentlichen IP-Adressbereiche,\n6. falls einschlägig, eine Auflistung der Mitgliedstaaten der Europäischen Union, in denen oder für die der Betreiber kritischer Anlagen wesentliche Dienste im Sinne des Artikels 2 Nummer 5 der Richtlinie (EU) 2022/2557 in der Fassung vom 14. Dezember 2022 und des Artikels 2 der Delegierten Verordnung (EU) 2023/2450 in der Fassung vom 25. Juli 2023 erbringt, unter Angabe, welche wesentlichen Dienste er in welchen oder für welche Mitgliedstaaten erbringt,\n7. eine Kontaktstelle, über die der Betreiber kritischer Anlagen erreichbar ist; in Bezug auf Maßnahmen nach dem BSI-Gesetz ist die jederzeitige Erreichbarkeit zu gewährleisten, sowie\n8. die bei ihm zum Einsatz kommenden Typen von kritischen Komponenten gemäß § 2 Nummer 23 des BSI-Gesetzes.",
+    "summary_en": "Register each critical facility with the BBK within three months of it becoming critical, giving operator, facility, sector, service, location and contact point.",
+    "pending_legal_detail": {
+      "reason_de": "Die Schwellenwerte (KritisV) sind noch nicht in Kraft; bis dahin besteht keine Registrierungspflicht.",
+      "reason_en": "The thresholds ordinance (KritisV) is not in force yet; until it is, there is no duty to register."
+    }
+  },
+  {
+    "id": "req-k-8-6",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 8",
+    "citation": "§ 8 Abs. 6",
+    "title_de": "Änderungen der Registrierungsangaben",
+    "title_en": "Report changes to registration data",
+    "text_de": "(6) Bei Änderungen der nach Absatz 1 zu übermittelnden Angaben sind über die in Absatz 1 genannte Registrierungsmöglichkeit geänderte Werte zum Versorgungsgrad einmal jährlich zu übermitteln und alle anderen Angaben unverzüglich, spätestens jedoch zwei Wochen ab dem Zeitpunkt, zu dem der Betreiber kritischer Anlagen von der Änderung Kenntnis erhalten hat, zu übermitteln. Das Bundesamt für Bevölkerungsschutz und Katastrophenhilfe informiert das Bundesamt für Sicherheit in der Informationstechnik sowie die zuständige Behörde unverzüglich über alle übermittelten Änderungen.",
+    "summary_en": "Report changes to the registration data within two weeks; supply-level figures are updated once a year.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-k-12-1",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 12",
+    "citation": "§ 12 Abs. 1",
+    "title_de": "Risikoanalyse und Risikobewertung",
+    "title_en": "Risk analysis and assessment",
+    "text_de": "(1) Der Betreiber kritischer Anlagen führt auf Grundlage der nationalen Risikoanalysen und Risikobewertungen und anderer vertrauenswürdiger Informationsquellen im Bedarfsfall, mindestens jedoch alle vier Jahre, eine Risikoanalyse und Risikobewertung durch, die Folgendes berücksichtigt:\n1. die in § 11 Absatz 2 Nummer 1 genannten Risiken,\n2. Risiken, die geeignet sein können, die Verfügbarkeit der kritischen Dienstleistungen zu beeinträchtigen und die sich aus Folgendem ergeben:\na) dem Ausmaß der Abhängigkeit des Betreibers kritischer Anlagen von den kritischen Dienstleistungen, die von anderen Betreibern kritischer Anlagen auch in anderen Sektoren und auch in benachbarten Mitgliedstaaten der Europäischen Union und in Drittstaaten erbracht werden, und\nb) dem Ausmaß der Abhängigkeiten anderer Sektoren von der kritischen Dienstleistung, die von einem Betreiber kritischer Anlagen auch in benachbarten Mitgliedstaaten der Europäischen Union und Drittstaaten erbracht wird.",
+    "summary_en": "Carry out a risk analysis and assessment based on the national risk analyses, including cross-sector dependencies, when needed and at least every four years.",
+    "pending_legal_detail": {
+      "reason_de": "Inhaltliche und methodische Vorgaben per Rechtsverordnung (§ 12 Abs. 3) stehen noch aus.",
+      "reason_en": "The ordinance setting content and method requirements (§ 12 Abs. 3) has not been issued yet."
+    }
+  },
+  {
+    "id": "req-k-13-1",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 13",
+    "citation": "§ 13 Abs. 1",
+    "title_de": "Resilienzmaßnahmen treffen",
+    "title_en": "Take resilience measures",
+    "text_de": "(1) Der Betreiber kritischer Anlagen ist verpflichtet, nach Maßgabe der Absätze 2 und 3 Maßnahmen zur Gewährleistung seiner Resilienz zu treffen, um\n1. das Auftreten von Vorfällen zu verhindern,\n2. einen angemessenen physischen Schutz von Liegenschaften und kritischen Anlagen zu gewährleisten,\n3. auf Vorfälle zu reagieren, sie abzuwehren und die negativen Auswirkungen solcher Vorfälle zu begrenzen und\n4. nach Vorfällen die zügige Wiederherstellung der kritischen Dienstleistung zu gewährleisten.",
+    "summary_en": "Take measures to prevent incidents, protect sites physically, respond to and limit incidents, and restore the critical service quickly.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-k-13-3-1",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 13",
+    "citation": "§ 13 Abs. 3 Nr. 1",
+    "title_de": "Notfallvorsorge",
+    "title_en": "Emergency preparedness",
+    "text_de": "(3) Zu den Maßnahmen zur Erreichung der Ziele nach Absatz 1 können die folgenden zählen, soweit ihnen nicht bereits bestehende spezialgesetzliche Regelungen in den jeweiligen Branchen vorgehen:\n1. zum Zweck der Zielerreichung nach Absatz 1 Nummer 1 zählen Maßnahmen der Notfallvorsorge,",
+    "summary_en": "Emergency preparedness measures to prevent incidents.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-k-13-3-2",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 13",
+    "citation": "§ 13 Abs. 3 Nr. 2",
+    "title_de": "Objektschutz, Detektion und Zugangskontrolle",
+    "title_en": "Physical protection, detection and access control",
+    "text_de": "(3) Zu den Maßnahmen zur Erreichung der Ziele nach Absatz 1 können die folgenden zählen, soweit ihnen nicht bereits bestehende spezialgesetzliche Regelungen in den jeweiligen Branchen vorgehen:\n2. zum Zweck der Zielerreichung nach Absatz 1 Nummer 2 zählen:\na) Maßnahmen der baulichen und technischen Sicherung und des organisatorischen Schutzes (Objektschutz) wie Liegenschaftsabgrenzungen und hemmende Fassadenelemente,\nb) Instrumente und Verfahren für die Überwachung der Umgebung,\nc) der Einsatz von Detektionsgeräten und\nd) Zugangskontrollen,",
+    "summary_en": "Structural and technical site security, monitoring of the surroundings, detection equipment and access control.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-k-13-3-3",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 13",
+    "citation": "§ 13 Abs. 3 Nr. 3",
+    "title_de": "Risiko- und Krisenmanagement, Alarmabläufe",
+    "title_en": "Risk and crisis management, alarm procedures",
+    "text_de": "(3) Zu den Maßnahmen zur Erreichung der Ziele nach Absatz 1 können die folgenden zählen, soweit ihnen nicht bereits bestehende spezialgesetzliche Regelungen in den jeweiligen Branchen vorgehen:\n3. zum Zweck der Zielerreichung nach Absatz 1 Nummer 3 zählen:\na) Risiko- und Krisenmanagementverfahren und -protokolle und\nb) vorgegebene Abläufe im Alarmfall,",
+    "summary_en": "Risk and crisis management procedures and protocols, and defined procedures for alarms.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-k-13-3-4",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 13",
+    "citation": "§ 13 Abs. 3 Nr. 4",
+    "title_de": "Aufrechterhaltung des Betriebs",
+    "title_en": "Business continuity",
+    "text_de": "(3) Zu den Maßnahmen zur Erreichung der Ziele nach Absatz 1 können die folgenden zählen, soweit ihnen nicht bereits bestehende spezialgesetzliche Regelungen in den jeweiligen Branchen vorgehen:\n4. zum Zweck der Zielerreichung nach Absatz 1 Nummer 4 zählen:\na) Maßnahmen zur Aufrechterhaltung des Betriebs, darunter die Notstromversorgung und\nb) die Ermittlung alternativer Lieferketten, um die Erbringung des wesentlichen Dienstes wiederaufzunehmen,",
+    "summary_en": "Keep operations running, including emergency power, and identify alternative supply chains to resume the service.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-k-13-3-5",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 13",
+    "citation": "§ 13 Abs. 3 Nr. 5",
+    "title_de": "Personalsicherheit",
+    "title_en": "Personnel security",
+    "text_de": "(3) Zu den Maßnahmen zur Erreichung der Ziele nach Absatz 1 können die folgenden zählen, soweit ihnen nicht bereits bestehende spezialgesetzliche Regelungen in den jeweiligen Branchen vorgehen:\n5. ein angemessenes Sicherheitsmanagement hinsichtlich der Mitarbeitenden zu gewährleisten, einschließlich des Personals externer Dienstleister, und",
+    "summary_en": "Appropriate security management for staff, including the staff of external service providers.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-k-13-3-6",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 13",
+    "citation": "§ 13 Abs. 3 Nr. 6",
+    "title_de": "Schulungen und Übungen",
+    "title_en": "Training and exercises",
+    "text_de": "(3) Zu den Maßnahmen zur Erreichung der Ziele nach Absatz 1 können die folgenden zählen, soweit ihnen nicht bereits bestehende spezialgesetzliche Regelungen in den jeweiligen Branchen vorgehen:\n6. das Personal für die unter den in Absatz 1 Nummer 1 bis 4 sowie in Nummer 5 genannten Maßnahmen durch Informationsmaterialien, Schulungen und Übungen vertraut zu machen.",
+    "summary_en": "Familiarise staff with the measures through information material, training and exercises.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-k-13-4",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 13",
+    "citation": "§ 13 Abs. 4",
+    "title_de": "Resilienzplan",
+    "title_en": "Resilience plan",
+    "text_de": "(4) Der Betreiber kritischer Anlagen muss die Maßnahmen nach Absatz 1 in einem Resilienzplan darstellen und diesen anwenden. Aus dem Resilienzplan müssen die den Maßnahmen zugrunde liegenden Erwägungen hervorgehen. Auf die Risikoanalyse und Risikobewertung des Betreibers ist Bezug zu nehmen. Der Resilienzplan ist bei Bedarf sowie nach Durchführung einer Risikoanalyse und Risikobewertung des Betreibers kritischer Anlagen zu aktualisieren.",
+    "summary_en": "Document the measures and their reasoning in a resilience plan that refers to the risk assessment, apply it and keep it up to date.",
+    "pending_legal_detail": {
+      "reason_de": "Die BBK-Vorlagen und -Muster für Resilienzpläne (§ 13 Abs. 5) sind noch nicht veröffentlicht.",
+      "reason_en": "The BBK templates for resilience plans (§ 13 Abs. 5) have not been published yet."
+    }
+  },
+  {
+    "id": "req-k-16-2",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 16",
+    "citation": "§ 16 Abs. 2",
+    "title_de": "Nachweise auf Verlangen",
+    "title_en": "Evidence on request",
+    "text_de": "(2) Sofern die nach Absatz 1 übermittelten Informationen zur Feststellung der Einhaltung der Verpflichtungen nach § 13 Absatz 1 nicht ausreichen, kann die zuständige Behörde einzelne Betreiber kritischer Anlagen zur Vorlage weiterer Informationen und geeigneter Nachweise auffordern. Insbesondere kann sie die Vorlage des Resilienzplans verlangen. Bei der Auswahl, von welchen Betreibern kritischer Anlagen Nachweise nach Satz 1 angefordert werden, verfolgt die zuständige Behörde einen risikobasierten Ansatz. Sie wählt die zu kontrollierenden Betreiber kritischer Anlagen anhand des Ausmaßes der Risikoexposition, der Größe des Betreibers kritischer Anlagen und der Eintrittswahrscheinlichkeit und Schwere von möglichen Vorfällen sowie deren möglichen gesellschaftlichen und wirtschaftlichen Auswirkungen aus. Der Grundsatz der Wirtschaftlichkeit der Verwaltung soll dabei berücksichtigt werden.",
+    "summary_en": "On request, provide further information and suitable evidence to the competent authority, in particular the resilience plan.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-k-16-3",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 16",
+    "citation": "§ 16 Abs. 3",
+    "title_de": "Nachweis durch Audits",
+    "title_en": "Evidence through audits",
+    "text_de": "(3) Ein Nachweis zur Einhaltung der Verpflichtung nach § 13 Absatz 1 kann durch Audits erfolgen. Der Betreiber kritischer Anlagen übermittelt der zuständigen Behörde auf deren Verlangen die Ergebnisse des Audits einschließlich der dabei aufgedeckten Mängel. Die zuständige Behörde kann die Vorlage der Dokumentation, die der Überprüfung durch ein Audit oder auf andere Weise zugrunde gelegt wurde, verlangen.",
+    "summary_en": "Compliance can be shown through audits; on request, submit the audit results including any deficiencies found.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-k-18-1",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 18",
+    "citation": "§ 18 Abs. 1",
+    "title_de": "Meldung von Vorfällen",
+    "title_en": "Report incidents",
+    "text_de": "(1) Der Betreiber kritischer Anlagen ist verpflichtet, dem Bundesamt für Bevölkerungsschutz und Katastrophenhilfe Vorfälle unverzüglich, spätestens 24 Stunden nach Kenntnis der vom Bundesamt für Sicherheit in der Informationstechnik und dem Bundesamt für Bevölkerungsschutz und Katastrophenhilfe eingerichteten gemeinsamen Meldestelle zu melden. Bei einem andauernden Vorfall ist die Erstmeldung zu aktualisieren. Spätestens einen Monat nach Kenntnis des Vorfalls ist ein ausführlicher Bericht zu übermitteln. Meldepflichten auf Grund sonstiger gesetzlicher Vorgaben bleiben unberührt.",
+    "summary_en": "Report incidents to the BBK within 24 hours, update the report while the incident lasts, and send a detailed report within one month.",
+    "pending_legal_detail": {
+      "reason_de": "Die Einzelheiten des Meldeverfahrens (§ 18 Abs. 3) sind noch nicht festgelegt.",
+      "reason_en": "The details of the reporting procedure (§ 18 Abs. 3) have not been set yet."
+    }
+  },
+  {
+    "id": "req-k-18-2",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 18",
+    "citation": "§ 18 Abs. 2",
+    "title_de": "Inhalt der Meldungen",
+    "title_en": "Content of incident reports",
+    "text_de": "(2) Die Meldungen müssen die zu ihrem Zeitpunkt verfügbaren Informationen enthalten, die erforderlich sind, damit Art, Ursache und mögliche, auch grenzüberschreitende, Auswirkungen und Folgen des Vorfalls ermittelt und nachvollzogen werden können. Insbesondere sind folgende Angaben zu machen:\n1. die Anzahl und der Anteil der von dem Vorfall Betroffenen,\n2. die bisherige und voraussichtliche Dauer des Vorfalls sowie\n3. das betroffene geografische Gebiet des Vorfalls, unter Berücksichtigung des Umstands, ob das Gebiet geografisch isoliert ist.",
+    "summary_en": "Reports state the people affected, the duration and the geographic area of the incident.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-k-20-1",
+    "framework_version_id": "fv-kritisdachg-2026-07",
+    "paragraph": "§ 20",
+    "citation": "§ 20 Abs. 1",
+    "title_de": "Umsetzungspflicht der Geschäftsleitung",
+    "title_en": "Management accountability",
+    "text_de": "(1) Geschäftsleitungen von Betreibern kritischer Anlagen sind verpflichtet, die von den Betreibern kritischer Anlagen nach § 13 Absatz 1 zu ergreifenden Resilienzmaßnahmen umzusetzen und ihre Umsetzung durch geeignete Organisationsmaßnahmen sicherzustellen.",
+    "summary_en": "Management must implement the resilience measures and ensure their implementation through suitable organisational measures.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-30-2-1",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 30",
+    "citation": "§ 30 Abs. 2 Nr. 1",
+    "title_de": "Risikoanalyse und Sicherheitskonzepte",
+    "title_en": "Risk analysis and security policies",
+    "text_de": "(2) Maßnahmen nach Absatz 1 sollen den Stand der Technik einhalten, die einschlägigen europäischen und internationalen Normen berücksichtigen und müssen auf einem gefahrenübergreifenden Ansatz beruhen. Die Maßnahmen müssen zumindest Folgendes umfassen:\n1. Konzepte in Bezug auf die Risikoanalyse und auf die Sicherheit in der Informationstechnik,",
+    "summary_en": "Policies on risk analysis and information security.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-30-2-2",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 30",
+    "citation": "§ 30 Abs. 2 Nr. 2",
+    "title_de": "Bewältigung von Sicherheitsvorfällen",
+    "title_en": "Incident handling",
+    "text_de": "(2) Maßnahmen nach Absatz 1 sollen den Stand der Technik einhalten, die einschlägigen europäischen und internationalen Normen berücksichtigen und müssen auf einem gefahrenübergreifenden Ansatz beruhen. Die Maßnahmen müssen zumindest Folgendes umfassen:\n2. Bewältigung von Sicherheitsvorfällen,",
+    "summary_en": "Handling of security incidents.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-30-2-3",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 30",
+    "citation": "§ 30 Abs. 2 Nr. 3",
+    "title_de": "Aufrechterhaltung des Betriebs und Krisenmanagement",
+    "title_en": "Business continuity and crisis management",
+    "text_de": "(2) Maßnahmen nach Absatz 1 sollen den Stand der Technik einhalten, die einschlägigen europäischen und internationalen Normen berücksichtigen und müssen auf einem gefahrenübergreifenden Ansatz beruhen. Die Maßnahmen müssen zumindest Folgendes umfassen:\n3. Aufrechterhaltung des Betriebs, wie Backup-Management und Wiederherstellung nach einem Notfall, und Krisenmanagement,",
+    "summary_en": "Business continuity, such as backup management and disaster recovery, and crisis management.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-30-2-4",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 30",
+    "citation": "§ 30 Abs. 2 Nr. 4",
+    "title_de": "Sicherheit der Lieferkette",
+    "title_en": "Supply chain security",
+    "text_de": "(2) Maßnahmen nach Absatz 1 sollen den Stand der Technik einhalten, die einschlägigen europäischen und internationalen Normen berücksichtigen und müssen auf einem gefahrenübergreifenden Ansatz beruhen. Die Maßnahmen müssen zumindest Folgendes umfassen:\n4. Sicherheit der Lieferkette einschließlich sicherheitsbezogener Aspekte der Beziehungen zu unmittelbaren Anbietern oder Diensteanbietern,",
+    "summary_en": "Supply chain security, including the security of relationships with direct suppliers and service providers.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-30-2-5",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 30",
+    "citation": "§ 30 Abs. 2 Nr. 5",
+    "title_de": "Sicherheit bei Erwerb, Entwicklung und Wartung",
+    "title_en": "Secure acquisition, development and maintenance",
+    "text_de": "(2) Maßnahmen nach Absatz 1 sollen den Stand der Technik einhalten, die einschlägigen europäischen und internationalen Normen berücksichtigen und müssen auf einem gefahrenübergreifenden Ansatz beruhen. Die Maßnahmen müssen zumindest Folgendes umfassen:\n5. Sicherheitsmaßnahmen bei Erwerb, Entwicklung und Wartung von informationstechnischen Systemen, Komponenten und Prozessen, einschließlich Management und Offenlegung von Schwachstellen,",
+    "summary_en": "Security in acquiring, developing and maintaining IT systems, including vulnerability handling and disclosure.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-30-2-6",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 30",
+    "citation": "§ 30 Abs. 2 Nr. 6",
+    "title_de": "Wirksamkeitsbewertung",
+    "title_en": "Effectiveness assessment",
+    "text_de": "(2) Maßnahmen nach Absatz 1 sollen den Stand der Technik einhalten, die einschlägigen europäischen und internationalen Normen berücksichtigen und müssen auf einem gefahrenübergreifenden Ansatz beruhen. Die Maßnahmen müssen zumindest Folgendes umfassen:\n6. Konzepte und Verfahren zur Bewertung der Wirksamkeit von Risikomanagementmaßnahmen im Bereich der Sicherheit in der Informationstechnik,",
+    "summary_en": "Policies and procedures to assess the effectiveness of cybersecurity risk-management measures.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-30-2-7",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 30",
+    "citation": "§ 30 Abs. 2 Nr. 7",
+    "title_de": "Schulungen und Sensibilisierung",
+    "title_en": "Training and awareness",
+    "text_de": "(2) Maßnahmen nach Absatz 1 sollen den Stand der Technik einhalten, die einschlägigen europäischen und internationalen Normen berücksichtigen und müssen auf einem gefahrenübergreifenden Ansatz beruhen. Die Maßnahmen müssen zumindest Folgendes umfassen:\n7. grundlegende Schulungen und Sensibilisierungsmaßnahmen im Bereich der Sicherheit in der Informationstechnik,",
+    "summary_en": "Basic cyber hygiene practices and cybersecurity training.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-30-2-8",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 30",
+    "citation": "§ 30 Abs. 2 Nr. 8",
+    "title_de": "Kryptographie",
+    "title_en": "Cryptography",
+    "text_de": "(2) Maßnahmen nach Absatz 1 sollen den Stand der Technik einhalten, die einschlägigen europäischen und internationalen Normen berücksichtigen und müssen auf einem gefahrenübergreifenden Ansatz beruhen. Die Maßnahmen müssen zumindest Folgendes umfassen:\n8. Konzepte und Prozesse für den Einsatz von kryptographischen Verfahren,",
+    "summary_en": "Policies and procedures for the use of cryptography.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-30-2-9",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 30",
+    "citation": "§ 30 Abs. 2 Nr. 9",
+    "title_de": "Personalsicherheit, Zugriffskontrolle und Asset-Management",
+    "title_en": "Personnel security, access control and asset management",
+    "text_de": "(2) Maßnahmen nach Absatz 1 sollen den Stand der Technik einhalten, die einschlägigen europäischen und internationalen Normen berücksichtigen und müssen auf einem gefahrenübergreifenden Ansatz beruhen. Die Maßnahmen müssen zumindest Folgendes umfassen:\n9. Erstellung von Konzepten für die Sicherheit des Personals, die Zugriffskontrolle und für die Verwaltung von IKT-Systemen, -Produkten und -Prozessen,",
+    "summary_en": "Human resources security, access control policies and asset management.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-30-2-10",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 30",
+    "citation": "§ 30 Abs. 2 Nr. 10",
+    "title_de": "Multi-Faktor-Authentifizierung und gesicherte Kommunikation",
+    "title_en": "Multi-factor authentication and secure communication",
+    "text_de": "(2) Maßnahmen nach Absatz 1 sollen den Stand der Technik einhalten, die einschlägigen europäischen und internationalen Normen berücksichtigen und müssen auf einem gefahrenübergreifenden Ansatz beruhen. Die Maßnahmen müssen zumindest Folgendes umfassen:\n10. Verwendung von Lösungen zur Multi-Faktor-Authentifizierung oder kontinuierlichen Authentifizierung, gesicherte Sprach-, Video- und Textkommunikation sowie gegebenenfalls gesicherte Notfallkommunikationssysteme innerhalb der Einrichtung.",
+    "summary_en": "Multi-factor or continuous authentication, secured voice, video and text communication, and secured emergency communication.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-31-2",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 31",
+    "citation": "§ 31 Abs. 2",
+    "title_de": "Systeme zur Angriffserkennung",
+    "title_en": "Attack detection systems",
+    "text_de": "(2) Betreiber kritischer Anlagen sind verpflichtet, für die informationstechnischen Systeme, Komponenten und Prozesse, die für die Funktionsfähigkeit der von ihnen betriebenen kritischen Anlagen maßgeblich sind, Systeme zur Angriffserkennung einzusetzen. Die eingesetzten Systeme zur Angriffserkennung müssen geeignete Parameter und Merkmale aus dem laufenden Betrieb kontinuierlich und automatisch erfassen und auswerten. Sie sollten dazu in der Lage sein, fortwährend Bedrohungen zu identifizieren und zu vermeiden sowie für eingetretene Störungen geeignete Beseitigungsmaßnahmen vorzusehen. Dabei soll der Stand der Technik eingehalten werden. Der hierfür erforderliche Aufwand soll nicht außer Verhältnis zu den Folgen eines Ausfalls oder einer Beeinträchtigung der betroffenen kritischen Anlage stehen.",
+    "summary_en": "Operators of critical facilities must run attack detection systems for the IT that their critical facilities depend on.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-32-1",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 32",
+    "citation": "§ 32 Abs. 1",
+    "title_de": "Meldepflichten",
+    "title_en": "Reporting obligations",
+    "text_de": "(1) Besonders wichtige Einrichtungen und wichtige Einrichtungen sind verpflichtet, folgende Informationen an eine vom Bundesamt und dem Bundesamt für Bevölkerungsschutz und Katastrophenhilfe eingerichtete gemeinsame Meldestelle zu melden:\n1. unverzüglich, spätestens jedoch innerhalb von 24 Stunden nach Kenntniserlangung von einem erheblichen Sicherheitsvorfall, eine frühe Erstmeldung, in der angegeben wird, ob der Verdacht besteht, dass der erhebliche Sicherheitsvorfall auf rechtswidrige oder böswillige Handlungen zurückzuführen ist oder grenzüberschreitende Auswirkungen haben könnte;\n2. unverzüglich, spätestens jedoch innerhalb von 72 Stunden nach Kenntniserlangung von einem erheblichen Sicherheitsvorfall, eine Meldung über diesen Sicherheitsvorfall, in der die in Nummer 1 genannten Informationen bestätigt oder aktualisiert werden und eine erste Bewertung des erheblichen Sicherheitsvorfalls, einschließlich seines Schweregrads und seiner Auswirkungen, sowie gegebenenfalls die Kompromittierungsindikatoren angegeben werden;\n3. auf Ersuchen des Bundesamtes eine Zwischenmeldung über relevante Statusaktualisierungen;\n4. spätestens einen Monat nach Übermittlung der Meldung des Sicherheitsvorfalls gemäß Nummer 2, vorbehaltlich Absatz 2, eine Abschlussmeldung, die Folgendes enthält:\na) eine ausführliche Beschreibung des Sicherheitsvorfalls, einschließlich seines Schweregrads und seiner Auswirkungen;\nb) Angaben zur Art der Bedrohung beziehungsweise ihrer zugrunde liegenden Ursache, die wahrscheinlich den Sicherheitsvorfall ausgelöst hat;\nc) Angaben zu den getroffenen und laufenden Abhilfemaßnahmen;\nd) gegebenenfalls die grenzüberschreitenden Auswirkungen des Sicherheitsvorfalls.\nDie Verpflichtung nach Satz 1 gilt frühestens ab Einrichtung des Meldewegs.",
+    "summary_en": "Report significant security incidents: early warning within 24 hours, notification within 72 hours, final report within one month.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-33-1",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 33",
+    "citation": "§ 33 Abs. 1",
+    "title_de": "Registrierungspflicht",
+    "title_en": "Registration",
+    "text_de": "(1) Besonders wichtige Einrichtungen und wichtige Einrichtungen sowie Domain-Name-Registry-Dienstleister sind verpflichtet, spätestens drei Monate, nachdem sie erstmals oder erneut als eine der vorgenannten Einrichtungen gelten oder Domain-Name-Registry-Dienste anbieten, dem Bundesamt über eine gemeinsam vom Bundesamt und dem Bundesamt für Bevölkerungsschutz und Katastrophenhilfe eingerichtete Registrierungsmöglichkeit folgende Angaben zu übermitteln:\n1. Name der Einrichtung, einschließlich der Rechtsform und falls einschlägig der Handelsregisternummer,\n2. Anschrift und aktuelle Kontaktdaten, einschließlich E-Mail-Adresse, öffentliche IP-Adressbereiche und Telefonnummern,\n3. relevanter in Anlage 1 oder 2 genannter Sektor oder falls einschlägig Branche,\n4. Auflistung derjenigen Mitgliedstaaten der Europäischen Union, in denen die Einrichtung Dienste der in Anlage 1 oder 2 genannten Einrichtungsarten erbringt, und\n5. die für die Tätigkeiten, aufgrund derer die Registrierung erfolgt, zuständigen Aufsichtsbehörden des Bundes und der Länder.",
+    "summary_en": "Register with the BSI within three months of qualifying as an essential or important entity.",
+    "pending_legal_detail": null
+  },
+  {
+    "id": "req-b-39-1",
+    "framework_version_id": "fv-bsig-2025-12",
+    "paragraph": "§ 39",
+    "citation": "§ 39 Abs. 1",
+    "title_de": "Nachweispflichten",
+    "title_en": "Evidence obligations",
+    "text_de": "(1) Betreiber kritischer Anlagen haben die Umsetzung der Maßnahmen in Bezug auf kritische Anlagen nach § 30 Absatz 1 Satz 1 in Verbindung mit § 31 Absatz 1 und 2 Satz 1 zu einem vom Bundesamt im Benehmen mit dem Bundesamt für Bevölkerungsschutz und Katastrophenhilfe festgelegten Zeitpunkt, frühestens drei Jahre nachdem sie erstmals oder spätestens drei Jahre nachdem sie erneut als ein Betreiber einer kritischen Anlage gelten, und anschließend alle drei Jahre dem Bundesamt durch Sicherheitsaudits, Prüfungen oder Zertifizierungen nachzuweisen. Die Betreiber übermitteln dem Bundesamt die Ergebnisse der durchgeführten Audits, Prüfungen oder Zertifizierungen einschließlich Angaben über die dabei aufgedeckten Sicherheitsmängel. Das Bundesamt kann die Vorlage der Dokumentation, die der Überprüfung zugrunde gelegt wurde, verlangen. Es kann bei Sicherheitsmängeln die Vorlage eines geeigneten Mängelbeseitigungsplanes und im Einvernehmen mit der zuständigen Aufsichtsbehörde des Bundes oder im Benehmen mit der sonst zuständigen Aufsichtsbehörde die Beseitigung der Sicherheitsmängel verlangen. Das Bundesamt kann die Vorlage eines geeigneten Nachweises über die erfolgte Mängelbeseitigung verlangen.",
+    "summary_en": "Operators of critical facilities prove their measures every three years through security audits, inspections or certifications.",
+    "pending_legal_detail": null
+  }
+]

@@ -76,3 +76,24 @@ Each milestone gets one entry with four parts:
 
 ### Lesson
 - **Measure the bundle, don't assume it.** The obvious suspect (the antd group) explained a tenth of the growth; the shell being eager and Motion's full feature set explained the rest.
+
+---
+
+## P-02 Demo fixtures and mock API (2026-10-25)
+
+### Accepted
+- **Review findings that were real bugs**, each with a test that fails on the old code:
+  - Lost update: the mock checked `If-Match` before reading the request body, so two saves of the same version could both succeed. The check now runs after the last `await`, in one synchronous step.
+  - The Activity Log cursor was a position; new entries shifted it and repeated rows on "load more". It now names the last entry seen.
+  - Invalid `limit`, `ordering` and `status` values were silently ignored instead of answered with 400, so a typo would look fine against the mock and fail against the backend.
+  - The Idempotency-Key fingerprint depended on JSON key order; a retry with reordered keys would have been refused.
+  - The extraction glued § 32 Abs. 1 Satz 2 BSIG onto the last list item. A seed test now rejects glued sentences in any statute text.
+  - The development compose stack didn't mount `seed/`.
+
+### Changed
+- **Statute text from memory.** The first plan was to write the Requirement texts by hand. They are now extracted from gesetze-im-internet.de and sliced per numbered item, so the wording is verbatim; only the English summaries are ours.
+- **A deprecated API in the AI's first draft.** The tests used `fetchQuery`, which TanStack Query 5.104 deprecates in favor of `query()`. The type-aware linter caught it.
+
+### Rejected
+- **"Show the simulation panel in the deployed prototype too"** (review). Rejected for now: the backlog asks for a development-only switch, and the public demo should show the product, not its test harness. The contract tests cover the failure states.
+- **"Bound the idempotency store"** (review). Not worth it in an in-memory mock that resets with the page; the backend stores keys for 24 hours.

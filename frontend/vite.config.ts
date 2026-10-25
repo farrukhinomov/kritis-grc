@@ -6,13 +6,19 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      // Demo fixtures shared with the backend's seed command; only the mock API reads them.
+      "@seed": fileURLToPath(new URL("../seed", import.meta.url)),
+    },
   },
   server: {
     port: 5173,
     // Same single-origin setup as production: the browser only ever talks to the SPA's
     // origin, and /api is forwarded to Django (a different host inside docker compose).
     proxy: { "/api": process.env.API_PROXY_TARGET ?? "http://localhost:8000" },
+    // The seed fixtures live next to the frontend, not inside it.
+    fs: { allow: [".", "../seed"] },
     // File change events don't cross into containers from some hosts' bind mounts.
     watch: { usePolling: process.env.VITE_USE_POLLING === "true" },
   },
