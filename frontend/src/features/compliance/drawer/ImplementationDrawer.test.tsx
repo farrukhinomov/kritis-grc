@@ -32,8 +32,10 @@ describe("changing the status", () => {
   });
 
   it("shows the new status at once and keeps it once saved", async () => {
-    setSimulation({ latency: "short" });
     const { drawer } = await openDrawer();
+    // Only the write is slowed, so its pending state can be seen; slowing the loads before
+    // it too would add seconds to the test and nothing to what it checks.
+    setSimulation({ latency: "short" });
 
     await userEvent.click(statusRadio("Umgesetzt"));
 
