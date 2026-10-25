@@ -186,3 +186,31 @@ Each milestone gets one entry with four parts:
 ### Rejected
 - **"Add an in-app swipe-right gesture for going back."** The browser's own back gesture already returns one level because every level is a history entry; a second, custom gesture would compete with it on iOS.
 - **"Arrow right into the last column."** It holds no controls yet, so there is nothing to focus; right arrow on a Requirement opens its detail and keeps focus on the list.
+
+---
+
+## P-06 Implementation drawer (2026-10-25)
+
+### Accepted
+- **A full Mapping in the seed, as a Tenant Mapping.** The seed had no full Mapping, so the one-click reference would never have appeared. A Platform Mapping claiming full coverage would be a legal statement for every Tenant; a Tenant Mapping rests on that Tenant's own facts (one personnel-security process for plants and IT), which is how "full" can honestly arise.
+- **The real upload flow, even in the mock.** Slot with a 5-minute URL, PUT to storage, Evidence created with the upload's ID, and the stored file checked against what was announced. A shortcut that posts the file to the API would hide the part that breaks in production.
+- **Only full Mappings are suggested.** A partial one leaves part of the Requirement uncovered, so the other Implementation alone could never prove it.
+- **The status control stays locked while a save is pending.** A second change would carry the old version and fail as a conflict with oneself.
+
+- **Review findings that were real defects**, each with a test that fails without its fix (mutation-checked):
+  - Switching tabs marked a deep link's entry as the drawer's own, so closing went back to the page before the cockpit. Switching now keeps the entry as it was.
+  - Closing the drawer dropped focus on the page body. Focus returns to the button that opened it.
+  - A second file picked during an upload could be overtaken by the first, and closing the drawer didn't stop an upload whose URL was still being issued. Only the newest upload may report back, and every upload is cancelled with the form.
+  - All Evidence forms shared one save, so a failed link showed its error under the file form. Each form and suggestion has its own.
+  - The Idempotency-Key lived for the whole form, so a corrected retry after a lost response was refused as a reused key. A key now belongs to one payload.
+  - The mock trusted the browser's file type, which comes from the name; a web page renamed to .pdf passed. The stored file's first bytes now have to match, and each upload URL takes one PUT. The threat model says the same for the backend.
+  - One stored address that didn't parse broke the whole Evidence list. Non-web addresses are shown as text.
+  - A spy from one test leaked into the next. Mocks are now restored after every test.
+
+### Changed
+- **The conflict dialog was a `modal.warning()`.** It had no accessible name. A regular Modal names the dialog by its title.
+- **Two tests passed with their feature removed** (found by mutation checks): the rollback test, because the refetch after the 412 restored the status anyway, and the file-limit test, because the server's 422 showed the same message. They now run with latency and assert that nothing was sent.
+
+### Rejected
+- **"Use antd's Upload.Dragger."** Its file input has no label and its list duplicates our own. A native file input over the drop zone keeps keyboard access, and the browser accepts dropped files on it without extra handlers.
+- **"Show upload progress steps in the mock."** The mock's service worker receives the body locally in one step, so only 0 and 100 % appear. Faking intermediate steps would test the fake, not the code; against real storage XMLHttpRequest reports real progress.

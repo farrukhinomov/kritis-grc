@@ -9,7 +9,7 @@ import { useCurrentMembership, useSession } from "@/shared/session/sessionContex
 import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 import { StatusBadge } from "@/shared/ui/StatusBadge/StatusBadge";
 
-import { formatDate } from "../format";
+import { formatDate } from "@/shared/lib/format";
 
 const SHOWN = 5;
 

@@ -120,3 +120,7 @@
   background: var(--grc-surface-sunken);
   white-space: pre-line;
 }
+
+.grc-cockpit-detail > .ant-btn {
+  justify-self: start;
+}

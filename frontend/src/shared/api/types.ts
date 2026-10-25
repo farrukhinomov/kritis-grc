@@ -203,7 +203,18 @@ export interface Evidence {
 export type NewEvidence =
   | { kind: "link"; title: string; url: string }
   | { kind: "reference"; title: string; referenced_implementation_id: string }
-  | { kind: "file"; title: string; file: EvidenceFile };
+  /** The upload must be finished; the server takes the file's details from storage. */
+  | { kind: "file"; title: string; upload_id: string };
+
+/** What the browser announces before uploading; checked again once the file is stored. */
+export type UploadRequest = EvidenceFile;
+
+/** A short-lived permission to PUT one file straight into storage. */
+export interface UploadSlot {
+  upload_id: string;
+  upload_url: string;
+  expires_at: string;
+}
 
 export type Coverage = "full" | "partial";
 

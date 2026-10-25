@@ -1,5 +1,11 @@
 import type { FieldError } from "@/shared/api/client";
-import type { ImplementationChange, ImplementationStatus, NewEvidence } from "@/shared/api/types";
+import { EVIDENCE_FILE_TYPES, MAX_EVIDENCE_BYTES } from "@/shared/api/compliance";
+import type {
+  ImplementationChange,
+  ImplementationStatus,
+  NewEvidence,
+  UploadRequest,
+} from "@/shared/api/types";
 
 import type { TenantData } from "./db";
 import { isRecord } from "./http";
@@ -20,14 +26,9 @@ const STATUSES: readonly ImplementationStatus[] = [
 const CHANGE_FIELDS = new Set(["status", "owner_id", "due_date", "note_de"]);
 const MAX_NOTE = 2000;
 const MAX_TITLE = 200;
-const MAX_FILE_BYTES = 25 * 1024 * 1024;
-const FILE_TYPES = new Set([
-  "application/pdf",
-  "image/png",
-  "image/jpeg",
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-]);
+const MAX_FILE_BYTES = MAX_EVIDENCE_BYTES;
+const FILE_TYPES = EVIDENCE_FILE_TYPES;
+const MAX_FILE_NAME = 255;
 
 function isIsoDate(value: unknown): value is string {
   if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -113,13 +114,9 @@ export function validateEvidence(
       break;
     }
     case "file": {
-      const file = body.file;
-      if (!isRecord(file) || typeof file.name !== "string" || typeof file.size_bytes !== "number") {
-        errors.push({ field: "file", code: "required" });
-      } else if (file.size_bytes <= 0 || file.size_bytes > MAX_FILE_BYTES) {
-        errors.push({ field: "file", code: "invalid_size" });
-      } else if (typeof file.content_type !== "string" || !FILE_TYPES.has(file.content_type)) {
-        errors.push({ field: "file", code: "unsupported_type" });
+      const code = uploadProblem(body.upload_id, data);
+      if (code) {
+        errors.push({ field: "upload_id", code });
       }
       break;
     }
@@ -127,6 +124,65 @@ export function validateEvidence(
       errors.push({ field: "kind", code: "invalid_choice" });
   }
   return errors.length > 0 ? { ok: false, errors } : { ok: true, value: body as NewEvidence };
+}
+
+/**
+ * The second check, on confirm: what arrived in storage must be what was announced when
+ * the URL was issued, or a client could announce a small PDF and store something else.
+ */
+function uploadProblem(uploadId: unknown, data: TenantData): string | null {
+  if (typeof uploadId !== "string" || uploadId === "") {
+    return "required";
+  }
+  const upload = data.uploads.get(uploadId);
+  if (!upload || upload.used) {
+    return "invalid_choice";
+  }
+  if (!upload.stored) {
+    return "not_uploaded";
+  }
+  if (upload.stored.size_bytes !== upload.announced.size_bytes) {
+    return "size_mismatch";
+  }
+  const announced = upload.announced.content_type;
+  const office = announced.includes("openxmlformats");
+  if (
+    upload.stored.content_type !== announced ||
+    upload.stored.detected !== (office ? "application/zip" : announced)
+  ) {
+    return "unsupported_type";
+  }
+  return null;
+}
+
+/** The first check, before an upload URL is issued. */
+export function validateUploadRequest(body: unknown): Result<UploadRequest> {
+  const fail = (code: string): Result<UploadRequest> => ({
+    ok: false,
+    errors: [{ field: "file", code }],
+  });
+  if (
+    !isRecord(body) ||
+    typeof body.name !== "string" ||
+    body.name.trim() === "" ||
+    body.name.length > MAX_FILE_NAME
+  ) {
+    return fail("required");
+  }
+  if (
+    typeof body.size_bytes !== "number" ||
+    body.size_bytes <= 0 ||
+    body.size_bytes > MAX_FILE_BYTES
+  ) {
+    return fail("invalid_size");
+  }
+  if (typeof body.content_type !== "string" || !FILE_TYPES.has(body.content_type)) {
+    return fail("unsupported_type");
+  }
+  return {
+    ok: true,
+    value: { name: body.name.trim(), size_bytes: body.size_bytes, content_type: body.content_type },
+  };
 }
 
 /** `"3"` or `W/"3"` → 3; anything else → null. */

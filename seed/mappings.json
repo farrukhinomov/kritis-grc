@@ -86,5 +86,16 @@
     "gap_note_de": "Alarmabläufe für Objektschutz-Vorfälle separat dokumentieren.",
     "approved_by_id": "u-kramer",
     "approved_at": "2026-10-08T10:12:00Z"
+  },
+  {
+    "id": "map-t-2",
+    "kind": "tenant",
+    "target_requirement_id": "req-k-13-3-5",
+    "source_requirement_id": "req-b-30-2-9",
+    "coverage": "full",
+    "justification_de": "Unser Personalsicherheitskonzept gilt für alle Beschäftigten und Dienstleister mit Zugang zu Anlagen oder IT gleichermaßen: Zuverlässigkeitsprüfung, Vergabe und Entzug von Zutritts- und Zugriffsrechten laufen über denselben Prozess.",
+    "gap_note_de": null,
+    "approved_by_id": "u-kramer",
+    "approved_at": "2026-10-12T09:30:00Z"
   }
 ]

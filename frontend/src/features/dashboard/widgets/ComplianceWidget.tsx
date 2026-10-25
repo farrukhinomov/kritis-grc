@@ -10,7 +10,7 @@ import { duration, ease } from "@/shared/theme/motion";
 import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 
 import { CountUp } from "../CountUp";
-import { implementedPercent } from "../format";
+import { implementedPercent } from "@/shared/lib/format";
 
 /** One block per Scope: Critical Facilities first, as the KRITIS duties attach to them. */
 function byScope(rows: ComplianceSummaryRow[]) {

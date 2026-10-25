@@ -1,8 +1,8 @@
 import "./cockpit.css";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { Alert, Select } from "antd";
-import { useCallback, useEffect, useState } from "react";
+import { Alert, Button, Select } from "antd";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -20,16 +20,19 @@ import type {
   Requirement,
 } from "@/shared/api/types";
 import { combine } from "@/shared/lib/combineQueries";
-import { useCurrentMembership } from "@/shared/session/sessionContext";
+import { useCan, useCurrentMembership } from "@/shared/session/sessionContext";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { ColumnDrillDown, type DrillColumn } from "@/shared/ui/patterns/ColumnDrillDown";
 import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 import { StatusBadge } from "@/shared/ui/StatusBadge/StatusBadge";
 
 import { DrillList } from "./DrillList";
+import { ImplementationDrawer } from "./drawer/ImplementationDrawer";
 import { overallStatus } from "./status";
-import { useCockpitPlace } from "./useCockpitPlace";
+import { PANELS, useCockpitPlace } from "./useCockpitPlace";
 import { currentVersion } from "./version";
+
+const OPEN_DRAWER_ID = "cockpit-open-implementation";
 
 /** Critical Facilities first, as the KRITIS duties attach to them. */
 const facilitiesFirst = (a: ComplianceSummaryRow, b: ComplianceSummaryRow) =>
@@ -73,8 +76,18 @@ interface CockpitProps {
 
 function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
   const { t } = useTranslation();
-  const { place, selectFramework, selectScope, selectParagraph, selectRequirement, back, discard } =
-    useCockpitPlace();
+  const {
+    place,
+    selectFramework,
+    selectScope,
+    selectParagraph,
+    selectRequirement,
+    back,
+    discard,
+    openPanel,
+    switchPanel,
+    closePanel,
+  } = useCockpitPlace();
   // Which column the keyboard is moving to; it takes focus once its items are there.
   const [focusLevel, setFocusLevel] = useState<number | null>(null);
   const focused = useCallback(() => {
@@ -136,6 +149,18 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
     }
   }, [unknownParagraph, unknownRequirement, discard]);
 
+  // The drawer goes away with its URL parameter, whether closed by its button or by the
+  // back gesture, and takes the focused element with it. Focus returns to the button
+  // that opened it, so keyboard and screen reader users continue where they were.
+  const drawerOpen = PANELS.some((option) => option === place.panel);
+  const wasOpen = useRef(drawerOpen);
+  useEffect(() => {
+    if (wasOpen.current && !drawerOpen) {
+      document.getElementById(OPEN_DRAWER_ID)?.focus();
+    }
+    wasOpen.current = drawerOpen;
+  }, [drawerOpen]);
+
   // A keyboard move into a column that turned out empty or failed has nowhere to land; it
   // is dropped rather than kept, or it would take focus away from a later mouse click.
   const nowhereToLand =
@@ -144,6 +169,9 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
   if (!framework || !scope) {
     return null;
   }
+
+  const panel = PANELS.find((option) => option === place.panel);
+  const openImplementation = requirement && implementationOf(requirement.id);
 
   const openParagraph = (key: string) => {
     setFocusLevel(null);
@@ -233,6 +261,9 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
         <ImplementationDetail
           requirement={requirement}
           implementation={implementationOf(requirement.id)}
+          onOpen={() => {
+            openPanel("status");
+          }}
         />
       ),
     });
@@ -256,6 +287,17 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
           onChange={selectScope}
         />
       </div>
+      {requirement && openImplementation && panel && (
+        <ImplementationDrawer
+          tenant={tenant}
+          implementation={openImplementation}
+          requirement={requirement}
+          scopeName={scope.scope_name}
+          panel={panel}
+          onPanel={switchPanel}
+          onClose={closePanel}
+        />
+      )}
       <ColumnDrillDown
         label={t("compliance.drill")}
         columns={columns}
@@ -331,11 +373,14 @@ function RequirementItem({
 function ImplementationDetail({
   requirement,
   implementation,
+  onOpen,
 }: {
   requirement: Requirement;
   implementation: Implementation | undefined;
+  onOpen: () => void;
 }) {
   const { t, i18n } = useTranslation();
+  const canChange = useCan("change");
   const english = i18n.language === "en";
   const date = (iso: string) =>
     new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium", timeZone: "UTC" }).format(
@@ -380,6 +425,11 @@ function ImplementationDetail({
           <dt>{t("compliance.updated")}</dt>
           <dd>{date(implementation.updated_at)}</dd>
         </dl>
+      ) : null}
+      {implementation ? (
+        <Button id={OPEN_DRAWER_ID} type={canChange ? "primary" : "default"} onClick={onOpen}>
+          {t(canChange ? "compliance.edit" : "compliance.view")}
+        </Button>
       ) : (
         <p className="grc-cockpit-summary">{t("compliance.noImplementation")}</p>
       )}
