@@ -3,6 +3,7 @@ import { authHandlers } from "./handlers/auth";
 import { complianceHandlers } from "./handlers/compliance";
 import { organizationHandlers } from "./handlers/organization";
 import { riskHandlers } from "./handlers/risk";
+import { searchHandlers } from "./handlers/search";
 import { statusHandlers } from "./handlers/status";
 
 /**
@@ -17,4 +18,5 @@ export const handlers = [
   ...complianceHandlers,
   ...riskHandlers,
   ...activityHandlers,
+  ...searchHandlers,
 ];

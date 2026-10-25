@@ -402,3 +402,40 @@ export interface ActivityEntry {
   object_label: string;
   changes: FieldChange[];
 }
+
+// ---------- Search ----------
+
+export interface RequirementHit {
+  id: string;
+  citation: string;
+  title_de: string;
+  title_en: string;
+  framework_id: string;
+  framework_name: string;
+  paragraph: string;
+}
+
+export interface RiskHit {
+  id: string;
+  title_de: string;
+  scope_name: string;
+}
+
+export interface AssetHit {
+  id: string;
+  name: string;
+  scope_id: string;
+  scope_name: string;
+}
+
+/** Hits are capped per group; `total` says how many matched in all. */
+export interface SearchGroup<T> {
+  items: T[];
+  total: number;
+}
+
+export interface SearchResults {
+  requirements: SearchGroup<RequirementHit>;
+  risks: SearchGroup<RiskHit>;
+  assets: SearchGroup<AssetHit>;
+}

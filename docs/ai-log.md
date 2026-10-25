@@ -294,3 +294,16 @@ Each milestone gets one entry with four parts:
 - **The four steps took a phone's whole first screen.** Phones get one line instead ("Schritt 2 von 4: …").
 - **"§" broke from its number at line ends.** Citations in the explanation keep their spaces unbreakable.
 - **Focus fell to the page after creating the facility.** It moves to the heading that replaced the form.
+
+---
+
+## P-10 Command palette (2026-10-25)
+
+### Accepted
+- **Search on the server.** Requirements, Risks and Assets are searched by `/search` inside the Tenant and come back in capped groups with totals, as aggregates do. Loading every list to filter it in the browser would grow with the Tenant and could not be checked for isolation.
+- **Pages are matched in the browser**, in the interface language, so "Betroffenheit" and "Applicability" both find the page, and pages stay findable when the search fails.
+- **Citations match however they are spaced.** "§13 abs.3" finds "§ 13 Abs. 3"; text matches ignore case and accents.
+- **The palette lives in the shell**, next to the navigation it complements, not in a feature module.
+
+### Rejected
+- **"Use cmdk."** A small own combobox follows the WAI-ARIA pattern exactly (focus stays in the input, options via aria-activedescendant, groups with names) and adds nothing to the bundle; the library's value is mostly fuzzy ranking, which the server does here.

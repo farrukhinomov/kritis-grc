@@ -312,3 +312,35 @@
 .grc-shell-main[data-narrow] {
   max-width: 960px;
 }
+
+/* ---------- Search ---------- */
+
+.grc-shell-search {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 44px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 8px;
+  background: var(--grc-surface);
+  color: var(--grc-text-secondary);
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (max-width: 767.98px) {
+  .grc-shell-search {
+    justify-content: center;
+    min-height: 44px;
+  }
+}
+
+.grc-shell-search-key {
+  padding: 0 6px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 12px;
+}
