@@ -20,10 +20,10 @@ As the maintainer, I want the repository set up with protections and templates, 
 - [x] `.editorconfig`, plus `.gitattributes` normalizing line endings to LF.
 
 **GitHub part (deferred until the gh CLI is authenticated):**
-- [ ] Public GitHub repository created and `main` pushed.
-- [ ] `main` protected with a ruleset: PRs only, required checks (filled in by M0-06), linear history, no force-push.
-- [ ] Private vulnerability reporting enabled. Labels synced.
-- [ ] GitHub Projects board with columns Backlog / Ready / In progress / Review / Done, milestones M0, P, M1, M2, M3, and this backlog imported as issues.
+- [x] Public GitHub repository created and `main` pushed.
+- [x] `main` protected with a ruleset: PRs only, required checks (filled in by M0-06), linear history, no force-push.
+- [x] Private vulnerability reporting enabled. Labels synced.
+- [x] GitHub Projects board with columns Backlog / Ready / In progress / Review / Done, milestones M0, P, M1, M2, M3, and this backlog imported as issues.
 
 ### M0-02 Backend skeleton (Django)
 **Labels:** `module:backend`, `type:chore`, `prio:must` · **Estimate:** 4 h · **Depends on:** M0-01
@@ -85,7 +85,7 @@ As a maintainer, I want every PR checked automatically, so that `main` stays rel
 - [x] Docker builds for all three images, with Trivy scanning each, plus a production-like stack run (`compose.prod.yaml`, waiting until all services are healthy).
 - [x] Security and licensing: osv-scanner, gitleaks, CodeQL, a license check against the allowed list (fails on GPL/AGPL/SSPL/BUSL/non-commercial), and Dependabot configured.
 - [x] Workflows use least-privilege `permissions`, actions pinned to commit SHAs, and concurrency groups that cancel superseded runs.
-- [ ] One aggregating job, "CI passed", is registered as the required check on `main`. This needs the GitHub repository (deferred with M0-01).
+- [x] One aggregating job, "CI passed", is registered as the required check on `main`.
 
 ### M0-07 Infrastructure as code
 **Labels:** `infra`, `type:chore`, `prio:must` · **Estimate:** 4 h · **Depends on:** M0-01
