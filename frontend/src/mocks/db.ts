@@ -14,7 +14,8 @@ interface StoredResponse {
 export interface StoredUpload {
   announced: EvidenceFile;
   expiresAt: number;
-  stored: { size_bytes: number; content_type: string } | null;
+  /** `detected` is what the file's first bytes say it is, whatever the browser claimed. */
+  stored: { size_bytes: number; content_type: string; detected: string | null } | null;
   used: boolean;
 }
 

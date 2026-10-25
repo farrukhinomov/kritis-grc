@@ -144,7 +144,12 @@ function uploadProblem(uploadId: unknown, data: TenantData): string | null {
   if (upload.stored.size_bytes !== upload.announced.size_bytes) {
     return "size_mismatch";
   }
-  if (upload.stored.content_type !== upload.announced.content_type) {
+  const announced = upload.announced.content_type;
+  const office = announced.includes("openxmlformats");
+  if (
+    upload.stored.content_type !== announced ||
+    upload.stored.detected !== (office ? "application/zip" : announced)
+  ) {
     return "unsupported_type";
   }
   return null;

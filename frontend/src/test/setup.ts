@@ -28,6 +28,8 @@ beforeEach(() => {
 });
 afterEach(async () => {
   cleanup();
+  // Spies must not outlive their test: a stubbed API call would leak into the next one.
+  vi.restoreAllMocks();
   resetMediaQueries();
   resetSimulation();
   resetDb();

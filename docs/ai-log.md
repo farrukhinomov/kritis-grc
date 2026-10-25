@@ -197,6 +197,16 @@ Each milestone gets one entry with four parts:
 - **Only full Mappings are suggested.** A partial one leaves part of the Requirement uncovered, so the other Implementation alone could never prove it.
 - **The status control stays locked while a save is pending.** A second change would carry the old version and fail as a conflict with oneself.
 
+- **Review findings that were real defects**, each with a test that fails without its fix (mutation-checked):
+  - Switching tabs marked a deep link's entry as the drawer's own, so closing went back to the page before the cockpit. Switching now keeps the entry as it was.
+  - Closing the drawer dropped focus on the page body. Focus returns to the button that opened it.
+  - A second file picked during an upload could be overtaken by the first, and closing the drawer didn't stop an upload whose URL was still being issued. Only the newest upload may report back, and every upload is cancelled with the form.
+  - All Evidence forms shared one save, so a failed link showed its error under the file form. Each form and suggestion has its own.
+  - The Idempotency-Key lived for the whole form, so a corrected retry after a lost response was refused as a reused key. A key now belongs to one payload.
+  - The mock trusted the browser's file type, which comes from the name; a web page renamed to .pdf passed. The stored file's first bytes now have to match, and each upload URL takes one PUT. The threat model says the same for the backend.
+  - One stored address that didn't parse broke the whole Evidence list. Non-web addresses are shown as text.
+  - A spy from one test leaked into the next. Mocks are now restored after every test.
+
 ### Changed
 - **The conflict dialog was a `modal.warning()`.** It had no accessible name. A regular Modal names the dialog by its title.
 - **Two tests passed with their feature removed** (found by mutation checks): the rollback test, because the refetch after the 412 restored the status anyway, and the file-limit test, because the server's 422 showed the same message. They now run with latency and assert that nothing was sent.

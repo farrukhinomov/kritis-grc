@@ -71,14 +71,18 @@ describe("validateUploadRequest", () => {
 describe("validateEvidence", () => {
   const announced = { name: "plan.pdf", size_bytes: 1024, content_type: "application/pdf" };
   const withUpload = (
-    stored: { size_bytes: number; content_type: string } | null,
+    stored: { size_bytes: number; content_type: string; detected: string | null } | null,
     used = false,
   ) => {
     const tenant = data();
     tenant.uploads.set("up-1", { announced, expiresAt: Date.now() + 60_000, stored, used });
     return tenant;
   };
-  const storedAsAnnounced = { size_bytes: 1024, content_type: "application/pdf" };
+  const storedAsAnnounced = {
+    size_bytes: 1024,
+    content_type: "application/pdf",
+    detected: "application/pdf",
+  };
 
   it("accepts a finished upload", () => {
     expect(
@@ -99,6 +103,12 @@ describe("validateEvidence", () => {
       () => withUpload({ ...storedAsAnnounced, size_bytes: 9 }),
       "up-1",
       "size_mismatch",
+    ],
+    [
+      "content that isn't a PDF",
+      () => withUpload({ ...storedAsAnnounced, detected: null }),
+      "up-1",
+      "unsupported_type",
     ],
     [
       "a different type",

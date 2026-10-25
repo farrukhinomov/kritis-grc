@@ -156,8 +156,16 @@ export const EVIDENCE_FILE_TYPES: ReadonlySet<string> = new Set([
 ]);
 
 /** Issued for one file; the API checks its size and type before handing out the URL. */
-export function requestUpload(tenant: string, file: UploadRequest): Promise<UploadSlot> {
-  return apiRequest<UploadSlot>(tenantPath(tenant, ["uploads"]), { method: "POST", body: file });
+export function requestUpload(
+  tenant: string,
+  file: UploadRequest,
+  signal?: AbortSignal,
+): Promise<UploadSlot> {
+  return apiRequest<UploadSlot>(tenantPath(tenant, ["uploads"]), {
+    method: "POST",
+    body: file,
+    ...(signal ? { signal } : {}),
+  });
 }
 
 /**
@@ -171,6 +179,11 @@ export function uploadFile(
   signal?: AbortSignal,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
+    // Cancelled before it started: nothing may be sent.
+    if (signal?.aborted) {
+      reject(new DOMException("The upload was cancelled.", "AbortError"));
+      return;
+    }
     const request = new XMLHttpRequest();
     request.open("PUT", slot.upload_url);
     request.setRequestHeader("Content-Type", file.type);

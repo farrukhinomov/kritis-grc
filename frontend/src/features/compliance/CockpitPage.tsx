@@ -2,7 +2,7 @@ import "./cockpit.css";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Alert, Button, Select } from "antd";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -31,6 +31,8 @@ import { ImplementationDrawer } from "./drawer/ImplementationDrawer";
 import { overallStatus } from "./status";
 import { PANELS, useCockpitPlace } from "./useCockpitPlace";
 import { currentVersion } from "./version";
+
+const OPEN_DRAWER_ID = "cockpit-open-implementation";
 
 /** Critical Facilities first, as the KRITIS duties attach to them. */
 const facilitiesFirst = (a: ComplianceSummaryRow, b: ComplianceSummaryRow) =>
@@ -146,6 +148,18 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
       discard({ requirement: null });
     }
   }, [unknownParagraph, unknownRequirement, discard]);
+
+  // The drawer goes away with its URL parameter, whether closed by its button or by the
+  // back gesture, and takes the focused element with it. Focus returns to the button
+  // that opened it, so keyboard and screen reader users continue where they were.
+  const drawerOpen = PANELS.some((option) => option === place.panel);
+  const wasOpen = useRef(drawerOpen);
+  useEffect(() => {
+    if (wasOpen.current && !drawerOpen) {
+      document.getElementById(OPEN_DRAWER_ID)?.focus();
+    }
+    wasOpen.current = drawerOpen;
+  }, [drawerOpen]);
 
   // A keyboard move into a column that turned out empty or failed has nowhere to land; it
   // is dropped rather than kept, or it would take focus away from a later mouse click.
@@ -413,7 +427,7 @@ function ImplementationDetail({
         </dl>
       ) : null}
       {implementation ? (
-        <Button type={canChange ? "primary" : "default"} onClick={onOpen}>
+        <Button id={OPEN_DRAWER_ID} type={canChange ? "primary" : "default"} onClick={onOpen}>
           {t(canChange ? "compliance.edit" : "compliance.view")}
         </Button>
       ) : (

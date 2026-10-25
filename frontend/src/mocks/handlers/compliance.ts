@@ -250,6 +250,28 @@ const STORAGE_ORIGIN = "/mock-storage";
 /** Upload URLs live about five minutes, long enough for 20 MB on a slow connection. */
 const UPLOAD_URL_LIFETIME_MS = 5 * 60_000;
 
+/**
+ * The type a file's first bytes reveal. The browser's type comes from the file name, so
+ * a web page renamed to .pdf would pass a check that trusts it. DOCX and XLSX are both
+ * ZIP containers and are told apart by the announced type only.
+ */
+function detectFileType(bytes: Uint8Array): string | null {
+  const starts = (...signature: number[]) => signature.every((byte, i) => bytes[i] === byte);
+  if (starts(0x25, 0x50, 0x44, 0x46, 0x2d)) {
+    return "application/pdf";
+  }
+  if (starts(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a)) {
+    return "image/png";
+  }
+  if (starts(0xff, 0xd8, 0xff)) {
+    return "image/jpeg";
+  }
+  if (starts(0x50, 0x4b, 0x03, 0x04)) {
+    return "application/zip";
+  }
+  return null;
+}
+
 const uploadRoutes = [
   tenantRoute("post", "/uploads", async ({ data, request, params }) => {
     const result = validateUploadRequest(await jsonBody(request));
@@ -279,10 +301,15 @@ const uploadRoutes = [
     if (Date.now() > upload.expiresAt) {
       return problem(403, "upload_expired", "The upload URL has expired.");
     }
+    // One PUT per URL: otherwise the file could be replaced after it was checked.
+    if (upload.stored || upload.used) {
+      return problem(409, "already_uploaded", "This upload URL has already been used.");
+    }
     const body = await request.arrayBuffer();
     upload.stored = {
       size_bytes: body.byteLength,
       content_type: request.headers.get("Content-Type") ?? "",
+      detected: detectFileType(new Uint8Array(body)),
     };
     return new HttpResponse(null, { status: 200 });
   }),

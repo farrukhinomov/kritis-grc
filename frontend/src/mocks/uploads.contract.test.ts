@@ -17,7 +17,12 @@ const PDF = "application/pdf";
 const MB = 1024 * 1024;
 const client = () => new QueryClient({ defaultOptions: { queries: { retry: false } } });
 const failure = (promise: Promise<unknown>) => promise.catch((error: unknown) => error);
-const pdf = (bytes: number) => new File([new Uint8Array(bytes)], "plan.pdf", { type: PDF });
+/** A file that really starts like a PDF, padded to the given size. */
+const pdf = (bytes: number) => {
+  const content = new Uint8Array(bytes);
+  content.set(new TextEncoder().encode("%PDF-1.7").subarray(0, bytes));
+  return new File([content], "plan.pdf", { type: PDF });
+};
 
 describe("upload slots", () => {
   it("are issued for an allowed file with a short expiry", async () => {
@@ -140,6 +145,41 @@ describe("file Evidence", () => {
       status: 422,
       errors: [{ field: "upload_id", code: "size_mismatch" }],
     });
+  });
+
+  it("is refused when the content isn't what the type claims, whatever the browser said", async () => {
+    // A web page renamed to .pdf: the browser reports application/pdf from the name.
+    const disguised = new File(["<html><script>alert(1)</script></html>"], "plan.pdf", {
+      type: PDF,
+    });
+    const slot = await requestUpload(DEMO, {
+      name: disguised.name,
+      size_bytes: disguised.size,
+      content_type: PDF,
+    });
+    await uploadFile(slot, disguised, () => undefined);
+
+    const error = await failure(
+      addEvidence(
+        DEMO,
+        IMPLEMENTATION,
+        { kind: "file", title: "T", upload_id: slot.upload_id },
+        crypto.randomUUID(),
+      ),
+    );
+
+    expect(error).toMatchObject({
+      status: 422,
+      errors: [{ field: "upload_id", code: "unsupported_type" }],
+    });
+  });
+
+  it("accepts one upload per URL, so the checked file can't be swapped afterwards", async () => {
+    const { slot } = await uploaded(pdf(10));
+
+    const error = await failure(uploadFile(slot, pdf(10), () => undefined));
+
+    expect(error).toMatchObject({ status: 409, code: "already_uploaded" });
   });
 
   it("uses an upload only once", async () => {

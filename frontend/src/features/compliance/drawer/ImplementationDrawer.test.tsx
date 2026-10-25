@@ -110,3 +110,33 @@ describe("the drawer on a phone", () => {
     });
   });
 });
+
+describe("closing the drawer", () => {
+  beforeEach(() => {
+    matchMediaQueries(WIDE_SCREEN_QUERY);
+  });
+
+  it("stays in the cockpit after a link opened it and a tab was switched", async () => {
+    const { router } = renderRoute("/t/muster-stadtwerke/dashboard");
+    await screen.findByRole("heading", { level: 1, name: "Übersicht" });
+    await router.navigate(`${PLACE}&panel=status`);
+    await userEvent.click(await screen.findByRole("tab", { name: "Verlauf" }));
+
+    await userEvent.click(screen.getByRole("button", { name: "Schließen" }));
+
+    await waitFor(() => {
+      expect(new URLSearchParams(router.state.location.search).get("panel")).toBeNull();
+    });
+    expect(router.state.location.pathname).toBe("/t/muster-stadtwerke/compliance");
+  });
+
+  it("returns focus to the button that opened it", async () => {
+    await openDrawer();
+
+    await userEvent.click(screen.getByRole("button", { name: "Schließen" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Umsetzung bearbeiten" })).toHaveFocus();
+    });
+  });
+});

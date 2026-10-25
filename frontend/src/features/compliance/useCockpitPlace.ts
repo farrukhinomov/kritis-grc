@@ -38,7 +38,10 @@ export function useCockpitPlace() {
     KEYS.map((key) => [key, params.get(key)]),
   ) as unknown as CockpitPlace;
 
-  const go = (change: Partial<CockpitPlace>, options: { replace?: boolean; entry?: EntryKind }) => {
+  const go = (
+    change: Partial<CockpitPlace>,
+    options: { replace?: boolean; entry?: EntryKind; keepEntry?: boolean },
+  ) => {
     setParams(
       (current) => {
         const next = new URLSearchParams(current);
@@ -56,6 +59,7 @@ export function useCockpitPlace() {
       },
       {
         replace: options.replace ?? false,
+        ...(options.keepEntry ? { state } : {}),
         ...(options.entry ? { state: { cockpit: options.entry } } : {}),
       },
     );
@@ -95,9 +99,13 @@ export function useCockpitPlace() {
     openPanel: (panel: Panel) => {
       go({ panel }, { entry: "panel" });
     },
-    /** Another tab of the open drawer replaces the entry instead of adding to history. */
+    /**
+     * Another tab of the open drawer replaces the entry instead of adding to history, and
+     * keeps what the entry was: a drawer opened from a link has no entry of its own to go
+     * back from, and closing it must not leave the cockpit.
+     */
     switchPanel: (panel: Panel) => {
-      go({ panel }, { replace: true, entry: "panel" });
+      go({ panel }, { replace: true, keepEntry: true });
     },
     closePanel: () => {
       if (entryKind(state) === "panel") {
