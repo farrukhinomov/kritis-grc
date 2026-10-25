@@ -7,6 +7,7 @@ export const de = {
     prototypeBadge: "Prototyp – Demodaten",
     prototypeBadgeShort: "Demo",
     openDemo: "Demo öffnen",
+    openApp: "Zur Anwendung",
   },
   nav: {
     main: "Hauptnavigation",
@@ -44,7 +45,46 @@ export const de = {
       title: "Mandant nicht gefunden",
       description: "Dieser Mandant existiert nicht, oder Sie haben keinen Zugriff darauf.",
     },
+    readOnly: "Nur Lesezugriff",
+    readOnlyShort: "Nur Lesen",
+    readOnlyHint: "In diesem Mandanten können Sie als Auditor alles einsehen, aber nichts ändern.",
     placeholder: "Dieser Bereich wird im Prototyp ausgebaut.",
+  },
+  auth: {
+    title: "Anmelden",
+    signIn: "Anmelden",
+    signOut: "Abmelden",
+    signOutFailed: "Abmelden ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    demo: {
+      title: "Demo ansehen, ohne Konto",
+      failed: "Der Demo-Zugang ist gerade nicht verfügbar. Bitte versuchen Sie es später erneut.",
+      grc_manager: {
+        action: "Als GRC-Manager ansehen",
+        description: "Bearbeitet Umsetzungen, lädt Nachweise hoch und gibt Mappings frei.",
+      },
+      auditor: {
+        action: "Als Auditor ansehen",
+        description: "Sieht alles, ändert nichts – wie bei einer Prüfung.",
+      },
+    },
+    orWithEmail: "oder mit E-Mail-Adresse",
+    fields: {
+      email: {
+        label: "E-Mail-Adresse",
+        required: "Bitte geben Sie Ihre E-Mail-Adresse ein.",
+        invalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      },
+      password: {
+        label: "Passwort",
+        required: "Bitte geben Sie Ihr Passwort ein.",
+        invalid: "Dieses Passwort wird nicht akzeptiert.",
+      },
+    },
+    submit: "Mit E-Mail anmelden",
+    invalidCredentials: "E-Mail-Adresse oder Passwort ist nicht korrekt.",
+    failed: "Die Anmeldung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    prototypeHint:
+      "Dieser Prototyp hat keine eigenen Konten. Bitte nutzen Sie einen der Demo-Zugänge oben.",
   },
   patterns: {
     back: "Zurück",

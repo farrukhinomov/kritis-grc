@@ -189,8 +189,8 @@ As a developer, I want realistic data behind a mock API shaped like the real one
 ### P-03 Login with demo role picker
 **Labels:** `module:frontend`, `type:feature`, `prio:must` · **Estimate:** 1 h · **Depends on:** P-02
 
-- [ ] Email/password form (mocked), plus two clear buttons: "Als GRC-Manager ansehen" and "Als Auditor ansehen".
-- [ ] The Auditor session hides or disables every write action across the app.
+- [x] Email/password form (mocked), plus two clear buttons: "Als GRC-Manager ansehen" and "Als Auditor ansehen".
+- [x] The Auditor session hides or disables every write action across the app.
 
 ### P-04 Dashboard
 **Labels:** `module:frontend`, `type:feature`, `prio:must` · **Estimate:** 4 h · **Depends on:** P-02

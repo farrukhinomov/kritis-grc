@@ -1,9 +1,11 @@
-import { QueryClient } from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 
+import { sessionKey } from "@/shared/api/auth";
 import { ApiError } from "@/shared/api/client";
 
 const MAX_RETRIES = 1;
 const FIRST_SERVER_ERROR = 500;
+const UNAUTHORIZED = 401;
 
 /**
  * One retry hides a brief network or server blip without making real outages slow to
@@ -18,7 +20,18 @@ export function shouldRetry(failureCount: number, error: unknown): boolean {
 }
 
 export function createQueryClient() {
-  return new QueryClient({
+  // The session is cached for good and only changes on login or logout. A 401 from any
+  // request means it expired on the server, so it's dropped and the gate sends the user
+  // to the login page instead of showing errors on every widget.
+  const forgetExpiredSession = (error: unknown) => {
+    if (error instanceof ApiError && error.status === UNAUTHORIZED) {
+      client.setQueryData(sessionKey, null);
+    }
+  };
+  const client: QueryClient = new QueryClient({
+    queryCache: new QueryCache({ onError: forgetExpiredSession }),
+    mutationCache: new MutationCache({ onError: forgetExpiredSession }),
     defaultOptions: { queries: { retry: shouldRetry } },
   });
+  return client;
 }

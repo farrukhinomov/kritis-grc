@@ -1,4 +1,5 @@
 import { activityHandlers } from "./handlers/activity";
+import { authHandlers } from "./handlers/auth";
 import { complianceHandlers } from "./handlers/compliance";
 import { organizationHandlers } from "./handlers/organization";
 import { riskHandlers } from "./handlers/risk";
@@ -11,6 +12,7 @@ import { statusHandlers } from "./handlers/status";
  */
 export const handlers = [
   ...statusHandlers,
+  ...authHandlers,
   ...organizationHandlers,
   ...complianceHandlers,
   ...riskHandlers,

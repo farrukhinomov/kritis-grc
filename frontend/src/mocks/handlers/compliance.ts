@@ -279,55 +279,65 @@ const suggestionRoutes = [
     ),
   ),
 
-  tenantRoute("post", "/mapping-suggestions/:id/approve", ({ data, params }) => {
-    const suggestion = data.mappingSuggestions.find((s) => s.id === params.id);
-    if (!suggestion) {
-      return notFound();
-    }
-    if (suggestion.status !== "pending") {
-      return problem(409, "suggestion_already_decided", "This suggestion was already decided.");
-    }
-    suggestion.status = "approved";
-    const mapping: Mapping = {
-      id: nextId("map"),
-      kind: "tenant",
-      target_requirement_id: suggestion.target_requirement_id,
-      source_requirement_id: suggestion.source_requirement_id,
-      coverage: suggestion.coverage,
-      justification_de: suggestion.rationale_de,
-      gap_note_de: null,
-      approved_by_id: ACTOR_ID,
-      approved_at: new Date().toISOString(),
-    };
-    data.mappings.push(mapping);
-    logActivity(data, {
-      action: "approved",
-      object_type: "mapping_suggestion",
-      object_id: suggestion.id,
-      object_label: `${suggestion.target_requirement_id} ← ${suggestion.source_requirement_id}`,
-      changes: [{ field: "status", from: "pending", to: "approved" }],
-    });
-    return HttpResponse.json(mapping, { status: 201 });
-  }),
+  tenantRoute(
+    "post",
+    "/mapping-suggestions/:id/approve",
+    ({ data, params }) => {
+      const suggestion = data.mappingSuggestions.find((s) => s.id === params.id);
+      if (!suggestion) {
+        return notFound();
+      }
+      if (suggestion.status !== "pending") {
+        return problem(409, "suggestion_already_decided", "This suggestion was already decided.");
+      }
+      suggestion.status = "approved";
+      const mapping: Mapping = {
+        id: nextId("map"),
+        kind: "tenant",
+        target_requirement_id: suggestion.target_requirement_id,
+        source_requirement_id: suggestion.source_requirement_id,
+        coverage: suggestion.coverage,
+        justification_de: suggestion.rationale_de,
+        gap_note_de: null,
+        approved_by_id: ACTOR_ID,
+        approved_at: new Date().toISOString(),
+      };
+      data.mappings.push(mapping);
+      logActivity(data, {
+        action: "approved",
+        object_type: "mapping_suggestion",
+        object_id: suggestion.id,
+        object_label: `${suggestion.target_requirement_id} ← ${suggestion.source_requirement_id}`,
+        changes: [{ field: "status", from: "pending", to: "approved" }],
+      });
+      return HttpResponse.json(mapping, { status: 201 });
+    },
+    "approve",
+  ),
 
-  tenantRoute("post", "/mapping-suggestions/:id/reject", ({ data, params }) => {
-    const suggestion = data.mappingSuggestions.find((s) => s.id === params.id);
-    if (!suggestion) {
-      return notFound();
-    }
-    if (suggestion.status !== "pending") {
-      return problem(409, "suggestion_already_decided", "This suggestion was already decided.");
-    }
-    suggestion.status = "rejected";
-    logActivity(data, {
-      action: "rejected",
-      object_type: "mapping_suggestion",
-      object_id: suggestion.id,
-      object_label: `${suggestion.target_requirement_id} ← ${suggestion.source_requirement_id}`,
-      changes: [{ field: "status", from: "pending", to: "rejected" }],
-    });
-    return HttpResponse.json(suggestion);
-  }),
+  tenantRoute(
+    "post",
+    "/mapping-suggestions/:id/reject",
+    ({ data, params }) => {
+      const suggestion = data.mappingSuggestions.find((s) => s.id === params.id);
+      if (!suggestion) {
+        return notFound();
+      }
+      if (suggestion.status !== "pending") {
+        return problem(409, "suggestion_already_decided", "This suggestion was already decided.");
+      }
+      suggestion.status = "rejected";
+      logActivity(data, {
+        action: "rejected",
+        object_type: "mapping_suggestion",
+        object_id: suggestion.id,
+        object_label: `${suggestion.target_requirement_id} ← ${suggestion.source_requirement_id}`,
+        changes: [{ field: "status", from: "pending", to: "rejected" }],
+      });
+      return HttpResponse.json(suggestion);
+    },
+    "approve",
+  ),
 ];
 
 export const complianceHandlers = [

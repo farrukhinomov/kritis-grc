@@ -13,6 +13,7 @@ export function renderRoute(path: string) {
 
   return {
     router,
+    client,
     ...render(
       <Providers client={client}>
         <RouterProvider router={router} />

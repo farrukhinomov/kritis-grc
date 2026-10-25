@@ -8,6 +8,7 @@ export const en: Translation = {
     prototypeBadge: "Prototype – demo data",
     prototypeBadgeShort: "Demo",
     openDemo: "Open demo",
+    openApp: "Open the app",
   },
   nav: {
     main: "Main navigation",
@@ -45,7 +46,46 @@ export const en: Translation = {
       title: "Tenant not found",
       description: "This tenant doesn't exist, or you don't have access to it.",
     },
+    readOnly: "Read-only",
+    readOnlyShort: "Read-only",
+    readOnlyHint: "As an Auditor in this tenant you can view everything but change nothing.",
     placeholder: "This area is being built out in the prototype.",
+  },
+  auth: {
+    title: "Sign in",
+    signIn: "Sign in",
+    signOut: "Sign out",
+    signOutFailed: "Signing out failed. Please try again.",
+    demo: {
+      title: "View the demo, no account needed",
+      failed: "The demo login is not available right now. Please try again later.",
+      grc_manager: {
+        action: "View as GRC Manager",
+        description: "Updates Implementations, uploads Evidence and approves Mappings.",
+      },
+      auditor: {
+        action: "View as Auditor",
+        description: "Sees everything, changes nothing, as in an audit.",
+      },
+    },
+    orWithEmail: "or with your email address",
+    fields: {
+      email: {
+        label: "Email address",
+        required: "Please enter your email address.",
+        invalid: "Please enter a valid email address.",
+      },
+      password: {
+        label: "Password",
+        required: "Please enter your password.",
+        invalid: "This password is not accepted.",
+      },
+    },
+    submit: "Sign in with email",
+    invalidCredentials: "The email address or password is not correct.",
+    failed: "Signing in failed. Please try again.",
+    prototypeHint:
+      "This prototype has no accounts of its own. Please use one of the demo logins above.",
   },
   patterns: {
     back: "Back",

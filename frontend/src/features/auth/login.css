@@ -1,0 +1,27 @@
+.grc-login {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.grc-login .grc-login-subtitle {
+  margin-top: 0;
+  font-size: 16px;
+}
+
+.grc-login-alert {
+  margin-bottom: 16px;
+}
+
+.grc-login-roles {
+  display: grid;
+  gap: 16px;
+}
+
+.grc-login-role {
+  display: grid;
+  gap: 4px;
+}
+
+.grc-login .grc-login-hint {
+  margin: 12px 0 0;
+}

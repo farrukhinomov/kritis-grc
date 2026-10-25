@@ -97,3 +97,24 @@ Each milestone gets one entry with four parts:
 ### Rejected
 - **"Show the simulation panel in the deployed prototype too"** (review). Rejected for now: the backlog asks for a development-only switch, and the public demo should show the product, not its test harness. The contract tests cover the failure states.
 - **"Bound the idempotency store"** (review). Not worth it in an in-memory mock that resets with the page; the backend stores keys for 24 hours.
+
+---
+
+## P-03 Login with demo role picker (2026-10-25)
+
+### Accepted
+- **A real session, not a role switch.** The demo buttons call `POST /api/v1/auth/demo-login`, the gate reads `GET /api/v1/me`, and the mock enforces 401, 404 and 403 per Membership, so the screens meet the same answers the backend will give. The demo session constant left `shared/` for the mock: a build without mocks has no built-in user.
+- **Roles follow the Membership.** The GRC Manager demo account is an Auditor in one showcase Tenant, so a test proves the UI asks the current Membership, not the user.
+- **`useCan` is presentation only.** The mock refuses an Auditor's writes with 403 and logs nothing, so a write control someone forgets to hide fails loudly instead of quietly succeeding.
+- **Review findings that were real defects**, each now covered by a test:
+  - Nothing proved that login and logout clear the cache: deleting both `clear()` calls left every test green. Two tests now fail without them.
+  - Logging out of a session that had already expired answered 401, showed "Abmelden ist fehlgeschlagen" and left the old page as `?next=`. A 401 on logout now counts as signed out, and running requests are cancelled before the login page loads.
+  - A server error on a field the form doesn't have showed nothing, and every field error read "required". Unknown fields now raise the general alert, and the wording follows the error code.
+  - The read-only explanation sat in a `title` attribute that keyboard and touch users never see. The badge is now a button with a tooltip on hover and focus, with a short label on phones.
+  - Real signed-in users saw "Demo öffnen"; builds without mocks say "Zur Anwendung".
+
+### Changed
+- **"Lazy-load the session gate to keep the entry chunk small."** Measured: it made the initial JavaScript 1 KB larger, not smaller. The growth (252 → 257 KB gzipped) is `useQuery` and the auth client, which the public header needs anyway, so the gate stays eager.
+
+### Rejected
+- **"Let the password form accept the demo accounts with a published password."** A password printed on the login page teaches the wrong habit and duplicates the demo buttons. The form refuses every login with the same answer for known and unknown emails, and a hint in mock builds points to the demo logins.
