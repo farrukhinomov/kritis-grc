@@ -248,8 +248,8 @@ As a GRC Manager, I want to see how my measures change the risk picture.
 ### P-09 Applicability Check
 **Labels:** `module:frontend`, `type:feature`, `prio:should` · **Estimate:** 2 h · **Depends on:** P-02
 
-- [ ] Wizard: Sector → Critical Service → threshold value. The result is explained with the legal citation.
-- [ ] A positive result creates a Critical Facility with a planned Registration and shows its projected deadlines.
+- [x] Wizard: Sector → Critical Service → threshold value. The result is explained with the legal citation.
+- [x] A positive result creates a Critical Facility with a planned Registration and shows its projected deadlines.
 
 ### P-10 Command palette
 **Labels:** `module:frontend`, `type:feature`, `prio:should` · **Estimate:** 1.5 h · **Depends on:** P-02

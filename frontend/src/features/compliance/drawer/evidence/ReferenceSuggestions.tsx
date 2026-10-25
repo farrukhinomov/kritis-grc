@@ -16,7 +16,9 @@ import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 import { StatusBadge } from "@/shared/ui/StatusBadge/StatusBadge";
 
 import { SaveError } from "./SaveError";
-import { type EvidenceTarget, useAddEvidence, useIdempotencyKey } from "./useAddEvidence";
+import { useIdempotencyKey } from "@/shared/lib/useIdempotencyKey";
+
+import { type EvidenceTarget, useAddEvidence } from "./useAddEvidence";
 
 const LAW_ABBREVIATIONS: Record<Framework["key"], string> = {
   kritis_dachg: "KRITIS-DachG",

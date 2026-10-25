@@ -1,11 +1,13 @@
-import type { Evidence, EvidenceFile } from "@/shared/api/types";
+import type { JsonBodyType } from "msw";
+
+import type { EvidenceFile } from "@/shared/api/types";
 
 import { DEMO_ACCOUNTS, SHOWCASE_TENANTS } from "./accounts";
 import { SEED, type SeedData, type StoredActivity } from "./seed";
 
 interface StoredResponse {
   status: number;
-  body: Evidence;
+  body: JsonBodyType;
   /** The request body the key was first used with; another body under the same key is refused. */
   fingerprint: string;
 }
