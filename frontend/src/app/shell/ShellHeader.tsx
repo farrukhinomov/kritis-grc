@@ -8,14 +8,22 @@ import { AnimatedIcon } from "@/shared/ui/AnimatedIcon/AnimatedIcon";
 import { LanguageSwitch } from "@/shared/ui/LanguageSwitch";
 
 import { screenOf } from "./navigation";
+import { isApple } from "./palette/shortcut";
 import { UserMenu } from "./UserMenu";
 
 /** Decided at build time, like the mock API itself. */
 const SHOWS_DEMO_DATA = import.meta.env.VITE_API_MOCKING === "enabled";
 
-export function ShellHeader({ membership, wide }: { membership: Membership; wide: boolean }) {
+interface ShellHeaderProps {
+  membership: Membership;
+  wide: boolean;
+  onSearch: () => void;
+}
+
+export function ShellHeader({ membership, wide, onSearch }: ShellHeaderProps) {
   const { t } = useTranslation();
   const readOnly = !useCan("change");
+  const apple = isApple();
 
   return (
     <header className="grc-shell-header">
@@ -25,6 +33,24 @@ export function ShellHeader({ membership, wide }: { membership: Membership; wide
         </span>
       )}
       <TenantSwitcher current={membership} />
+      {/* Phones have no keyboard shortcut, so the search needs its button there most. */}
+      <button
+        type="button"
+        className="grc-shell-search"
+        aria-label={wide ? undefined : t("search.label")}
+        aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
+        onClick={onSearch}
+      >
+        <AnimatedIcon preset="search" />
+        {wide && (
+          <>
+            <span>{t("search.label")}</span>
+            <kbd className="grc-shell-search-key">
+              {t(apple ? "search.keyApple" : "search.key")}
+            </kbd>
+          </>
+        )}
+      </button>
       <span className="grc-shell-header-spacer" />
       {SHOWS_DEMO_DATA && (
         <span className="grc-shell-prototype-badge">

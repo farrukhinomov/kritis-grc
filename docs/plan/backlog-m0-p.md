@@ -254,7 +254,7 @@ As a GRC Manager, I want to see how my measures change the risk picture.
 ### P-10 Command palette
 **Labels:** `module:frontend`, `type:feature`, `prio:should` · **Estimate:** 1.5 h · **Depends on:** P-02
 
-- [ ] Ctrl/Cmd+K, or the header search on phones. Searches Requirements (by citation or text), Risks, Assets and pages, navigable with the keyboard.
+- [x] Ctrl/Cmd+K, or the header search on phones. Searches Requirements (by citation or text), Risks, Assets and pages, navigable with the keyboard.
 
 ### P-11 Approvals inbox
 **Labels:** `module:frontend`, `type:feature`, `prio:should` · **Estimate:** 1.5 h · **Depends on:** P-02
