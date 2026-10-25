@@ -4,7 +4,7 @@ Instructions for AI coding assistants working in this repository. `.cursorrules`
 
 ## Project
 
-A multi-tenant GRC SaaS for KRITIS-Dachgesetz compliance with mapping to NIS2 (BSIG 2025). Django/DRF modular monolith, one stateless FastAPI risk engine, a React 19 + TypeScript + Ant Design 6 SPA, and PostgreSQL. **Status: design phase, no code yet.** Add build/test commands below as soon as they exist.
+A multi-tenant GRC SaaS for KRITIS-Dachgesetz compliance with mapping to NIS2 (BSIG 2025). Django/DRF modular monolith, one stateless FastAPI risk engine, a React 19 + TypeScript + Ant Design 6 SPA, and PostgreSQL. **Status: M0 in progress.** The backend skeleton exists; keep the commands below current.
 
 ## Read before changing anything
 
@@ -15,7 +15,16 @@ A multi-tenant GRC SaaS for KRITIS-Dachgesetz compliance with mapping to NIS2 (B
 
 ## Commands
 
-_None yet. Planned: `uv run pytest`, `uv run ruff check`, `uv run mypy`, `pnpm test`, `pnpm lint`, `docker compose up`._
+Backend (run in `backend/`, details in [backend/README.md](backend/README.md)):
+
+```bash
+uv run pytest                        # tests, coverage ≥ 80 % enforced
+uv run ruff check . && uv run ruff format --check .
+uv run mypy src manage.py            # strict; needs the variables from backend/.env
+PYTHONPATH=src uv run lint-imports   # module and layer boundaries
+```
+
+_Frontend and `docker compose` commands follow with M0-04 and M0-05._
 
 ## Non-negotiable rules
 

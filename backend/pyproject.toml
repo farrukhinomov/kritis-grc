@@ -1,0 +1,162 @@
+[project]
+name = "grc-backend"
+version = "0.1.0"
+description = "Django API for the GRC platform"
+readme = "README.md"
+license = "LicenseRef-Proprietary"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "django>=5.2,<5.3",
+    "djangorestframework>=3.18.3",
+    "drf-spectacular>=0.30.0",
+    "gunicorn>=26.2.0",
+    "psycopg[binary]>=3.3.6",
+    "pydantic-settings>=2.16.1",
+    "python-json-logger>=4.2.0",
+    "whitenoise>=6.12.0",
+]
+
+[tool.uv]
+# A Django project is deployed, not distributed: no wheel is built.
+package = false
+
+[dependency-groups]
+dev = [
+    "django-stubs[compatible-mypy]>=6.1.2",
+    "djangorestframework-stubs>=3.18.1",
+    "import-linter>=2.15",
+    "mypy>=2.4.0",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "pytest-django>=4.14.0",
+    "pytest-env>=1.8.1",
+    "ruff>=0.17.2",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+django_find_project = false
+pythonpath = ["src"]
+testpaths = ["src"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-fail-under=80",
+]
+filterwarnings = [
+    "error",
+    # WhiteNoise warns when collectstatic hasn't run, which is irrelevant in tests.
+    "ignore:No directory at:UserWarning",
+]
+# Test-only values. Real environments get their configuration from the platform.
+env = [
+    "D:APP_ENV=test",
+    "D:DJANGO_SECRET_KEY=test-only-insecure-secret-key-not-for-any-real-environment",
+    "D:DATABASE_URL=postgres://grc:grc@localhost:55432/grc",
+    "D:ALLOWED_HOSTS=testserver,localhost",
+]
+
+[tool.coverage.run]
+branch = true
+omit = ["*/migrations/*", "*/tests/*", "src/config/wsgi.py"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F",  # pycodestyle, pyflakes
+    "I",            # isort
+    "B",            # bugbear
+    "UP",           # pyupgrade
+    "S",            # bandit security rules
+    "DJ",           # Django
+    "N",            # naming
+    "C4",           # comprehensions
+    "SIM",          # simplifications
+    "PT",           # pytest style
+    "T20",          # no print
+    "DTZ",          # timezone-aware datetimes
+    "RUF",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S101", "S106"]
+
+[tool.mypy]
+python_version = "3.13"
+mypy_path = "src"
+strict = true
+warn_unreachable = true
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main", "pydantic.mypy"]
+exclude = ["/migrations/"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings"
+
+[tool.importlinter]
+root_packages = ["grc", "config"]
+
+[[tool.importlinter.contracts]]
+name = "The shared core imports no business module"
+type = "forbidden"
+source_modules = ["grc.core"]
+forbidden_modules = ["grc.organization", "grc.assets", "grc.compliance", "grc.risk", "grc.activity", "grc.demo"]
+
+[[tool.importlinter.contracts]]
+name = "Inside a module: api -> services -> selectors -> models"
+type = "layers"
+containers = ["grc.organization", "grc.assets", "grc.compliance", "grc.risk", "grc.activity", "grc.demo"]
+layers = ["api", "services", "selectors", "models"]
+
+[[tool.importlinter.contracts]]
+name = "grc.organization uses other modules only through their services, selectors and events"
+type = "forbidden"
+source_modules = ["grc.organization"]
+forbidden_modules = ["grc.assets.api", "grc.assets.models", "grc.assets.tests", "grc.compliance.api", "grc.compliance.models", "grc.compliance.tests", "grc.risk.api", "grc.risk.models", "grc.risk.tests", "grc.activity.api", "grc.activity.models", "grc.activity.tests", "grc.demo.api", "grc.demo.models", "grc.demo.tests"]
+# Reaching another module's models through its services is the intended path.
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "grc.assets uses other modules only through their services, selectors and events"
+type = "forbidden"
+source_modules = ["grc.assets"]
+forbidden_modules = ["grc.organization.api", "grc.organization.models", "grc.organization.tests", "grc.compliance.api", "grc.compliance.models", "grc.compliance.tests", "grc.risk.api", "grc.risk.models", "grc.risk.tests", "grc.activity.api", "grc.activity.models", "grc.activity.tests", "grc.demo.api", "grc.demo.models", "grc.demo.tests"]
+# Reaching another module's models through its services is the intended path.
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "grc.compliance uses other modules only through their services, selectors and events"
+type = "forbidden"
+source_modules = ["grc.compliance"]
+forbidden_modules = ["grc.organization.api", "grc.organization.models", "grc.organization.tests", "grc.assets.api", "grc.assets.models", "grc.assets.tests", "grc.risk.api", "grc.risk.models", "grc.risk.tests", "grc.activity.api", "grc.activity.models", "grc.activity.tests", "grc.demo.api", "grc.demo.models", "grc.demo.tests"]
+# Reaching another module's models through its services is the intended path.
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "grc.risk uses other modules only through their services, selectors and events"
+type = "forbidden"
+source_modules = ["grc.risk"]
+forbidden_modules = ["grc.organization.api", "grc.organization.models", "grc.organization.tests", "grc.assets.api", "grc.assets.models", "grc.assets.tests", "grc.compliance.api", "grc.compliance.models", "grc.compliance.tests", "grc.activity.api", "grc.activity.models", "grc.activity.tests", "grc.demo.api", "grc.demo.models", "grc.demo.tests"]
+# Reaching another module's models through its services is the intended path.
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "grc.activity uses other modules only through their services, selectors and events"
+type = "forbidden"
+source_modules = ["grc.activity"]
+forbidden_modules = ["grc.organization.api", "grc.organization.models", "grc.organization.tests", "grc.assets.api", "grc.assets.models", "grc.assets.tests", "grc.compliance.api", "grc.compliance.models", "grc.compliance.tests", "grc.risk.api", "grc.risk.models", "grc.risk.tests", "grc.demo.api", "grc.demo.models", "grc.demo.tests"]
+# Reaching another module's models through its services is the intended path.
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "grc.demo uses other modules only through their services, selectors and events"
+type = "forbidden"
+source_modules = ["grc.demo"]
+forbidden_modules = ["grc.organization.api", "grc.organization.models", "grc.organization.tests", "grc.assets.api", "grc.assets.models", "grc.assets.tests", "grc.compliance.api", "grc.compliance.models", "grc.compliance.tests", "grc.risk.api", "grc.risk.models", "grc.risk.tests", "grc.activity.api", "grc.activity.models", "grc.activity.tests"]
+# Reaching another module's models through its services is the intended path.
+allow_indirect_imports = true

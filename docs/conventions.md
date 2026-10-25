@@ -29,14 +29,18 @@ This applies to all source code, tests, migrations, Dockerfiles and CI/CD workfl
 ## Backend (Django)
 
 - Python 3.13, **uv** with a committed lockfile, **Django 5.2 LTS**. Upgrade to 6.2 LTS after April 2027.
-- Layout: `backend/src/grc/<module>/{api,services,selectors,models,events,tests}/` and `backend/src/config/`. The modules are listed in [ADR 0010](adr/0010-modular-monolith-plus-one-service.md).
+- Layout: `backend/src/grc/<module>/{api,services,selectors,models,events,tests}/` and `backend/src/config/`. The modules are listed in [ADR 0010](adr/0010-modular-monolith-plus-one-service.md). Technical plumbing shared by all modules (request IDs, logging, cache headers, health probes) lives in `grc/core`, which must never import a business module.
+- The project is deployed, not packaged: `src/` goes on the Python path (`pythonpath` in pytest, `PYTHONPATH` in the image and for import-linter).
 - Configuration comes only from environment variables, validated at startup with **pydantic-settings**. A missing secret stops the process.
 - Runs synchronously under gunicorn with threads. Static files (admin, Scalar) are served by WhiteNoise.
 - Business logic never lives in views or serializers. Services receive the acting user and Membership ([ADR 0020](adr/0020-authorization-in-the-service-layer.md)).
-- `ATOMIC_REQUESTS = True`. Under the pooler: `DISABLE_SERVER_SIDE_CURSORS = True` and `CONN_MAX_AGE = 0` ([ADR 0004](adr/0004-supavisor-transaction-pooling.md)).
+- `ATOMIC_REQUESTS = True`. Under the pooler: `DISABLE_SERVER_SIDE_CURSORS = True`, `CONN_MAX_AGE = 0` and psycopg `prepare_threshold = None` ([ADR 0004](adr/0004-supavisor-transaction-pooling.md)). Production requires TLS to the database (`sslmode=require`).
+- `APP_ENV` is required, with no default. Production also requires `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`.
+- Logs never contain query strings or the serialized request object.
 - Optimistic concurrency: every editable resource has a `version`, exposed as `ETag`. Writes send `If-Match`, and a stale version returns `412 Precondition Failed`.
 - Idempotency: create endpoints accept `Idempotency-Key`. Keys are stored per (Tenant, user, key) together with the original response, replayed on retry, and expire after 24 h.
-- Health: `/health/live` (process up) and `/health/ready` (database reachable), wired to the platform's probes.
+- Health: `/health/live` (process up) and `/health/ready` (database reachable), wired to the platform's probes. They are answered by middleware ahead of host validation, the HTTPS redirect and the per-request transaction, so probes by IP work and a database outage returns a clean 503.
+- Containers: multi-stage build, base images pinned by digest, a non-root user that can't write to the code, gunicorn with `gthread` workers, and a `HEALTHCHECK`.
 
 ## Risk engine (FastAPI)
 
@@ -141,7 +145,7 @@ Every check below is required before merging into `main`.
 - **Environments:** local (`docker compose`, Postgres, R2 dev bucket) and one public demo. Vercel preview builds use the demo API.
 - **Cloud Run:**
   - Region `europe-west3`.
-  - Two services, `min-instances 0` and `max-instances 1`.
+  - Two services, `min-instances 0` and `max-instances 1`. Per-instance concurrency equals gunicorn workers x threads (8 for Django).
   - Images go to Artifact Registry. GitHub Actions authenticates with Workload Identity Federation, with no stored keys. Secrets live in Secret Manager.
   - Migrations run as a Cloud Run Job before traffic switches to the new revision.
 - **Cloud Scheduler:** the nightly Demo Tenant reset (a Job that also wipes the Tenant's R2 objects), and the every-minute outbox drain. This also keeps Supabase from pausing.

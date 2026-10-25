@@ -30,15 +30,15 @@ As the maintainer, I want the repository set up with protections and templates, 
 
 As a developer, I want a running Django project in the agreed structure, so that modules can be added without restructuring.
 
-- [ ] `backend/` with uv, Python 3.13, Django 5.2 LTS, DRF and drf-spectacular. The lockfile is committed.
-- [ ] Layout `src/config/` and `src/grc/<module>/`, with the six empty modules and their layer folders. import-linter contracts enforce the boundaries.
-- [ ] Settings come from environment variables via pydantic-settings, and startup fails with a clear message if a required variable is missing. `.env.example` is provided.
-- [ ] Pooler-safe database settings: `ATOMIC_REQUESTS`, `DISABLE_SERVER_SIDE_CURSORS`, `CONN_MAX_AGE = 0`.
-- [ ] `/health/live` and `/health/ready` (the latter checks the database).
-- [ ] Structured JSON logging to stdout, with a request ID and `traceparent` taken from the incoming request or generated.
-- [ ] Middleware sets `Cache-Control: private, no-store` on every `/api` response, with an allow-list for public paths.
-- [ ] Multi-stage Dockerfile: slim base, non-root user, gunicorn with threads, healthcheck.
-- [ ] pytest-django, Ruff (including `S` rules), mypy (strict for `src/grc`), and a first test for the health endpoints and the cache header.
+- [x] `backend/` with uv, Python 3.13, Django 5.2 LTS, DRF and drf-spectacular. The lockfile is committed.
+- [x] Layout `src/config/` and `src/grc/<module>/`, with the six empty modules and their layer folders. import-linter contracts enforce the boundaries.
+- [x] Settings come from environment variables via pydantic-settings, and startup fails with a clear message if a required variable is missing. `.env.example` is provided.
+- [x] Pooler-safe database settings: `ATOMIC_REQUESTS`, `DISABLE_SERVER_SIDE_CURSORS`, `CONN_MAX_AGE = 0`.
+- [x] `/health/live` and `/health/ready` (the latter checks the database).
+- [x] Structured JSON logging to stdout, with a request ID and `traceparent` taken from the incoming request or generated.
+- [x] Middleware sets `Cache-Control: private, no-store` on every `/api` response, with an allow-list for public paths.
+- [x] Multi-stage Dockerfile: slim base, non-root user, gunicorn with threads, healthcheck.
+- [x] pytest-django, Ruff (including `S` rules), mypy (strict for `src/grc`), and a first test for the health endpoints and the cache header.
 
 ### M0-03 Risk-engine skeleton (FastAPI)
 **Labels:** `module:risk-engine`, `type:chore`, `prio:must` · **Estimate:** 2 h · **Depends on:** M0-01
