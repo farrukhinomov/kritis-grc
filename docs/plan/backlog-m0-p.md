@@ -13,12 +13,17 @@ Labels: `module:*` (backend modules, `risk-engine`, `frontend`, `infra`, `ci`, `
 
 As the maintainer, I want the repository set up with protections and templates, so that every later change follows the same quality bar.
 
-- [ ] Git repository initialized, with the existing docs as the first commit. `_docs/` is confirmed ignored.
-- [ ] Public GitHub repository with a proprietary, evaluation-only `LICENSE`.
-- [ ] `main` is protected: PRs only, required checks (filled in by M0-06), linear history, no force-push.
-- [ ] Issue templates (feature, bug) with acceptance-criteria sections, a PR template carrying the Definition of Done checklist, and labels as defined above.
-- [ ] GitHub Projects board with columns Backlog / Ready / In progress / Review / Done, and milestones M0, P, M1, M2, M3.
-- [ ] `.editorconfig`, plus `.gitattributes` normalizing line endings to LF.
+**Local part (done):**
+- [x] Git repository initialized on `main`, with the existing docs as the first commit. `_docs/` is confirmed ignored.
+- [x] A proprietary, evaluation-only `LICENSE` and `.github/SECURITY.md` (private vulnerability reporting).
+- [x] Issue forms (feature, bug), a PR template with the Definition of Done checklist, and labels defined in `.github/labels.yml` with `scripts/sync-labels.sh`.
+- [x] `.editorconfig`, plus `.gitattributes` normalizing line endings to LF.
+
+**GitHub part (deferred until the gh CLI is authenticated):**
+- [ ] Public GitHub repository created and `main` pushed.
+- [ ] `main` protected with a ruleset: PRs only, required checks (filled in by M0-06), linear history, no force-push.
+- [ ] Private vulnerability reporting enabled. Labels synced.
+- [ ] GitHub Projects board with columns Backlog / Ready / In progress / Review / Done, milestones M0, P, M1, M2, M3, and this backlog imported as issues.
 
 ### M0-02 Backend skeleton (Django)
 **Labels:** `module:backend`, `type:chore`, `prio:must` · **Estimate:** 4 h · **Depends on:** M0-01
