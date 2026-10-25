@@ -2,7 +2,9 @@ import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 
+import { problem } from "@/mocks/http";
 import { server } from "@/mocks/server";
+import { scrollIntoViewEverywhere } from "@/test/intersection";
 import { WIDE_SCREEN_QUERY } from "@/shared/lib/breakpoints";
 import { matchMediaQueries } from "@/test/media";
 import { renderRoute } from "@/test/render";
@@ -95,6 +97,49 @@ describe("the Activity Log", () => {
     expect(await within(await log()).findByText(/Ältere Umsetzung/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Ältere Einträge laden" })).not.toBeInTheDocument();
     expect(calls).toBe(2);
+  });
+
+  it("loads the next page when the end of the list comes into view, and only once", async () => {
+    const requests: string[] = [];
+    server.use(
+      http.get("/api/v1/tenants/:tenant/activity", ({ request }) => {
+        const cursor = new URL(request.url).searchParams.get("cursor");
+        requests.push(cursor ?? "first");
+        if (cursor) {
+          return problem(503, "service_unavailable", "Down.");
+        }
+        return HttpResponse.json({
+          items: [
+            {
+              id: "a-1",
+              occurred_at: "2026-10-01T10:00:00Z",
+              actor_id: "u-kramer",
+              actor_name: "Alex Kramer",
+              action: "updated",
+              object_type: "implementation",
+              object_id: "im-001",
+              object_label: "Neuere Umsetzung",
+              changes: [],
+            },
+          ],
+          page: { next_cursor: "next", limit: 1 },
+        });
+      }),
+    );
+    await openActivity();
+    await within(await log()).findByText(/Neuere Umsetzung/);
+
+    scrollIntoViewEverywhere();
+    await waitFor(() => {
+      expect(requests).toEqual(["first", "next"]);
+    });
+    // After a failure the end stays in view, but only the button tries again.
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    scrollIntoViewEverywhere();
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    expect(requests).toEqual(["first", "next"]);
+    expect(screen.getByRole("button", { name: "Ältere Einträge laden" })).toBeInTheDocument();
   });
 
   it("explains a filter without entries", async () => {

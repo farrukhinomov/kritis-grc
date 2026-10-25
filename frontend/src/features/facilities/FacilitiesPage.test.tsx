@@ -62,6 +62,52 @@ describe("the Facilities and Assets", () => {
     });
   });
 
+  it("name dependencies in other Scopes too", async () => {
+    await openFacilities("?scope=sc-nord&asset=as-n-power");
+
+    const detail = within(await screen.findByRole("dialog"));
+    expect(await detail.findByRole("region", { name: "Hängt ab von" })).toHaveTextContent(
+      "Stromversorgung (Verteilnetzbetreiber)",
+    );
+  });
+
+  it("close the Asset with its button and return focus to its name", async () => {
+    const { router } = await openFacilities("?scope=sc-nord");
+    await userEvent.click(await screen.findByRole("button", { name: "Pumpwerk Nord" }));
+    await screen.findByRole("dialog");
+
+    await userEvent.click(screen.getByRole("button", { name: "Schließen" }));
+
+    await waitFor(() => {
+      expect(params(router).get("asset")).toBeNull();
+    });
+    expect(router.state.historyAction).toBe("POP");
+    expect(screen.getByRole("button", { name: "Pumpwerk Nord" })).toHaveFocus();
+  });
+
+  it("survive a broken Asset link and keep focus on the page", async () => {
+    await openFacilities('?asset=x"y');
+    await screen.findByText(/gibt es in diesem Geltungsbereich nicht/);
+
+    await userEvent.click(screen.getByRole("button", { name: "Schließen" }));
+
+    await waitFor(() => {
+      expect(document.activeElement).toHaveTextContent(/^Assets: /);
+    });
+  });
+
+  it("keep the default Scope out of the URL", async () => {
+    const { router } = await openFacilities("?scope=sc-sued");
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Assets anzeigen: Wasserwerk Nord" }),
+    );
+
+    await waitFor(() => {
+      expect(params(router).get("scope")).toBeNull();
+    });
+  });
+
   it("open an Asset straight from a link, as the search gives one", async () => {
     await openFacilities("?scope=sc-nord&asset=as-n-pumps");
 

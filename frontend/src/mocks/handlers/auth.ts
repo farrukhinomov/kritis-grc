@@ -10,11 +10,6 @@ import { isRecord, jsonBody, notAuthenticated, problem } from "../http";
 const nonEmpty = (value: unknown) => typeof value === "string" && value.trim() !== "";
 const isRole = (value: unknown): value is Role => ROLES.some((role) => role === value);
 
-/**
- * Sign-in as the backend will offer it. The prototype has no accounts of its own, so a
- * password login is always refused, with the same answer for known and unknown emails;
- * the demo logins are the way in.
- */
 /** A Tenant's Theme can change in its settings; the session always carries the current one. */
 function withCurrentThemes(session: Session): Session {
   return {
@@ -29,6 +24,11 @@ function withCurrentThemes(session: Session): Session {
   };
 }
 
+/**
+ * Sign-in as the backend will offer it. The prototype has no accounts of its own, so a
+ * password login is always refused, with the same answer for known and unknown emails;
+ * the demo logins are the way in.
+ */
 export const authHandlers = [
   http.get("/api/v1/me", () => {
     const session = currentSession();

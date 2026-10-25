@@ -44,7 +44,11 @@ export function FacilitiesPage() {
     const before = shown.current;
     shown.current = assetId;
     if (before && !assetId) {
-      document.querySelector<HTMLElement>(`[data-asset="${before}"]`)?.focus();
+      // Compared, not put into a selector: the value comes from the URL and may be anything.
+      const name = [...document.querySelectorAll<HTMLElement>("[data-asset]")].find(
+        (element) => element.dataset.asset === before,
+      );
+      (name ?? document.querySelector<HTMLElement>(".grc-facility-assets h2"))?.focus();
     }
   }, [assetId]);
 
@@ -83,7 +87,8 @@ export function FacilitiesPage() {
                     scope={item}
                     selected={item.id === scope?.id}
                     onSelect={() => {
-                      set({ scope: item.id, asset: null });
+                      // The first Scope is the default and stays out of the URL.
+                      set({ scope: item.id === ordered[0]?.id ? null : item.id, asset: null });
                     }}
                   />
                 </li>
@@ -94,7 +99,7 @@ export function FacilitiesPage() {
                 tenant={tenant}
                 scope={scope}
                 onOpen={(id) => {
-                  set({ scope: scope.id, asset: id }, true);
+                  set({ scope: scope.id === ordered[0]?.id ? null : scope.id, asset: id }, true);
                 }}
               />
             )}
@@ -199,7 +204,7 @@ function AssetList({
 
   return (
     <section aria-labelledby={headingId} className="grc-facility-assets">
-      <h2 id={headingId} className="grc-facility-name">
+      <h2 id={headingId} tabIndex={-1} className="grc-facility-name">
         {t("facilities.assetsOf", { name: scope.name })}
       </h2>
       <QueryContent

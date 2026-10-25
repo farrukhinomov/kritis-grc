@@ -23,11 +23,13 @@ interface AssetDetailProps {
 export function AssetDetail({ tenant, scopeId, assetId, onClose }: AssetDetailProps) {
   const { t } = useTranslation();
   const query = combine([
-    useQuery(assetsQuery(tenant, { scope: scopeId, limit: 100 })),
+    // All of the Tenant's Assets: dependencies cross Scopes, as both plants depend on the
+    // same grid connection, and naming only the Scope's own would hide them.
+    useQuery(assetsQuery(tenant, { limit: 100 })),
     useQuery(risksQuery(tenant, { asset: assetId, limit: 100 })),
   ] as const);
   const assets = query.data?.[0].items ?? [];
-  const asset = assets.find((item) => item.id === assetId);
+  const asset = assets.find((item) => item.id === assetId && item.scope_id === scopeId);
 
   return (
     <ResponsiveDrawer open onClose={onClose} title={asset?.name ?? t("facilities.asset")}>

@@ -75,3 +75,11 @@
   padding-block: 4px;
   white-space: normal;
 }
+
+/* Touch targets of at least 44 px where fingers tap. */
+@media (pointer: coarse), (max-width: 767.98px) {
+  .grc-asset-name.ant-btn,
+  .grc-facility-show.ant-btn {
+    min-height: 44px;
+  }
+}

@@ -9,10 +9,12 @@ import { resetDb } from "@/mocks/db";
 import { server } from "@/mocks/server";
 import { resetSimulation } from "@/mocks/simulation";
 
+import { installIntersectionObserver, resetIntersectionObservers } from "./intersection";
 import { installMatchMedia, installResizeObserver, resetMediaQueries } from "./media";
 
 installMatchMedia();
 installResizeObserver();
+installIntersectionObserver();
 // jsdom lays nothing out, so it has no scrolling; components may still ask for it.
 Element.prototype.scrollIntoView = () => undefined;
 
@@ -30,6 +32,7 @@ beforeEach(() => {
 });
 afterEach(async () => {
   cleanup();
+  resetIntersectionObservers();
   // Spies must not outlive their test: a stubbed API call would leak into the next one.
   vi.restoreAllMocks();
   resetMediaQueries();

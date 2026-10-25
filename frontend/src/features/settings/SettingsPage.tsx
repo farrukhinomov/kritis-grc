@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { sessionKey } from "@/shared/api/auth";
 import { resourceKey } from "@/shared/api/keys";
 import { updateTenantTheme } from "@/shared/api/organization";
+import type { Session } from "@/shared/session/session";
 import { useCan, useCurrentMembership } from "@/shared/session/sessionContext";
 import { COLOR_MODE_PREFERENCES } from "@/shared/theme/colorMode";
 import { THEME_NAMES, type ThemeName } from "@/shared/theme/semantic";
@@ -29,7 +30,24 @@ export function SettingsPage() {
   const [saved, setSaved] = useState("");
   const change = useMutation({
     mutationFn: (theme: ThemeName) => updateTenantTheme(tenant, theme),
+    onMutate: () => {
+      setSaved("");
+    },
     onSuccess: (updated) => {
+      // The saved Theme goes into the session at once, so the app shows it even if the
+      // reload of the session that follows fails.
+      client.setQueryData<Session | null>(sessionKey, (session) =>
+        session
+          ? {
+              ...session,
+              memberships: session.memberships.map((item) =>
+                item.tenant.slug === tenant
+                  ? { ...item, tenant: { ...item.tenant, theme: updated.theme } }
+                  : item,
+              ),
+            }
+          : session,
+      );
       setSaved(t("settings.saved", { theme: t(`settings.themes.${updated.theme}.name`) }));
     },
     onSettled: () =>

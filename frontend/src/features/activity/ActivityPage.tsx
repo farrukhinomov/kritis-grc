@@ -2,7 +2,7 @@ import "./activity.css";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Button, Select } from "antd";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 
@@ -56,26 +56,33 @@ export function ActivityPage() {
       ...(action ? { action } : {}),
     }),
   );
-  const end = useRef<HTMLDivElement>(null);
-
   // Reaching the end of the list loads the next page; the button does the same for
-  // keyboard users and where the observer isn't available.
+  // keyboard users, where the observer isn't available, and as the retry after a
+  // failure. One observer lives as long as the end marker and reads the current state,
+  // so settling a fetch never starts the next one by itself.
   const { hasNextPage, isFetchingNextPage, fetchNextPage } = log;
+  const latest = useRef({ ready: false, fetchNextPage });
   useEffect(() => {
-    const target = end.current;
-    if (!target || !hasNextPage || typeof IntersectionObserver === "undefined") {
+    latest.current = {
+      ready: hasNextPage && !log.isFetching && !log.isFetchNextPageError,
+      fetchNextPage,
+    };
+  });
+  const end = useCallback((node: HTMLDivElement | null) => {
+    if (!node || typeof IntersectionObserver === "undefined") {
       return;
     }
     const observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting) && !isFetchingNextPage) {
-        void fetchNextPage();
+      if (entries.some((entry) => entry.isIntersecting) && latest.current.ready) {
+        latest.current.ready = false;
+        void latest.current.fetchNextPage();
       }
     });
-    observer.observe(target);
+    observer.observe(node);
     return () => {
       observer.disconnect();
     };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, []);
 
   const setFilter = (key: "type" | "action", value: string) => {
     setParams(

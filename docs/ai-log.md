@@ -331,6 +331,17 @@ Each milestone gets one entry with four parts:
 - **One formatter for changed fields.** The drawer's history and the Activity Log both say "Status: offen → teilweise umgesetzt", never stored values.
 - **The route-error test fails a real page.** It used to rely on a placeholder page, and after this step none is left.
 
+- **Review findings that were real defects**, each with a test that fails without its fix (mutation-checked):
+  - The Asset detail named only dependencies in the same Scope; the grid connection both plants depend on sits in the organization's Scope and showed as "none". The detail looks dependencies up across the Tenant.
+  - After a failed "load more", every settled fetch built a new observer that fetched again, without end. One observer lives as long as the end marker, reads the current state and never retries a failure; the button does.
+  - Any failed reload of the session replaced the whole app with an error panel, though a valid session was cached. Only a session that never loaded stops the app now (found while testing the Theme change).
+  - After a Theme change whose session reload failed, the choice jumped back while the status said it was saved. The saved Theme goes into the session at once.
+  - A broken Asset link crashed the page on closing the detail, as the URL value went into a selector; focus fell to the page when the Asset wasn't listed. Values are compared instead, and focus falls back to the Asset list's heading.
+  - Asset names and the Scope buttons were under 44 px on touch screens; the default Scope went into the URL; choosing the current Theme again logged a change; a stale success message survived a later failure; a docstring sat on the wrong function.
+
+### Rejected
+- **"Use one word for approving in the log and in the suggestion's state."** "freigegeben" is what someone did, the action of the log, which also covers Risk Assessments; "angenommen" is the state a Mapping Suggestion is in. They are different things and read correctly where each appears.
+
 ### Changed
 - **A long Scope name stretched its card and the page.** The button now reads "Assets anzeigen" and carries the Scope in its accessible name, which starts with the visible text.
 - **The Activity Log showed stored values** ("open → partial", "inherent_impact"). It uses the shared formatter.

@@ -34,6 +34,10 @@ export const organizationHandlers = [
       ]);
     }
     const from = data.tenant.theme;
+    // Choosing the Theme already set changes nothing, and nothing is logged.
+    if (theme === from) {
+      return HttpResponse.json(data.tenant);
+    }
     data.tenant.theme = theme as ThemeName;
     logActivity(data, {
       action: "updated",
