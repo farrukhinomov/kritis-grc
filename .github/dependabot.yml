@@ -2,12 +2,18 @@ version: 2
 
 # Weekly, grouped updates keep the PR count manageable. A cooldown lets the ecosystem
 # catch compromised or broken releases before they reach this repository; security
-# updates are not delayed by it.
+# updates are not delayed by it. Ignore rules encode deliberate version holds; each one
+# names its reason and is lifted by changing it here.
 updates:
   - package-ecosystem: uv
     directories: [/backend, /services/risk-engine]
     schedule: { interval: weekly, day: monday }
     cooldown: { default-days: 7 }
+    labels: [dependencies]
+    ignore:
+      # Django moves from LTS to LTS only: 5.2 until 6.2 LTS (April 2027).
+      - dependency-name: django
+        versions: [">=5.3"]
     groups:
       python-minor-and-patch:
         update-types: [minor, patch]
@@ -16,6 +22,19 @@ updates:
     directory: /frontend
     schedule: { interval: weekly, day: monday }
     cooldown: { default-days: 7 }
+    labels: [dependencies]
+    ignore:
+      # Node types follow the runtime, which stays on the Node 24 LTS line.
+      - dependency-name: "@types/node"
+        update-types: [version-update:semver-major]
+      # Held until typescript-eslint supports TypeScript 7.
+      - dependency-name: typescript
+        versions: [">=6.1"]
+      # Held until eslint-plugin-jsx-a11y supports ESLint 10.
+      - dependency-name: eslint
+        versions: [">=10"]
+      - dependency-name: "@eslint/js"
+        versions: [">=10"]
     groups:
       frontend-minor-and-patch:
         update-types: [minor, patch]
@@ -24,16 +43,25 @@ updates:
     directories: [/backend, /services/risk-engine, /frontend]
     schedule: { interval: weekly, day: monday }
     cooldown: { default-days: 7 }
+    labels: [dependencies]
+    ignore:
+      # Runtimes move between LTS releases deliberately, never automatically.
+      - dependency-name: node
+        update-types: [version-update:semver-major]
+      - dependency-name: python
+        update-types: [version-update:semver-major, version-update:semver-minor]
 
   - package-ecosystem: docker-compose
     directory: /
     schedule: { interval: weekly, day: monday }
     cooldown: { default-days: 7 }
+    labels: [dependencies]
 
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly, day: monday }
     cooldown: { default-days: 7 }
+    labels: [dependencies]
     groups:
       actions:
         patterns: ["*"]

@@ -65,6 +65,22 @@ def runtime_packages() -> list[str]:
     return names
 
 
+def installed(packages: list[str]) -> list[str]:
+    """Keeps the packages present in this environment.
+
+    The export also lists dependencies for other platforms (e.g. tzdata on Windows only);
+    they aren't installed here and don't ship in this platform's image.
+    """
+    present = []
+    for package in packages:
+        try:
+            metadata.distribution(package)
+        except metadata.PackageNotFoundError:
+            continue
+        present.append(package)
+    return present
+
+
 def licenses_of(package: str) -> set[str]:
     meta = metadata.metadata(package)
     if expression := meta.get("License-Expression"):
@@ -98,7 +114,7 @@ def main() -> int:
     allowed = set(policy["allowed"]) | set(policy["conditional"])
     exempt = set(policy["packages"])
     violations = []
-    for package in sorted(set(runtime_packages()) - exempt):
+    for package in sorted(set(installed(runtime_packages())) - exempt):
         for license_id in licenses_of(package):
             if not is_allowed(license_id, allowed):
                 violations.append(f"{package}: {license_id}")

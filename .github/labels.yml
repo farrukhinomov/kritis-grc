@@ -18,3 +18,4 @@
 - { name: "infra", color: "5319e7", description: "Cloud, compose, infrastructure as code" }
 - { name: "ci", color: "5319e7", description: "CI/CD workflows" }
 - { name: "docs", color: "0e8a16", description: "GLOSSARY, ADRs, conventions, plans" }
+- { name: "dependencies", color: "0366d6", description: "Dependency updates (Dependabot)" }

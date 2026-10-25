@@ -65,6 +65,10 @@ class LicensePolicyTest(unittest.TestCase):
         self.assertFalse(check_python_licenses.is_allowed("GPL-3.0-only", self.allowed))
         self.assertFalse(check_python_licenses.is_allowed("AGPL-3.0-only", self.allowed))
 
+    def test_packages_for_other_platforms_are_not_checked(self) -> None:
+        # e.g. tzdata, required only on Windows, isn't installed on a Linux runner.
+        self.assertEqual(check_python_licenses.installed(["no-such-package-xyz", "pip"]), ["pip"])
+
     def test_unknown_free_text_is_reported_not_guessed(self) -> None:
         self.assertTrue(check_python_licenses._spdx_from_text("gplv3").startswith("UNKNOWN"))
 
