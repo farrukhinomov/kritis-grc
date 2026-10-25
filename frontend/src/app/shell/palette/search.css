@@ -63,3 +63,19 @@
   padding: 12px 16px 0;
   color: var(--grc-text-secondary);
 }
+
+/* The title names the dialog for screen readers; the input says enough on screen. */
+.grc-palette-modal .ant-modal-header {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Hits of an earlier query, while the current one is still on its way. */
+.grc-palette-option[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: progress;
+}

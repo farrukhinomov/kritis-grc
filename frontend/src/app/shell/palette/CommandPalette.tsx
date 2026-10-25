@@ -6,10 +6,11 @@ import { type KeyboardEvent, type ReactNode, useEffect, useId, useState } from "
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
-import { NAV_ITEMS } from "../navigation";
 import { MIN_SEARCH_LENGTH, searchQuery } from "@/shared/api/search";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
 import { AnimatedIcon } from "@/shared/ui/AnimatedIcon/AnimatedIcon";
+
+import { NAV_ITEMS } from "../navigation";
 
 /** Long enough to skip the keystrokes of a word being typed, short enough to feel instant. */
 const DEBOUNCE_MS = 150;
@@ -56,42 +57,57 @@ function useDebounced(value: string): string {
  */
 export function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
-  const titleId = useId();
+  // Escape returns to where the user was; choosing a result leads to a new page, whose
+  // heading receives focus, and the trigger must not take it back after the animation.
+  const [returnFocus, setReturnFocus] = useState(true);
 
   return (
     <Modal
       open={open}
+      title={t("search.title")}
       onCancel={onClose}
+      afterOpenChange={(opened) => {
+        if (opened) {
+          setReturnFocus(true);
+        }
+      }}
       footer={null}
       closable={false}
       width={640}
       className="grc-palette-modal"
       destroyOnHidden
-      aria-labelledby={titleId}
+      focusable={{ focusTriggerAfterClose: returnFocus }}
     >
-      <h2 id={titleId} className="grc-visually-hidden">
-        {t("search.title")}
-      </h2>
-      <Palette onClose={onClose} />
+      <Palette
+        onChoose={() => {
+          setReturnFocus(false);
+          onClose();
+        }}
+      />
     </Modal>
   );
 }
 
-function Palette({ onClose }: { onClose: () => void }) {
+function Palette({ onChoose }: { onChoose: () => void }) {
   const { t, i18n } = useTranslation();
   const tenant = useCurrentMembership().tenant.slug;
   const navigate = useNavigate();
   const [text, setText] = useState("");
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState({ for: "", index: 0 });
   const listId = useId();
-  const q = useDebounced(text.trim());
+  const typed = text.trim();
+  const q = useDebounced(typed);
   const searching = q.length >= MIN_SEARCH_LENGTH;
   const results = useQuery({ ...searchQuery(tenant, q), enabled: searching });
   const english = i18n.language === "en";
 
-  const needle = fold(text.trim());
-  const pages = NAV_ITEMS.filter((item) => fold(t(`nav.${item.key}`)).includes(needle));
+  // The server's hits are current only once they answer what is in the field; until
+  // then they are shown as in progress and can't be chosen, so Enter never opens a hit
+  // of an earlier query.
+  const settled = q === typed && !results.isPlaceholderData && !results.isFetching;
   const data = searching ? results.data : undefined;
+  const needle = fold(typed);
+  const pages = NAV_ITEMS.filter((item) => fold(t(`nav.${item.key}`)).includes(needle));
   const groups: Group[] = [
     {
       key: "pages",
@@ -117,6 +133,7 @@ function Palette({ onClose }: { onClose: () => void }) {
         detail: hit.framework_name,
         to: `compliance?${new URLSearchParams({
           framework: hit.framework_id,
+          scope: hit.scope_id,
           paragraph: hit.paragraph,
           requirement: hit.id,
         }).toString()}`,
@@ -146,37 +163,45 @@ function Palette({ onClose }: { onClose: () => void }) {
     },
   ].filter((group) => group.options.length > 0);
   const flat = groups.flatMap((group) => group.options);
-  const current = flat.length === 0 ? -1 : Math.min(active, flat.length - 1);
+  const choosable = (option: Option) => settled || option.id.startsWith("page-");
+  // The active option belongs to one set of results; new results start at the top.
+  const signature = `${typed}|${String(settled)}|${String(flat.length)}`;
+  const current = flat.length === 0 ? -1 : active.for === signature ? active.index : 0;
   const optionId = (index: number) => `${listId}-${String(index)}`;
 
+  useEffect(() => {
+    if (current >= 0) {
+      document.getElementById(optionId(current))?.scrollIntoView({ block: "nearest" });
+    }
+  });
+
   const choose = (option: Option | undefined) => {
-    if (option) {
-      onClose();
+    if (option && choosable(option)) {
+      onChoose();
       void navigate(`/t/${tenant}/${option.to}`);
     }
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    const moves: Partial<Record<string, number>> = {
-      ArrowDown: current + 1,
-      ArrowUp: current - 1,
-      Home: 0,
-      End: flat.length - 1,
-    };
-    const target = moves[event.key];
-    if (target !== undefined && flat.length > 0) {
+    // A key pressed while an input method composes a word belongs to the word.
+    if (event.nativeEvent.isComposing) {
+      return;
+    }
+    // Home and End stay the text field's, to move the caret, as in other comboboxes.
+    const step = { ArrowDown: 1, ArrowUp: -1 }[event.key];
+    if (step !== undefined && flat.length > 0) {
       event.preventDefault();
       // The list wraps around, as menus do, so the last result is one key away.
-      setActive((target + flat.length) % flat.length);
+      setActive({ for: signature, index: (current + step + flat.length) % flat.length });
     } else if (event.key === "Enter") {
       event.preventDefault();
       choose(flat[current]);
     }
   };
 
-  const loading = searching && results.isFetching && !results.data;
+  const loading = searching && !settled;
   const failed = searching && results.isError;
-  const empty = searching && !loading && !failed && flat.length === 0;
+  const empty = searching && settled && !failed && flat.length === 0;
   let index = -1;
 
   return (
@@ -190,7 +215,7 @@ function Palette({ onClose }: { onClose: () => void }) {
           role="combobox"
           aria-label={t("search.label")}
           aria-expanded={flat.length > 0}
-          aria-controls={listId}
+          aria-controls={flat.length > 0 ? listId : undefined}
           aria-autocomplete="list"
           aria-activedescendant={current >= 0 ? optionId(current) : undefined}
           className="grc-palette-input"
@@ -198,61 +223,78 @@ function Palette({ onClose }: { onClose: () => void }) {
           value={text}
           onChange={(event) => {
             setText(event.target.value);
-            setActive(0);
           }}
           onKeyDown={onKeyDown}
         />
       </div>
       <p role="status" className="grc-visually-hidden">
-        {searching && !loading ? t("search.count", { count: flat.length }) : ""}
+        {typed !== "" && !loading ? t("search.count", { count: flat.length }) : ""}
       </p>
       {failed && <p className="grc-palette-note">{t("search.unavailable")}</p>}
       {empty && <p className="grc-palette-note">{t("search.empty", { query: q })}</p>}
       {loading && <p className="grc-palette-note">{t("search.loading")}</p>}
-      <div id={listId} role="listbox" aria-label={t("search.results")} className="grc-palette-list">
-        {groups.map((group) => {
-          const headingId = `${listId}-${group.key}`;
-          return (
-            <div key={group.key} role="group" aria-labelledby={headingId}>
-              <div id={headingId} role="presentation" className="grc-palette-group">
-                {group.title}
-                {group.total > group.options.length && (
-                  <span className="grc-meta">
-                    {" "}
-                    {t("search.shown", { shown: group.options.length, total: group.total })}
-                  </span>
-                )}
-              </div>
-              {group.options.map((option) => {
-                index += 1;
-                const position = index;
-                return (
-                  // The input owns the keyboard; options are reached by aria-activedescendant
-                  // and the mouse, so they are not focusable themselves.
-                  // eslint-disable-next-line jsx-a11y/click-events-have-key-events
-                  <div
-                    key={option.id}
-                    id={optionId(position)}
-                    role="option"
-                    tabIndex={-1}
-                    aria-selected={position === current}
-                    className="grc-palette-option"
-                    onMouseMove={() => {
-                      setActive(position);
-                    }}
-                    onClick={() => {
-                      choose(option);
-                    }}
-                  >
-                    <span className="grc-palette-option-label">{option.label}</span>
-                    {option.detail && <span className="grc-meta">{option.detail}</span>}
+      {flat.length > 0 && (
+        // A pointer press on the list must not take focus from the input, or the arrow
+        // keys and Enter would stop working; keyboard users never leave the input.
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+        <div
+          onMouseDown={(event) => {
+            event.preventDefault();
+          }}
+        >
+          <div
+            id={listId}
+            role="listbox"
+            aria-label={t("search.results")}
+            aria-busy={loading}
+            className="grc-palette-list"
+          >
+            {groups.map((group) => {
+              const headingId = `${listId}-${group.key}`;
+              return (
+                <div key={group.key} role="group" aria-labelledby={headingId}>
+                  <div id={headingId} role="presentation" className="grc-palette-group">
+                    {group.title}
+                    {group.total > group.options.length && (
+                      <span className="grc-meta">
+                        {" "}
+                        {t("search.shown", { shown: group.options.length, total: group.total })}
+                      </span>
+                    )}
                   </div>
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>
+                  {group.options.map((option) => {
+                    index += 1;
+                    const position = index;
+                    return (
+                      // The input owns the keyboard: options are reached through
+                      // aria-activedescendant, so they never take focus themselves.
+                      // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+                      <div
+                        key={option.id}
+                        id={optionId(position)}
+                        role="option"
+                        tabIndex={-1}
+                        aria-selected={position === current}
+                        aria-disabled={!choosable(option)}
+                        className="grc-palette-option"
+                        onMouseMove={() => {
+                          setActive({ for: signature, index: position });
+                        }}
+                        onClick={() => {
+                          choose(option);
+                        }}
+                      >
+                        <span className="grc-palette-option-label">{option.label}</span>
+                        {option.detail && <span className="grc-meta">{option.detail}</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

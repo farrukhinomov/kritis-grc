@@ -305,5 +305,16 @@ Each milestone gets one entry with four parts:
 - **Citations match however they are spaced.** "§13 abs.3" finds "§ 13 Abs. 3"; text matches ignore case and accents.
 - **The palette lives in the shell**, next to the navigation it complements, not in a feature module.
 
+- **Review findings that were real defects**, each with a test that fails without its fix (mutation-checked):
+  - Enter could open a hit of an earlier query while the new one was on its way. Hits become choosable only once they answer what is in the field; until then they are shown as in progress.
+  - Requirement hits opened the cockpit in its first Scope, where the Requirement might not apply, and a Tenant without Implementations got hits that led nowhere. Hits now come only from Requirements the Tenant applies and carry the Scope to open.
+  - A query of punctuation, such as ". .", matched every citation. Only a query with a number is compared as a citation.
+  - On a Mac, Ctrl+K deletes to the end of the line in text fields; the shortcut took it over. Apple keyboards use Cmd+K only, others Ctrl+K only, and Shift, Alt and composing input are left alone.
+  - The shortcut opened the palette over another dialog, whose work a page change would discard. It waits until no other dialog is open.
+  - The dialog had no accessible name; the hidden heading named nothing. The dialog's own title names it and is hidden visually only.
+  - After choosing a result, the dialog moved focus back to the trigger, away from the new page's heading. It returns focus only when closed with Escape.
+  - The active option could sit out of view, Enter confirmed an input method's word as a choice, Home and End no longer moved the caret, a click on the list took focus from the input, an empty listbox stayed referenced, one-letter page filtering was never announced, and the header button was under 44 px on touch tablets. All fixed.
+  - Two tests passed without their feature: the IME test checked the URL before the page's code could load, and the dialog-name check could not resolve antd's test ids. Both now check what they claim.
+
 ### Rejected
 - **"Use cmdk."** A small own combobox follows the WAI-ARIA pattern exactly (focus stays in the input, options via aria-activedescendant, groups with names) and adds nothing to the bundle; the library's value is mostly fuzzy ranking, which the server does here.

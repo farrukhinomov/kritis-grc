@@ -1,6 +1,6 @@
-import { screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { http } from "msw";
+import { delay, http } from "msw";
 
 import { problem } from "@/mocks/http";
 import { server } from "@/mocks/server";
@@ -47,12 +47,103 @@ describe("the command palette", () => {
     expect(location(router).params.get("framework")).toBe("fw-kritisdachg");
   });
 
-  it("opens with Cmd+K as well", async () => {
+  it("opens with Cmd+K on Apple keyboards, where Ctrl+K stays the system's", async () => {
+    vi.spyOn(navigator, "userAgent", "get").mockReturnValue("Mozilla/5.0 (Macintosh)");
     await openDashboard();
 
+    await userEvent.keyboard("{Control>}k{/Control}");
+    expect(screen.queryByRole("combobox", { name: "Suchen" })).not.toBeInTheDocument();
     await userEvent.keyboard("{Meta>}k{/Meta}");
 
     expect(await palette()).toBeInTheDocument();
+  });
+
+  it("doesn't open over another dialog, whose work it would throw away", async () => {
+    await openDashboard();
+    const other = document.createElement("div");
+    other.setAttribute("aria-modal", "true");
+    document.body.append(other);
+
+    await userEvent.keyboard("{Control>}k{/Control}");
+
+    expect(screen.queryByRole("combobox", { name: "Suchen" })).not.toBeInTheDocument();
+    other.remove();
+  });
+
+  it("is a named dialog", async () => {
+    await openDashboard();
+
+    await userEvent.keyboard("{Control>}k{/Control}");
+
+    // antd gives every id the same value under test, so the name is checked by its link.
+    const dialog = await screen.findByRole("dialog");
+    const label = dialog.getAttribute("aria-labelledby");
+    expect(label).not.toBeNull();
+    expect(dialog.querySelector(`[id="${label!}"]`)).toHaveTextContent("Suche");
+  });
+
+  it("opens a Requirement in a Scope that applies it", async () => {
+    const { router } = await openDashboard();
+    await userEvent.keyboard("{Control>}k{/Control}");
+
+    await userEvent.type(await palette(), "§13 abs.3 nr.2");
+    await screen.findByRole("option", { name: ACCESS });
+    await userEvent.keyboard("{Enter}");
+
+    await waitFor(() => {
+      expect(location(router).params.get("scope")).toBe("sc-nord");
+    });
+  });
+
+  it("never opens a result of an earlier query", async () => {
+    let release: () => void = () => undefined;
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    server.use(
+      http.get("/api/v1/tenants/:tenant/search", async ({ request }) => {
+        if (new URL(request.url).searchParams.get("q") !== "pumpwerk") {
+          await held;
+        }
+        return undefined;
+      }),
+    );
+    const { router } = await openDashboard();
+    await userEvent.keyboard("{Control>}k{/Control}");
+    const input = await palette();
+    await userEvent.type(input, "pumpwerk");
+    await screen.findByRole("option", { name: /Längerer Stromausfall/ });
+
+    await userEvent.type(input, " süd{Enter}");
+    await delay(300);
+
+    expect(location(router).pathname).toBe("/t/muster-stadtwerke/dashboard");
+    release();
+  });
+
+  it("ignores Enter while an input method is composing a word", async () => {
+    const { router } = await openDashboard();
+    await userEvent.keyboard("{Control>}k{/Control}");
+    const input = await palette();
+    await userEvent.type(input, "Risik");
+    await screen.findByRole("option", { name: /^Risiken/ });
+
+    fireEvent.keyDown(input, { key: "Enter", isComposing: true });
+    // A navigation would load the page's code first; give it the time to.
+    await delay(300);
+
+    expect(location(router).pathname).toBe("/t/muster-stadtwerke/dashboard");
+  });
+
+  it("keeps the active option in view", async () => {
+    const scrolled = vi.spyOn(Element.prototype, "scrollIntoView");
+    await openDashboard();
+    await userEvent.keyboard("{Control>}k{/Control}");
+    await palette();
+
+    await userEvent.keyboard("{ArrowUp}");
+
+    expect(scrolled).toHaveBeenCalledWith({ block: "nearest" });
   });
 
   it("moves through the results with the arrow keys", async () => {
@@ -69,7 +160,7 @@ describe("the command palette", () => {
     await userEvent.keyboard("{ArrowUp}{ArrowUp}");
     expect(options().at(-1)).toHaveAttribute("aria-selected", "true");
 
-    await userEvent.keyboard("{Home}{Enter}");
+    await userEvent.keyboard("{ArrowDown}{Enter}");
 
     await waitFor(() => {
       expect(location(router).params.get("risk")).toBe("rk-n-power");

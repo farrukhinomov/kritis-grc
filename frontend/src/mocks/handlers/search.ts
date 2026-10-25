@@ -26,8 +26,9 @@ function group<T>(ranked: { item: T; rank: number }[]): SearchGroup<T> {
 /**
  * The search behind the command palette. It runs on the server, inside one Tenant, as
  * the backend will: the browser never loads whole lists to filter them. Requirements are
- * the public catalogue; Risks and Assets are the Tenant's own. Citation matches rank
- * before title matches, title matches before text matches.
+ * found only where the Tenant applies them, so every hit opens somewhere in the cockpit;
+ * Risks and Assets are the Tenant's own. Citation matches rank before title matches,
+ * title matches before text matches.
  */
 function search(data: TenantData, q: string): SearchResults {
   const needle = fold(q);
@@ -37,17 +38,29 @@ function search(data: TenantData, q: string): SearchResults {
       framework.versions.some((version) => version.id === versionId),
     );
   const scopeName = (id: string) => data.scopes.find((scope) => scope.id === id)?.name ?? "";
+  // Only a query with a number can be a citation; "§." alone would match every one.
+  const citationNeedle = /\d/.test(compactNeedle) ? compactNeedle : null;
+  // The cockpit lists Critical Facilities first, so a hit opens there when it can.
+  const scopeApplying = (requirementId: string) => {
+    const scopes = data.implementations
+      .filter((implementation) => implementation.requirement_id === requirementId)
+      .map((implementation) => data.scopes.find((scope) => scope.id === implementation.scope_id))
+      .filter((scope) => scope !== undefined);
+    return (scopes.find((scope) => scope.kind === "critical_facility") ?? scopes[0])?.id;
+  };
 
   const requirements = data.requirements.flatMap((requirement) => {
-    const rank = compact(requirement.citation).includes(compactNeedle)
-      ? 0
-      : fold(`${requirement.title_de} ${requirement.title_en}`).includes(needle)
-        ? 1
-        : fold(`${requirement.text_de} ${requirement.summary_en}`).includes(needle)
-          ? 2
-          : null;
+    const rank =
+      citationNeedle !== null && compact(requirement.citation).includes(citationNeedle)
+        ? 0
+        : fold(`${requirement.title_de} ${requirement.title_en}`).includes(needle)
+          ? 1
+          : fold(`${requirement.text_de} ${requirement.summary_en}`).includes(needle)
+            ? 2
+            : null;
     const framework = frameworkOf(requirement.framework_version_id);
-    return rank === null || !framework
+    const scopeId = scopeApplying(requirement.id);
+    return rank === null || !framework || !scopeId
       ? []
       : [
           {
@@ -60,6 +73,7 @@ function search(data: TenantData, q: string): SearchResults {
               framework_id: framework.id,
               framework_name: framework.name,
               paragraph: requirement.paragraph,
+              scope_id: scopeId,
             },
           },
         ];

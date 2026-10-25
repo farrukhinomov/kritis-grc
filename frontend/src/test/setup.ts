@@ -13,6 +13,8 @@ import { installMatchMedia, installResizeObserver, resetMediaQueries } from "./m
 
 installMatchMedia();
 installResizeObserver();
+// jsdom lays nothing out, so it has no scrolling; components may still ask for it.
+Element.prototype.scrollIntoView = () => undefined;
 
 // Routes load their code lazily; the first test to reach a chunk waits for it to be
 // transformed, which under coverage instrumentation can take longer than the 1 s default.

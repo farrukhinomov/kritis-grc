@@ -12,6 +12,7 @@ import { useTenantTheme } from "@/shared/theme/themeContext";
 import { MAIN_CONTENT_ID } from "../RootLayout";
 import { BottomTabBar } from "./BottomTabBar";
 import { CommandPalette } from "./palette/CommandPalette";
+import { isSearchShortcut } from "./palette/shortcut";
 import { ShellHeader } from "./ShellHeader";
 import { SideNav } from "./SideNav";
 import { UnknownTenant } from "./UnknownTenant";
@@ -26,11 +27,23 @@ export function TenantShell() {
   const [searching, setSearching] = useState(false);
   useTenantTheme(membership?.tenant.theme ?? DEFAULT_THEME);
 
-  // Ctrl+K, or Cmd+K on Apple keyboards, opens the search from anywhere, even from a
-  // text field, as in most tools; the browser's own use of the shortcut gives way.
+  const [searchTenant, setSearchTenant] = useState(tenantSlug);
+
+  // Another Tenant's palette would search the wrong data; switching Tenants closes it.
+  if (searchTenant !== tenantSlug) {
+    setSearchTenant(tenantSlug);
+    setSearching(false);
+  }
+
+  // The shortcut opens the search from anywhere, even from a text field, as in most
+  // tools, but never over another dialog: choosing a page would throw its work away.
+  const known = membership !== undefined;
   useEffect(() => {
+    if (!known) {
+      return;
+    }
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+      if (isSearchShortcut(event) && !document.querySelector('[aria-modal="true"]')) {
         event.preventDefault();
         setSearching(true);
       }
@@ -39,7 +52,7 @@ export function TenantShell() {
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, []);
+  }, [known]);
 
   if (!membership) {
     return <UnknownTenant />;

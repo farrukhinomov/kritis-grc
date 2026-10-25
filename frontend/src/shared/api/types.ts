@@ -413,6 +413,8 @@ export interface RequirementHit {
   framework_id: string;
   framework_name: string;
   paragraph: string;
+  /** A Scope that applies the Requirement, where the cockpit can open it. */
+  scope_id: string;
 }
 
 export interface RiskHit {

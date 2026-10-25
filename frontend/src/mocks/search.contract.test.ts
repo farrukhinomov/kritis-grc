@@ -23,7 +23,20 @@ describe("the search", () => {
       framework_id: "fw-kritisdachg",
       framework_name: "KRITIS-Dachgesetz",
       paragraph: "§ 13",
+      scope_id: "sc-nord",
     });
+  });
+
+  it("finds only Requirements the Tenant applies, which the cockpit can open", async () => {
+    const result = await search("§13", EMPTY);
+
+    expect(result.requirements.items).toEqual([]);
+  });
+
+  it("doesn't treat a query of punctuation as a citation that matches everything", async () => {
+    const result = await search(". .");
+
+    expect(result.requirements.total).toBe(0);
   });
 
   it("finds Requirements by their text, ignoring case and accents", async () => {

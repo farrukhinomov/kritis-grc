@@ -8,13 +8,11 @@ import { AnimatedIcon } from "@/shared/ui/AnimatedIcon/AnimatedIcon";
 import { LanguageSwitch } from "@/shared/ui/LanguageSwitch";
 
 import { screenOf } from "./navigation";
+import { isApple } from "./palette/shortcut";
 import { UserMenu } from "./UserMenu";
 
 /** Decided at build time, like the mock API itself. */
 const SHOWS_DEMO_DATA = import.meta.env.VITE_API_MOCKING === "enabled";
-
-/** Apple keyboards say Cmd where the others say Ctrl. */
-const APPLE = /Mac|iPhone|iPad/.test(globalThis.navigator.userAgent);
 
 interface ShellHeaderProps {
   membership: Membership;
@@ -25,6 +23,7 @@ interface ShellHeaderProps {
 export function ShellHeader({ membership, wide, onSearch }: ShellHeaderProps) {
   const { t } = useTranslation();
   const readOnly = !useCan("change");
+  const apple = isApple();
 
   return (
     <header className="grc-shell-header">
@@ -39,7 +38,7 @@ export function ShellHeader({ membership, wide, onSearch }: ShellHeaderProps) {
         type="button"
         className="grc-shell-search"
         aria-label={wide ? undefined : t("search.label")}
-        aria-keyshortcuts={APPLE ? "Meta+K" : "Control+K"}
+        aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
         onClick={onSearch}
       >
         <AnimatedIcon preset="search" />
@@ -47,7 +46,7 @@ export function ShellHeader({ membership, wide, onSearch }: ShellHeaderProps) {
           <>
             <span>{t("search.label")}</span>
             <kbd className="grc-shell-search-key">
-              {t(APPLE ? "search.keyApple" : "search.key")}
+              {t(apple ? "search.keyApple" : "search.key")}
             </kbd>
           </>
         )}
