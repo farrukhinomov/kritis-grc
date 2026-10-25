@@ -1,5 +1,5 @@
 import deDE from "antd/locale/de_DE";
-import i18n, { type BackendModule } from "i18next";
+import i18n, { type BackendModule, type i18n as I18n } from "i18next";
 import { initReactI18next } from "react-i18next";
 
 import { de, type Translation } from "./locales/de";
@@ -62,8 +62,8 @@ export function lazyLanguages(loaders: Loaders = LOADERS): BackendModule {
           callback(null, translation);
         },
         (error: unknown) => {
-          // i18next then falls back to German, which keeps the UI usable offline.
-          callback(error instanceof Error ? error : new Error(String(error)), false);
+          // `true` lets i18next retry: most failures are a brief network blip.
+          callback(error instanceof Error ? error : new Error(String(error)), true);
         },
       );
     },
@@ -96,23 +96,56 @@ function rememberLanguage(language: string): void {
 // browser's hyphenation follow the document language.
 i18n.on("languageChanged", (language) => {
   document.documentElement.lang = language;
-  rememberLanguage(language);
 });
 
-/** Resolves once the remembered language is loaded; rendering waits for it, so an English
- * user never sees German flash by after a reload. */
-export const i18nReady = i18n
-  .use(lazyLanguages())
-  .use(initReactI18next)
-  .init({
-    resources: { de: { translation: de } },
-    partialBundledLanguages: true,
-    lng: storedLanguage(),
-    fallbackLng: DEFAULT_LANGUAGE,
-    supportedLngs: SUPPORTED_LANGUAGES,
-    // React already escapes output, so double escaping would show entities literally.
-    interpolation: { escapeValue: false },
-    returnNull: false,
-  });
+/**
+ * Switches only once the language is loaded. i18next's own `changeLanguage` switches
+ * even when the load failed, leaving the page English in name and German in text, and
+ * never tries a failed language again; this forces a fresh attempt every time.
+ * Resolves to whether the switch happened, so the caller can tell the user.
+ */
+export async function selectLanguage(language: Language, instance: I18n = i18n): Promise<boolean> {
+  if (!instance.hasResourceBundle(language, "translation")) {
+    await instance.reloadResources([language], ["translation"]);
+  }
+  if (!instance.hasResourceBundle(language, "translation")) {
+    return false;
+  }
+  await instance.changeLanguage(language);
+  if (instance === i18n) {
+    rememberLanguage(language);
+  }
+  return true;
+}
+
+/**
+ * Starts in German, which is bundled, then switches to the remembered language once it
+ * has loaded. Rendering waits for this, so an English user never sees German flash by;
+ * if English can't load, the app stays German and the choice is kept for next time.
+ */
+export async function initI18n(instance: I18n, loaders: Loaders = LOADERS): Promise<void> {
+  await instance
+    .use(lazyLanguages(loaders))
+    .use(initReactI18next)
+    .init({
+      resources: { de: { translation: de } },
+      partialBundledLanguages: true,
+      lng: DEFAULT_LANGUAGE,
+      fallbackLng: DEFAULT_LANGUAGE,
+      supportedLngs: SUPPORTED_LANGUAGES,
+      // Two quick retries cover a blip without keeping a slow start waiting for long.
+      maxRetries: 2,
+      retryTimeout: 300,
+      // React already escapes output, so double escaping would show entities literally.
+      interpolation: { escapeValue: false },
+      returnNull: false,
+    });
+  const remembered = storedLanguage();
+  if (remembered !== DEFAULT_LANGUAGE) {
+    await selectLanguage(remembered, instance);
+  }
+}
+
+export const i18nReady = initI18n(i18n);
 
 export default i18n;

@@ -3,8 +3,11 @@ import { useTranslation } from "react-i18next";
 
 import { currentLanguage, type Language, SUPPORTED_LANGUAGES } from "@/shared/i18n";
 
+import { useSelectLanguage } from "./useSelectLanguage";
+
 export function LanguageSwitch() {
   const { t, i18n } = useTranslation();
+  const switchTo = useSelectLanguage();
 
   return (
     <Segmented<Language>
@@ -15,7 +18,7 @@ export function LanguageSwitch() {
         label: language.toUpperCase(),
         value: language,
       }))}
-      onChange={(language) => void i18n.changeLanguage(language)}
+      onChange={(language) => void switchTo(language)}
     />
   );
 }

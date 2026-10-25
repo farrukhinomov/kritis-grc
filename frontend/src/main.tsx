@@ -33,14 +33,20 @@ function render(container: HTMLElement) {
 
 // Rendering must never depend on the mock worker starting: a failure there shows up as
 // failed requests in the app, not as a blank page.
-// The remembered language loads in parallel. If it fails, i18next has already fallen back
-// to German, so rendering never waits on more than the slower of the two.
+// The remembered language loads in parallel. Rendering waits for it at most a few
+// seconds: a stalled request must never leave a blank page, and if English arrives
+// later the app switches by itself.
+const LANGUAGE_WAIT_MS = 3000;
+
 void Promise.all([
   enableMocking().catch((error: unknown) => {
     // eslint-disable-next-line no-console -- the only signal a developer gets in the browser
     console.error("Mock API could not be started", error);
   }),
-  i18nReady.catch(() => undefined),
+  Promise.race([
+    i18nReady.catch(() => undefined),
+    new Promise((resolve) => setTimeout(resolve, LANGUAGE_WAIT_MS)),
+  ]),
 ]).finally(() => {
   render(root);
 });

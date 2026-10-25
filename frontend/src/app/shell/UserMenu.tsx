@@ -14,6 +14,7 @@ import { COLOR_MODE_PREFERENCES, type ColorModePreference } from "@/shared/theme
 import { useColorMode } from "@/shared/theme/themeContext";
 import { AnimatedIcon } from "@/shared/ui/AnimatedIcon/AnimatedIcon";
 import type { IconPreset } from "@/shared/ui/AnimatedIcon/presets";
+import { useSelectLanguage } from "@/shared/ui/useSelectLanguage";
 
 const MODE_ICONS: Record<ColorModePreference, IconPreset> = {
   light: "lightMode",
@@ -40,6 +41,7 @@ export function UserMenu({ role, includeLanguage, showName }: UserMenuProps) {
   const { preference, setPreference } = useColorMode();
   const language = currentLanguage(i18n.resolvedLanguage);
   const signOut = useSignOut();
+  const switchTo = useSelectLanguage();
 
   const items: MenuProps["items"] = [
     {
@@ -101,7 +103,10 @@ export function UserMenu({ role, includeLanguage, showName }: UserMenuProps) {
         setPreference(mode);
       }
     } else if (key.startsWith(LANGUAGE_KEY)) {
-      void i18n.changeLanguage(key.slice(LANGUAGE_KEY.length));
+      const language = SUPPORTED_LANGUAGES.find((option) => `${LANGUAGE_KEY}${option}` === key);
+      if (language) {
+        void switchTo(language);
+      }
     } else if (key === LOGOUT_KEY) {
       signOut.mutate();
     }

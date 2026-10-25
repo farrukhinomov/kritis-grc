@@ -15,3 +15,21 @@ describe("LanguageSwitch", () => {
     expect(localStorage.getItem("grc.language")).toBe("en");
   });
 });
+
+describe("LanguageSwitch when English can't be loaded", () => {
+  it("says so and stays in German", async () => {
+    const i18nModule = await import("@/shared/i18n");
+    vi.spyOn(i18nModule, "selectLanguage").mockResolvedValue(false);
+    renderRoute("/");
+    await screen.findByRole("heading", { name: "Systemstatus" });
+
+    await userEvent.click(screen.getByText("EN"));
+
+    expect(
+      await screen.findByText(
+        "Englisch konnte gerade nicht geladen werden. Bitte versuchen Sie es erneut.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Systemstatus" })).toBeInTheDocument();
+  });
+});
