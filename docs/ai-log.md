@@ -141,3 +141,14 @@ Each milestone gets one entry with four parts:
 
 ### Rejected
 - **"Color empty matrix cells by the category they would have."** That needs the risk method's 4×4 table in the frontend, a copy of the risk engine's logic that could drift from it. Only occupied cells are colored, by the risks actually in them.
+
+---
+
+## Load only the active UI language (#35, 2026-10-25)
+
+### Accepted
+- **German stays bundled, English loads on demand.** German is the default, the fallback when a load fails and the typed source of every key, so it can't be lazy. English texts and Ant Design's English locale load together, before i18next switches, so no screen ever shows two languages.
+- **No new dependency.** The loader is a ten-line i18next backend, the pattern the i18next docs describe; the official plugin would add a package for the same lines.
+
+### Changed
+- **The saving is smaller today than estimated.** Measured: 261 → 260 KB gzipped, not the ~4 KB guessed. Ant Design already ships English as its built-in default, so its locale file saves only about 1 KB. The point is the trend: from now on every screen's English text stays out of the first download.
