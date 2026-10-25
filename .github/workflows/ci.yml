@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: read # lists the files a pull request changes
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       risk-engine: ${{ steps.filter.outputs.risk-engine }}
@@ -66,6 +66,20 @@ jobs:
               - frontend/**
               - infra/**
               - compose*.yaml
+
+  tooling:
+    name: Repository scripts and AI instructions
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Unit tests of the repository scripts
+        run: python3 -m unittest discover -s scripts/tests -v
+      - name: AI instruction files match CLAUDE.md
+        run: python3 scripts/sync_ai_instructions.py --check
 
   backend:
     name: Backend
@@ -313,7 +327,7 @@ jobs:
   ci-passed:
     name: CI passed
     if: always()
-    needs: [changes, backend, risk-engine, frontend, infra, images, dependencies, secrets, stack]
+    needs: [changes, tooling, backend, risk-engine, frontend, infra, images, dependencies, secrets, stack]
     runs-on: ubuntu-24.04
     permissions: {}
     steps:

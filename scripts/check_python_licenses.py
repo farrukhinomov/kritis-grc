@@ -13,6 +13,7 @@ import re
 import shutil
 import subprocess
 import sys
+from collections.abc import Set
 from importlib import metadata
 from pathlib import Path
 
@@ -86,7 +87,7 @@ def _spdx_from_text(text: str) -> str:
     return TEXT_TO_SPDX.get(text) or KNOWN_SPDX.get(text) or f"UNKNOWN({text[:40]})"
 
 
-def is_allowed(license_id: str, allowed: set[str]) -> bool:
+def is_allowed(license_id: str, allowed: Set[str]) -> bool:
     if " OR " in license_id:
         return any(is_allowed(option.strip("() "), allowed) for option in license_id.split(" OR "))
     return license_id in allowed

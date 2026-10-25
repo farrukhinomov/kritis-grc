@@ -9,14 +9,14 @@
 | [plan/](plan/README.md) | How do we get there: sequence, Definition of Done, backlog per milestone? | A milestone is planned or re-planned |
 | [research/](research/) | What do the law and the libraries actually say? | Facts are re-checked (each file is dated, with sources) |
 | [design/](design/) | Visual references | The design system changes |
-| [../CLAUDE.md](../CLAUDE.md) | Rules for AI assistants | Any of the above changes in a way an assistant must know |
+| [../CLAUDE.md](../CLAUDE.md) | Rules for AI assistants (other tools' files are generated from it) | Any of the above changes in a way an assistant must know |
+| [ai-log.md](ai-log.md) | Where was AI output accepted, changed or rejected, and why? | Every milestone |
+| [security/threat-model.md](security/threat-model.md) | What can go wrong, and what stops it? | Every milestone, and with any new boundary or asset |
 
 ## Planned (created with the milestone that needs them)
 
 | Document | Milestone |
 |---|---|
-| `security/threat-model.md` | M0 |
-| `ai-log.md` | M0 |
 | `events.md` (generated from event schemas) | M2 |
 | `architecture.md` (C4 and event-flow diagrams in Mermaid) | M3 |
 

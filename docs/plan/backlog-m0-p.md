@@ -136,10 +136,10 @@ As the maintainer, I want proof that a request passes through every layer of the
 
 As a reviewer, I want to see how AI is used and how security is reasoned about, from day one.
 
-- [ ] A script generates `.cursorrules` and `.github/copilot-instructions.md` from `CLAUDE.md`, and CI fails if they're out of date.
-- [ ] An AI review step on PRs posts its findings as review comments, and it never blocks on its own.
-- [ ] `docs/ai-log.md` is started with its format and a first M0 entry.
-- [ ] `docs/security/threat-model.md` v0 covers the public demo, uploads, tenant isolation, LLM cost, credential brute-forcing and the Vercel cache, each with a mitigation and a test reference. The CSP `unsafe-inline` exception for styles is documented there.
+- [x] A script generates `AGENTS.md`, `.github/copilot-instructions.md` and `.cursor/rules/project.mdc` from `CLAUDE.md`, and CI fails if they're out of date.
+- [x] An AI review step on PRs posts its findings as review comments, and it never blocks on its own.
+- [x] `docs/ai-log.md` is started with its format and a first M0 entry.
+- [x] `docs/security/threat-model.md` v0 covers the public demo, uploads, tenant isolation, LLM cost, credential brute-forcing and the Vercel cache, each with a mitigation and a test reference. The CSP `unsafe-inline` exception for styles is documented there.
 
 **M0 total:** about 26.5 h.
 

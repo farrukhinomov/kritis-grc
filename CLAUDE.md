@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Instructions for AI coding assistants working in this repository. `.cursorrules` and `.github/copilot-instructions.md` are generated from this file, so don't edit them by hand.
+Instructions for AI coding assistants working in this repository. `AGENTS.md`, `.github/copilot-instructions.md` and `.cursor/rules/project.mdc` are generated from this file by `python scripts/sync_ai_instructions.py`, so edit only this file and regenerate. CI fails if they drift.
 
 ## Project
 
@@ -47,9 +47,11 @@ docker compose up                                  # development, http://localho
 docker compose -f compose.prod.yaml up --build     # production-like, http://localhost:8081
 ```
 
-Workflow checks (repository root):
+Repository tooling (repository root):
 
 ```bash
+python scripts/sync_ai_instructions.py                           # regenerate other AI tools' rules after editing this file
+python -m unittest discover -s scripts/tests                      # tests of the repository scripts
 docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.12   # workflow syntax and shellcheck
 uvx zizmor .github/workflows                                      # workflow security
 ```

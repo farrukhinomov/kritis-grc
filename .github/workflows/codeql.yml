@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-      security-events: write
+      security-events: write # uploads findings to code scanning
     strategy:
       fail-fast: false
       matrix:

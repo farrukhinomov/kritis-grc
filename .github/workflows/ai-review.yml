@@ -1,0 +1,77 @@
+name: AI review
+
+# Advisory only: posts review comments on pull requests and never approves, blocks or
+# changes code. It isn't part of the required "CI passed" check, and a failure here never
+# stops a merge.
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+permissions: {}
+
+concurrency:
+  group: ai-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: Review the pull request
+    # Drafts aren't ready for review. Pull requests from forks and Dependabot get no
+    # secrets, so the review couldn't run there anyway.
+    if: >-
+      !github.event.pull_request.draft
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    continue-on-error: true
+    # The API key lives in this environment only, not as a repository-wide secret, so no
+    # other workflow can read it and access can be restricted in the environment settings.
+    environment: ai-review
+    permissions:
+      contents: read
+      pull-requests: write # posts the review comments
+    env:
+      HAS_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - name: Skip without an API key
+        if: env.HAS_API_KEY != 'true'
+        run: echo "::notice::ANTHROPIC_API_KEY is not configured; skipping the AI review."
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: env.HAS_API_KEY == 'true'
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: anthropics/claude-code-action@925afb53776cf1a2b738c6bdbed37b4d4000ef13 # v1.0.262
+        if: env.HAS_API_KEY == 'true'
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ github.token }}
+          prompt: |
+            REPOSITORY: ${{ github.repository }}
+            PULL REQUEST: ${{ github.event.pull_request.number }}
+
+            Review this pull request as a senior engineer on this project.
+
+            First read CLAUDE.md, GLOSSARY.md and docs/conventions.md. Check the diff
+            against them and against the ADRs in docs/adr/ that it touches.
+
+            Report only concrete, verifiable problems, most severe first:
+            - correctness bugs and missing edge cases
+            - security issues: tenant isolation, authorization in the service layer,
+              secrets, injection, unsafe defaults
+            - violations of the project's non-negotiable rules
+            - missing or weak tests for new behavior
+            - code comments that reference ADRs or Markdown files (not allowed)
+
+            Put each finding as an inline comment on the exact line, with a concrete fix.
+            Skip style nits that the linters already enforce. If there is nothing worth
+            raising, leave one short summary comment saying so. Never approve or request
+            changes: the review is advisory.
+          claude_args: >-
+            --model claude-sonnet-5-5
+            --max-turns 30
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Read,Glob,Grep"

@@ -125,7 +125,7 @@ See [ADR 0017](adr/0017-http-standard-responses-no-envelope.md), [ADR 0018](adr/
 - Each call sends one KRITIS-DachG Requirement and all BSIG Requirements as candidates. Results are validated: citations not in the candidate list are discarded, and only full/partial become suggestions.
 - Evaluation: a gold set built from the Platform Mappings plus known non-overlaps. Precision and recall are measured per coverage level. It runs on prompt changes, not on every PR, and the latest results go in the README.
 - Development with AI:
-  - [CLAUDE.md](../CLAUDE.md) is the source of truth. `.cursorrules` and `.github/copilot-instructions.md` are generated from it.
+  - [CLAUDE.md](../CLAUDE.md) is the source of truth. `AGENTS.md`, `.github/copilot-instructions.md` and `.cursor/rules/project.mdc` (Cursor's current format, replacing the deprecated `.cursorrules`) are generated from it.
   - Every PR gets an AI review step.
   - `docs/ai-log.md` records, per milestone, what the AI proposed, what was accepted and what was rejected, and why.
 
