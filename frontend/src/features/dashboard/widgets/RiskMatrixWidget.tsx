@@ -2,10 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
 import { riskMatrixQuery } from "@/shared/api/risk";
+import { combine } from "@/shared/lib/combineQueries";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
-
-import { combine } from "../combine";
-import { WidgetContent } from "../Widget";
+import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 
 const LEVELS = [1, 2, 3, 4] as const;
 
@@ -15,7 +14,7 @@ export function RiskMatrixWidget() {
   const query = combine([useQuery(riskMatrixQuery(tenant))] as const);
 
   return (
-    <WidgetContent
+    <QueryContent
       query={query}
       rows={5}
       isEmpty={([matrix]) => matrix.total === 0}
@@ -74,6 +73,6 @@ export function RiskMatrixWidget() {
           )}
         </>
       )}
-    </WidgetContent>
+    </QueryContent>
   );
 }

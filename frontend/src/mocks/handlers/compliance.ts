@@ -6,11 +6,14 @@ import type {
   Evidence,
   FieldChange,
   Implementation,
+  ParagraphSummary,
+  ParagraphSummaryRow,
   ImplementationChange,
   Mapping,
 } from "@/shared/api/types";
 
 import { ACTOR_ID, logActivity, nextId, type TenantData } from "../db";
+import type { StoredImplementation } from "../seed";
 import {
   canonicalJson,
   etag,
@@ -26,7 +29,16 @@ import { parseIfMatch, validateChange, validateEvidence } from "../validation";
 const byParam = <T>(items: T[], value: string | null, key: (item: T) => string) =>
   value === null ? items : items.filter((item) => key(item) === value);
 
-function label(data: TenantData, implementation: Implementation): string {
+/** An Implementation as the API returns it, with its owner's name joined in. */
+function present(data: TenantData, implementation: StoredImplementation): Implementation {
+  const owner = data.members.find((member) => member.id === implementation.owner_id);
+  return { ...implementation, owner_name: owner?.display_name ?? null };
+}
+
+/** "§ 8" before "§ 8a" before "§ 12": numbers compare as numbers, letters after them. */
+export const byParagraph = (a: string, b: string) => a.localeCompare(b, "de", { numeric: true });
+
+function label(data: TenantData, implementation: StoredImplementation): string {
   const requirement = data.requirements.find((r) => r.id === implementation.requirement_id);
   const scope = data.scopes.find((s) => s.id === implementation.scope_id);
   return `${requirement?.citation ?? implementation.requirement_id} · ${scope?.name ?? ""}`;
@@ -34,7 +46,7 @@ function label(data: TenantData, implementation: Implementation): string {
 
 function describeChanges(
   data: TenantData,
-  before: Implementation,
+  before: StoredImplementation,
   change: ImplementationChange,
 ): FieldChange[] {
   const name = (id: string | null) =>
@@ -53,7 +65,7 @@ const SIMULATED_COLLEAGUE_ID = "u-becker";
 
 const STATUSES = new Set(["open", "partial", "implemented", "not_applicable"]);
 
-const ORDERINGS: Record<string, (a: Implementation, b: Implementation) => number> = {
+const ORDERINGS: Record<string, (a: StoredImplementation, b: StoredImplementation) => number> = {
   due_date: (a, b) => (a.due_date ?? "9999").localeCompare(b.due_date ?? "9999"),
   "-due_date": (a, b) => (b.due_date ?? "").localeCompare(a.due_date ?? ""),
   updated_at: (a, b) => a.updated_at.localeCompare(b.updated_at),
@@ -63,12 +75,18 @@ const ORDERINGS: Record<string, (a: Implementation, b: Implementation) => number
 const implementationRoutes = [
   tenantRoute("get", "/implementations", ({ data, url }) => {
     const params = url.searchParams;
+    const requirementOf = (id: string) => data.requirements.find((r) => r.id === id);
     const versionOf = (requirementId: string) =>
-      data.requirements.find((r) => r.id === requirementId)?.framework_version_id ?? "";
+      requirementOf(requirementId)?.framework_version_id ?? "";
     let items = byParam(data.implementations, params.get("scope"), (i) => i.scope_id);
     items = byParam(items, params.get("requirement"), (i) => i.requirement_id);
     items = byParam(items, params.get("owner"), (i) => i.owner_id ?? "");
     items = byParam(items, params.get("framework_version"), (i) => versionOf(i.requirement_id));
+    items = byParam(
+      items,
+      params.get("paragraph"),
+      (i) => requirementOf(i.requirement_id)?.paragraph ?? "",
+    );
     // "any of" as a comma-separated list, the way Django filters read it.
     const statusParam = params.get("status");
     const statuses = statusParam ? statusParam.split(",") : undefined;
@@ -83,7 +101,11 @@ const implementationRoutes = [
     if (orderingName !== null && !ordering) {
       return problem(400, "invalid_ordering", "Unknown ordering.");
     }
-    return listResponse(ordering ? items.toSorted(ordering) : items, url);
+    const sorted = ordering ? items.toSorted(ordering) : items;
+    return listResponse(
+      sorted.map((implementation) => present(data, implementation)),
+      url,
+    );
   }),
 
   tenantRoute("get", "/compliance-summary", ({ data }) => {
@@ -113,10 +135,39 @@ const implementationRoutes = [
     return HttpResponse.json<ComplianceSummary>({ rows: [...rows.values()] });
   }),
 
+  tenantRoute("get", "/compliance-paragraphs", ({ data, url }) => {
+    const version = url.searchParams.get("framework_version");
+    const scope = url.searchParams.get("scope");
+    if (!version || !scope) {
+      return problem(400, "missing_filter", "framework_version and scope are required.");
+    }
+    const rows = new Map<string, ParagraphSummaryRow>();
+    for (const implementation of data.implementations) {
+      const requirement = data.requirements.find((r) => r.id === implementation.requirement_id);
+      if (implementation.scope_id !== scope || requirement?.framework_version_id !== version) {
+        continue;
+      }
+      const row = rows.get(requirement.paragraph) ?? {
+        paragraph: requirement.paragraph,
+        requirement_count: data.requirements.filter(
+          (r) => r.framework_version_id === version && r.paragraph === requirement.paragraph,
+        ).length,
+        counts: { open: 0, partial: 0, implemented: 0, not_applicable: 0 },
+      };
+      row.counts[implementation.status] += 1;
+      rows.set(requirement.paragraph, row);
+    }
+    return HttpResponse.json<ParagraphSummary>({
+      rows: [...rows.values()].toSorted((a, b) => byParagraph(a.paragraph, b.paragraph)),
+    });
+  }),
+
   tenantRoute("get", "/implementations/:id", ({ data, params }) => {
     const implementation = data.implementations.find((i) => i.id === params.id);
     return implementation
-      ? HttpResponse.json(implementation, { headers: { ETag: etag(implementation.version) } })
+      ? HttpResponse.json(present(data, implementation), {
+          headers: { ETag: etag(implementation.version) },
+        })
       : notFound();
   }),
 
@@ -163,9 +214,11 @@ const implementationRoutes = [
     }
     const changes = describeChanges(data, current, result.value);
     if (changes.length === 0) {
-      return HttpResponse.json(current, { headers: { ETag: etag(current.version) } });
+      return HttpResponse.json(present(data, current), {
+        headers: { ETag: etag(current.version) },
+      });
     }
-    const updated: Implementation = {
+    const updated: StoredImplementation = {
       ...current,
       ...result.value,
       version: current.version + 1,
@@ -179,7 +232,9 @@ const implementationRoutes = [
       object_label: label(data, updated),
       changes,
     });
-    return HttpResponse.json(updated, { headers: { ETag: etag(updated.version) } });
+    return HttpResponse.json(present(data, updated), {
+      headers: { ETag: etag(updated.version) },
+    });
   }),
 ];
 

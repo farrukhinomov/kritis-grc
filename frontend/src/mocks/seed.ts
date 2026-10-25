@@ -30,6 +30,9 @@ import type {
   Treatment,
 } from "@/shared/api/types";
 
+/** The owner's name is looked up on every read, as the backend joins it. */
+export type StoredImplementation = Omit<Implementation, "owner_name">;
+
 /** The name is looked up on every read, as the backend joins it. */
 export type StoredActivity = Omit<ActivityEntry, "actor_name">;
 
@@ -63,7 +66,7 @@ export interface SeedData {
   assets: Asset[];
   mappings: Mapping[];
   mappingSuggestions: MappingSuggestion[];
-  implementations: Implementation[];
+  implementations: StoredImplementation[];
   evidence: Evidence[];
   hazards: Hazard[];
   risks: StoredRisk[];

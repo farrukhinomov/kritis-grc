@@ -141,6 +141,8 @@ export interface Implementation {
   scope_id: string;
   status: ImplementationStatus;
   owner_id: string | null;
+  /** Embedded, so a reader never needs the whole member list to name the owner. */
+  owner_name: string | null;
   due_date: string | null;
   note_de: string | null;
   /** Sent back as If-Match on writes; a stale value is rejected with 412. */
@@ -165,6 +167,17 @@ export interface ComplianceSummaryRow {
 /** An aggregate, not a list: it is never paged, so no row can go missing. */
 export interface ComplianceSummary {
   rows: ComplianceSummaryRow[];
+}
+
+/** One paragraph of a Framework Version, counted for one Scope. */
+export interface ParagraphSummaryRow {
+  paragraph: string;
+  requirement_count: number;
+  counts: Record<ImplementationStatus, number>;
+}
+
+export interface ParagraphSummary {
+  rows: ParagraphSummaryRow[];
 }
 
 export type EvidenceKind = "file" | "link" | "reference";

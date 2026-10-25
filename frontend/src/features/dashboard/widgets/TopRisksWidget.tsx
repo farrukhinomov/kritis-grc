@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
 import { risksQuery } from "@/shared/api/risk";
+import { combine } from "@/shared/lib/combineQueries";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
+import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 
-import { combine } from "../combine";
-import { WidgetContent } from "../Widget";
 import { RiskChip } from "./riskLabels";
 
 export const TOP_RISKS = 5;
@@ -18,7 +18,7 @@ export function TopRisksWidget() {
   ] as const);
 
   return (
-    <WidgetContent
+    <QueryContent
       query={query}
       rows={5}
       isEmpty={([risks]) => risks.items.length === 0}
@@ -39,6 +39,6 @@ export function TopRisksWidget() {
           ))}
         </ol>
       )}
-    </WidgetContent>
+    </QueryContent>
   );
 }

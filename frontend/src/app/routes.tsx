@@ -15,6 +15,9 @@ const SCREENS: Partial<Record<NavEntry["key"], typeof placeholder>> = {
   dashboard: async () => ({
     Component: (await import("@/features/dashboard/DashboardPage")).DashboardPage,
   }),
+  compliance: async () => ({
+    Component: (await import("@/features/compliance/CockpitPage")).CockpitPage,
+  }),
 };
 
 // Each page is its own chunk, loaded on first visit, so the initial download stays small

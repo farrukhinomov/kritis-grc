@@ -135,6 +135,18 @@ describe("ColumnDrillDown", () => {
   });
 });
 
+describe("ColumnDrillDown without user action", () => {
+  it("leaves focus alone when levels appear by themselves, e.g. a deep link loading", () => {
+    const { rerender } = render(
+      <ColumnDrillDown label="Cockpit" columns={COLUMNS.slice(0, 1)} onBack={vi.fn()} />,
+    );
+
+    rerender(<ColumnDrillDown label="Cockpit" columns={COLUMNS} onBack={vi.fn()} />);
+
+    expect(screen.getByRole("heading", { level: 2, name: "Notfallvorsorge" })).not.toHaveFocus();
+  });
+});
+
 describe("ResponsiveDrawer", () => {
   function renderDrawer() {
     render(

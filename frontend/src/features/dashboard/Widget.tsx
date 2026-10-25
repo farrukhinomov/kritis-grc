@@ -1,14 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Alert, Button, Empty } from "antd";
 import { type ReactNode, useId } from "react";
-import { useTranslation } from "react-i18next";
 
 import { tenantKey } from "@/shared/api/keys";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
 import { ErrorBoundary } from "@/shared/ui/patterns/ErrorBoundary";
-import { WidgetSkeleton } from "@/shared/ui/patterns/Skeletons";
-
-import type { CombinedQuery } from "./combine";
 
 interface WidgetProps {
   title: string;
@@ -45,58 +40,5 @@ export function Widget({ title, wide = false, children }: WidgetProps) {
         {children}
       </ErrorBoundary>
     </section>
-  );
-}
-
-interface WidgetContentProps<T> {
-  query: CombinedQuery<T>;
-  /** Lines of the loading placeholder, roughly the content's height. */
-  rows: number;
-  isEmpty: (data: T) => boolean;
-  empty: string;
-  children: (data: T) => ReactNode;
-}
-
-/**
- * Loading, error, empty or content: every widget goes through the same four states. A
- * failed refresh keeps the data already shown and says it may be outdated, instead of
- * replacing good numbers with an error.
- */
-export function WidgetContent<T>({ query, rows, isEmpty, empty, children }: WidgetContentProps<T>) {
-  const { t } = useTranslation();
-
-  if (query.isError && query.data === undefined) {
-    return (
-      <Alert
-        type="warning"
-        showIcon
-        title={t("dashboard.loadError")}
-        action={
-          <Button size="small" onClick={query.retry}>
-            {t("errors.retry")}
-          </Button>
-        }
-      />
-    );
-  }
-  if (query.data === undefined) {
-    return <WidgetSkeleton rows={rows} />;
-  }
-  return (
-    <>
-      {query.isError && (
-        <p className="grc-widget-stale">
-          {t("dashboard.stale")}{" "}
-          <Button type="link" size="small" onClick={query.retry}>
-            {t("errors.retry")}
-          </Button>
-        </p>
-      )}
-      {isEmpty(query.data) ? (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={empty} />
-      ) : (
-        children(query.data)
-      )}
-    </>
   );
 }

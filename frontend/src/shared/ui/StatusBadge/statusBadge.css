@@ -1,0 +1,29 @@
+.grc-status-badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 4px;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.grc-status-badge-implemented {
+  background: var(--grc-status-success-bg);
+  color: var(--grc-status-success-text);
+}
+
+.grc-status-badge-partial {
+  background: var(--grc-status-warning-bg);
+  color: var(--grc-status-warning-text);
+}
+
+.grc-status-badge-open,
+.grc-status-badge-not_applicable {
+  background: var(--grc-surface-sunken);
+  box-shadow: inset 0 0 0 1px var(--grc-border-subtle);
+  color: var(--grc-text-secondary);
+}

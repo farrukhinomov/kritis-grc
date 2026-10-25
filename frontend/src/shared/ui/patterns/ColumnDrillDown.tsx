@@ -2,7 +2,15 @@ import "./patterns.css";
 
 import { Button, Typography } from "antd";
 import { AnimatePresence, m } from "motion/react";
-import { type ReactNode, useEffect, useId, useRef, useState } from "react";
+import {
+  type KeyboardEvent,
+  type MouseEvent,
+  type ReactNode,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 
 import { useIsWideScreen } from "@/shared/lib/breakpoints";
@@ -72,14 +80,21 @@ function StackedColumns({ label, columns, onBack }: ColumnDrillDownProps) {
     setPreviousDepth(depth);
   }
   const titleId = `${headingId}-${String(depth)}`;
-  useFocusTitleOnDepthChange(depth, titleId);
+  const interacted = useFocusTitleOnDepthChange(depth, titleId);
 
   if (!current) {
     return null;
   }
 
   return (
-    <div className="grc-drill-stack" role="group" aria-label={label}>
+    // Capturing marks that the next level change was the user's doing, not data loading.
+    <div
+      className="grc-drill-stack"
+      role="group"
+      aria-label={label}
+      onClickCapture={interacted}
+      onKeyDownCapture={interacted}
+    >
       <AnimatePresence mode="popLayout" initial={false} custom={direction}>
         <m.section
           key={current.key}
@@ -108,25 +123,49 @@ function StackedColumns({ label, columns, onBack }: ColumnDrillDownProps) {
   );
 }
 
+/** Keys that open or close a level; moving within a list doesn't. */
+const ACTIVATION_KEYS = new Set(["Enter", " ", "ArrowRight", "ArrowLeft"]);
+
+/** A level change this long after the user's action still counts as caused by it. */
+const ACTION_WINDOW_MS = 1500;
+
 /**
  * Drilling in or back replaces the screen, and the button that was used disappears with
  * it. Focus moves to the new level's title, so keyboard and screen reader users continue
- * there instead of at the top of the page. The first render is left alone.
+ * there instead of at the top of the page. Only a change the user just caused by opening
+ * or closing a level moves focus: levels that appear while a deep link loads, or change
+ * because of a control outside, must not pull focus away. Returns the handler that
+ * records such an action.
  */
 function useFocusTitleOnDepthChange(depth: number, titleId: string) {
   const previousDepth = useRef(depth);
+  const actedAt = useRef(Number.NEGATIVE_INFINITY);
 
   useEffect(() => {
     if (previousDepth.current === depth) {
       return;
     }
     previousDepth.current = depth;
+    const causedByUser = performance.now() - actedAt.current < ACTION_WINDOW_MS;
+    actedAt.current = Number.NEGATIVE_INFINITY;
+    if (!causedByUser) {
+      return;
+    }
     const title = document.getElementById(titleId);
     if (title) {
       title.tabIndex = -1;
       title.focus();
     }
   }, [depth, titleId]);
+
+  return (event: KeyboardEvent | MouseEvent) => {
+    const onButton = event.target instanceof Element && event.target.closest("button") !== null;
+    const activates =
+      event.type === "click" ? onButton : ACTIVATION_KEYS.has((event as KeyboardEvent).key);
+    if (activates) {
+      actedAt.current = performance.now();
+    }
+  };
 }
 
 function ColumnTitle({ id, title }: { id: string; title: string }) {
