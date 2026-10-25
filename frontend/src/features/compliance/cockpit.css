@@ -87,21 +87,6 @@
   margin: 0;
 }
 
-.grc-cockpit-facts {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 8px 16px;
-  margin: 0;
-}
-
-.grc-cockpit-facts dt {
-  color: var(--grc-text-secondary);
-}
-
-.grc-cockpit-facts dd {
-  margin: 0;
-}
-
 .grc-cockpit-detail .grc-cockpit-statute-title {
   margin: 0;
   font-size: 14px;

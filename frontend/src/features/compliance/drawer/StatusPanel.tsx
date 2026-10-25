@@ -5,7 +5,7 @@ import type { Implementation, ImplementationStatus } from "@/shared/api/types";
 import { useCan } from "@/shared/session/sessionContext";
 import { StatusBadge } from "@/shared/ui/StatusBadge/StatusBadge";
 
-import { useUpdateStatus } from "./useUpdateStatus";
+import { useUpdateStatus } from "@/shared/mutations/useUpdateStatus";
 
 const STATUSES: readonly ImplementationStatus[] = [
   "open",

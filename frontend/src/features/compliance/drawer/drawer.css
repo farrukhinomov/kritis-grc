@@ -79,11 +79,6 @@
   overflow-wrap: anywhere;
 }
 
-.grc-evidence-meta {
-  color: var(--grc-text-secondary);
-  font-size: 13px;
-}
-
 .grc-evidence-add {
   display: grid;
   gap: 12px;
@@ -135,7 +130,7 @@
 }
 
 .grc-suggestion .grc-suggestion-text,
-.grc-suggestion .grc-evidence-meta {
+.grc-suggestion .grc-meta {
   margin: 0;
 }
 

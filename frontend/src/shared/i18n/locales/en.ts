@@ -238,6 +238,54 @@ export const en: Translation = {
       commented: "commented",
     },
   },
+  risk: {
+    description: "How your measures change the risk picture.",
+    ratings: { inherent: "Inherent rating", residual: "Residual rating", target: "Target rating" },
+    matrix: {
+      title: "Risk matrix",
+      caption: "Risk matrix, {{rating}}: number of risks per cell",
+      cellLabel_one: "Likelihood {{likelihood}}, impact {{impact}}: {{count}} risk",
+      cellLabel_other: "Likelihood {{likelihood}}, impact {{impact}}: {{count}} risks",
+      cellLabelCategory_one:
+        "Likelihood {{likelihood}}, impact {{impact}}: {{count}} risk, category {{category}}",
+      cellLabelCategory_other:
+        "Likelihood {{likelihood}}, impact {{impact}}: {{count}} risks, category {{category}}",
+    },
+    filters: {
+      allScopes: "All scopes",
+      category: "Category",
+      allCategories: "All categories",
+      cell: "Cell likelihood {{likelihood}} × impact {{impact}}",
+      clearCell: "Show all cells",
+    },
+    table: {
+      risk: "Risk",
+      hazard: "Hazard",
+      empty: "No risks for this selection.",
+    },
+    hazardCategories: { natural: "natural", technical: "technical", human: "human-made" },
+    criticality: { low: "low criticality", medium: "medium criticality", high: "high criticality" },
+    dimensions: { likelihood: "likelihood", impact: "impact" },
+    detail: {
+      title: "Risk",
+      ratings: "Ratings",
+      rating: "{{category}} (likelihood {{likelihood}}, impact {{impact}})",
+      pending:
+        "Calculation pending: the risk engine can't be reached right now. The residual rating follows as soon as it answers again.",
+      assets: "Affected assets",
+      noAssets: "No individual assets assigned.",
+      treatments: "Treatments",
+      effectApplied_one: "lowers the {{dimension}} by {{count}} level",
+      effectApplied_other: "lowers the {{dimension}} by {{count}} levels",
+      effectPending: "effect: calculation pending",
+      effectPlanned_one: "would lower the {{dimension}} by {{count}} level once implemented",
+      effectPlanned_other: "would lower the {{dimension}} by {{count}} levels once implemented",
+      effectPartial:
+        "currently lowers the {{dimension}} by {{applied}} of {{count}} levels; by {{count}} once fully implemented",
+      markImplemented: "Mark as implemented",
+      method: "Calculated with method {{version}}.",
+    },
+  },
   implementationStatus: {
     open: "Open",
     partial: "Partially implemented",

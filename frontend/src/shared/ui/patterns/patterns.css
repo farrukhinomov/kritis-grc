@@ -1,5 +1,28 @@
 /* Responsive patterns. The sheet is global, so every class carries the grc- prefix. */
 
+/* ---------- Facts and secondary text ---------- */
+
+/* A label-value list, as in a detail's header. */
+.grc-facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.grc-facts dt {
+  color: var(--grc-text-secondary);
+}
+
+.grc-facts dd {
+  margin: 0;
+}
+
+.grc-meta {
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+}
+
 /* ---------- Card list with swipe actions ---------- */
 
 .grc-card-list {

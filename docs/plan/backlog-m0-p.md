@@ -234,10 +234,10 @@ As a GRC Manager, I want to update an Implementation and prove it.
 
 As a GRC Manager, I want to see how my measures change the risk picture.
 
-- [ ] 4×4 matrix (Inherent / Residual / Target toggle), plus a risk table with filters.
-- [ ] Risk detail: Hazard, affected Assets, Treatments with their effects, and the explanation list.
-- [ ] **Signature moment:** when an Implementation linked by a Treatment becomes "implemented", the risk glides to its new matrix cell. Shows "Berechnung ausstehend" in the simulated failure mode.
-- [ ] Phones: compact matrix, and tapping a cell opens its risks in a sheet.
+- [x] 4×4 matrix (Inherent / Residual / Target toggle), plus a risk table with filters.
+- [x] Risk detail: Hazard, affected Assets, Treatments with their effects, and the explanation list.
+- [x] **Signature moment:** when an Implementation linked by a Treatment becomes "implemented", the risk glides to its new matrix cell. Shows "Berechnung ausstehend" in the simulated failure mode.
+- [x] Phones: compact matrix, and tapping a cell opens its risks in a sheet.
 
 ### P-08 Mapping-suggestion review
 **Labels:** `module:frontend`, `module:compliance`, `type:feature`, `prio:must` · **Estimate:** 2 h · **Depends on:** P-02

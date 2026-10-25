@@ -301,13 +301,22 @@ export interface RiskMatrix {
   total: number;
 }
 
+/** Which of a Risk's three ratings a view is about. */
+export type RatingKind = "inherent" | "residual" | "target";
+
 export interface Risk {
   id: string;
   scope_id: string;
+  scope_name: string;
   hazard_id: string;
+  /** Embedded, so a reader never needs the Hazard catalogue to name it. */
+  hazard: Pick<Hazard, "id" | "category" | "name_de" | "name_en">;
   asset_ids: string[];
+  /** The affected Assets with what a reader needs, in the order of `asset_ids`. */
+  assets: Pick<Asset, "id" | "name" | "criticality">[];
   title_de: string;
   owner_id: string;
+  owner_name: string | null;
   inherent: Rating;
   target: Rating;
   /** Null while the risk engine hasn't calculated it, e.g. when it is unreachable. */

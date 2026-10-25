@@ -51,7 +51,18 @@ export interface StoredRating {
   impact: number;
 }
 
-export type StoredRisk = Omit<Risk, "inherent" | "target" | "residual" | "treatments"> & {
+/** Names (Hazard, Assets, owner) are joined in on every read, as the backend does. */
+export type StoredRisk = Omit<
+  Risk,
+  | "inherent"
+  | "target"
+  | "residual"
+  | "treatments"
+  | "hazard"
+  | "assets"
+  | "owner_name"
+  | "scope_name"
+> & {
   inherent: StoredRating;
   target: StoredRating;
   treatments: Treatment[];

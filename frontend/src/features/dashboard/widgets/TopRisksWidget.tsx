@@ -5,8 +5,7 @@ import { risksQuery } from "@/shared/api/risk";
 import { combine } from "@/shared/lib/combineQueries";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
 import { QueryContent } from "@/shared/ui/patterns/QueryContent";
-
-import { RiskChip } from "./riskLabels";
+import { RiskChip } from "@/shared/ui/RiskChip/RiskChip";
 
 export const TOP_RISKS = 5;
 

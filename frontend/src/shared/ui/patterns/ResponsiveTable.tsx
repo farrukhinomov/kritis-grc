@@ -79,6 +79,8 @@ export function ResponsiveTable<T extends object>({
           dataSource={[...rows]}
           rowKey={rowKey}
           pagination={false}
+          // A table wider than its box scrolls inside it rather than widening the page.
+          scroll={{ x: "max-content" }}
         />
       </section>
     );

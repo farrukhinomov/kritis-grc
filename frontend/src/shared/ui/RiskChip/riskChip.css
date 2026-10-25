@@ -1,0 +1,29 @@
+/* The four risk categories as colored surfaces, used by every matrix and chip. */
+.grc-risk-chip {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.grc-risk-low {
+  background: var(--grc-risk-low-bg);
+  color: var(--grc-risk-low-text);
+}
+
+.grc-risk-medium {
+  background: var(--grc-risk-medium-bg);
+  color: var(--grc-risk-medium-text);
+}
+
+.grc-risk-high {
+  background: var(--grc-risk-high-bg);
+  color: var(--grc-risk-high-text);
+}
+
+.grc-risk-critical {
+  background: var(--grc-risk-critical-bg);
+  color: var(--grc-risk-critical-text);
+}

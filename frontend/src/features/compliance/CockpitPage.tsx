@@ -406,7 +406,7 @@ function ImplementationDetail({
         />
       )}
       {implementation ? (
-        <dl className="grc-cockpit-facts">
+        <dl className="grc-facts">
           <dt>{t("compliance.status")}</dt>
           <dd>
             <StatusBadge status={implementation.status} />
