@@ -11,9 +11,12 @@ export function renderRoute(path: string) {
   client.setDefaultOptions({ queries: { retry: false } });
   const router = createMemoryRouter(routes, { initialEntries: [path] });
 
-  return render(
-    <Providers client={client}>
-      <RouterProvider router={router} />
-    </Providers>,
-  );
+  return {
+    router,
+    ...render(
+      <Providers client={client}>
+        <RouterProvider router={router} />
+      </Providers>,
+    ),
+  };
 }

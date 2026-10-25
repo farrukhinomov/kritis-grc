@@ -5,7 +5,7 @@
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"],
+    "types": ["vite/client"],
     "jsx": "react-jsx",
     "noEmit": true,
     "isolatedModules": true,
@@ -25,5 +25,8 @@
 
     "paths": { "@/*": ["./src/*"] }
   },
-  "include": ["src"]
+  "include": ["src"],
+  // Test code is checked by tsconfig.test.json, so test globals (describe, expect) and
+  // Node APIs stay invisible to the code that ships to the browser.
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/test", "src/mocks/server.ts"]
 }

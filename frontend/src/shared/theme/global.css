@@ -1,0 +1,59 @@
+/*
+ * One focus indicator for every Theme: 2 px in the Theme's focus color, offset so it stays
+ * visible on filled buttons and selected navigation items. antd draws its own outline in a
+ * light primary tint that fails the 3:1 contrast minimum, so this rule must win.
+ * Text inputs are left out: antd marks them with a border and ring in the same color.
+ */
+:root :focus-visible:not(input, textarea, select) {
+  outline: 2px solid var(--grc-focus-ring) !important;
+  outline-offset: 2px !important;
+}
+
+:root :is(.ant-checkbox, .ant-radio, .ant-segmented-item):has(input:focus-visible) {
+  outline: 2px solid var(--grc-focus-ring) !important;
+  outline-offset: 2px !important;
+}
+
+body {
+  margin: 0;
+}
+
+/* Hidden on screen, still read by screen readers. */
+.grc-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Visible only while focused, as the first stop in the tab order. */
+.grc-skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--grc-surface-raised);
+  color: var(--grc-link);
+  font-weight: 600;
+  transform: translateY(-200%);
+}
+
+.grc-skip-link:focus-visible {
+  transform: none;
+}
+
+/* Headings receive focus only programmatically, after navigation; no ring for that. */
+h1[tabindex="-1"]:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* antd's Result renders its title as a div; pages put a real h1 inside it. */
+.grc-result-title {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}

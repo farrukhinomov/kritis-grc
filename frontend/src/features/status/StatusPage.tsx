@@ -1,6 +1,6 @@
 import { Alert, Button, Card, Flex, Skeleton, Typography } from "antd";
 import { CircleCheck, CircleHelp, CircleX } from "lucide-react";
-import { motion } from "motion/react";
+import { m } from "motion/react";
 import { useTranslation } from "react-i18next";
 
 import { CHECK_NAMES, type DisplayedCheckState, type SystemStatus, useSystemStatus } from "./api";
@@ -45,7 +45,7 @@ function StatusReport({ status }: { status: SystemStatus }) {
       {/* eslint-disable-next-line jsx-a11y/no-redundant-roles -- see the line above */}
       <ul role="list" style={{ listStyle: "none", margin: 0, padding: 0 }}>
         {CHECK_NAMES.map((name, index) => (
-          <motion.li
+          <m.li
             key={name}
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
@@ -55,7 +55,7 @@ function StatusReport({ status }: { status: SystemStatus }) {
               <Typography.Text>{t(`status.checks.${name}`)}</Typography.Text>
               <CheckBadge state={status.checks[name] ?? "unknown"} />
             </Flex>
-          </motion.li>
+          </m.li>
         ))}
       </ul>
     </>

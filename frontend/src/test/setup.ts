@@ -6,20 +6,10 @@ import i18n from "i18next";
 
 import { server } from "@/mocks/server";
 
-// Ant Design reads media queries for responsive behavior; jsdom doesn't provide them.
-Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  value: (query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: () => undefined,
-    removeListener: () => undefined,
-    addEventListener: () => undefined,
-    removeEventListener: () => undefined,
-    dispatchEvent: () => false,
-  }),
-});
+import { installMatchMedia, installResizeObserver, resetMediaQueries } from "./media";
+
+installMatchMedia();
+installResizeObserver();
 
 // Any request without a mock fails the test instead of silently hitting the network.
 beforeAll(() => {
@@ -27,6 +17,8 @@ beforeAll(() => {
 });
 afterEach(async () => {
   cleanup();
+  resetMediaQueries();
+  localStorage.clear();
   server.resetHandlers();
   await i18n.changeLanguage("de");
 });

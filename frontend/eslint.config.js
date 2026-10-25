@@ -6,12 +6,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-// Colors come only from the design tokens, so Themes and dark mode stay consistent.
-const RAW_COLOR_MESSAGE = "Use a semantic design token instead of a raw color.";
-const RAW_COLORS = [
-  { selector: "Literal[value=/^#[0-9a-fA-F]{3,8}$/]", message: RAW_COLOR_MESSAGE },
-  { selector: "Literal[value=/^(rgb|hsl)a?[(]/]", message: RAW_COLOR_MESSAGE },
-];
+import { RAW_COLOR_SELECTORS } from "./eslint/raw-colors.js";
 
 export default tseslint.config(
   { ignores: ["dist", "coverage", "public/mockServiceWorker.js"] },
@@ -32,7 +27,7 @@ export default tseslint.config(
     plugins: { "react-refresh": reactRefresh },
     rules: {
       "react-refresh/only-export-components": ["error", { allowConstantExport: true }],
-      "no-restricted-syntax": ["error", ...RAW_COLORS],
+      "no-restricted-syntax": ["error", ...RAW_COLOR_SELECTORS],
       "no-console": "error",
     },
   },
@@ -45,7 +40,7 @@ export default tseslint.config(
     rules: { "@typescript-eslint/no-non-null-assertion": "off" },
   },
   {
-    files: ["eslint.config.js"],
+    files: ["eslint.config.js", "eslint/**/*.js"],
     extends: [tseslint.configs.disableTypeChecked],
     languageOptions: { globals: globals.node },
   },

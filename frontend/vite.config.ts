@@ -20,15 +20,14 @@ export default defineConfig({
     sourcemap: true,
     rolldownOptions: {
       output: {
-        // Module IDs use forward slashes on every OS. Framework and UI-library code changes rarely, so it gets its own long-cached
-        // chunks instead of being re-downloaded with every app release.
+        // React rarely changes, so it gets its own long-cached chunk instead of being
+        // re-downloaded with every release. antd is deliberately not grouped: a fixed group
+        // would pull every component any screen uses (tables, forms, date pickers) into the
+        // first download, while split by usage each screen loads only what it renders.
+        // Module IDs use forward slashes on every OS.
         codeSplitting: {
           groups: [
             { name: "react", test: /node_modules\/(react|react-dom|react-router|scheduler)\// },
-            {
-              name: "antd",
-              test: /node_modules\/(antd|@ant-design|@rc-component|rc-[^/]+)\//,
-            },
           ],
         },
       },
