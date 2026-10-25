@@ -1,6 +1,6 @@
 # Demo fixtures
 
-The content of the Demo Tenant "Muster-Stadtwerke Saar GmbH": two Critical Facilities, their Assets, both Frameworks, Implementations, Evidence, Hazards, Risks, Mappings, Mapping Suggestions and Activity Log entries. Everything is fictional and contains no personal data; addresses use `example.com`.
+The content of the Demo Tenant "Muster-Stadtwerke Saar GmbH": two Critical Facilities, their Assets, both Frameworks, Implementations, Evidence, Hazards, Risks, Risk Assessments, Mappings, Mapping Suggestions and Activity Log entries. Everything is fictional and contains no personal data; addresses use `example.com`.
 
 The same files feed the prototype's mock API (MSW) and, from M1, the Django seed command that restores the Demo Tenant every night.
 
@@ -18,6 +18,7 @@ The same files feed the prototype's mock API (MSW) and, from M1, the Django seed
 | `mapping-suggestions.json` | Pending Mapping Suggestions |
 | `hazards.json` | Sample Hazard catalogue (natural, technical, human-made), to be replaced by the national risk analyses |
 | `risks.json` | Risks with Inherent and Target Ratings and their Treatments |
+| `risk-assessments.json` | Risk Assessments per Critical Facility: one submitted and waiting for approval, one approved |
 | `activity.json` | Activity Log entries, oldest first |
 
 ## Rules

@@ -12,6 +12,8 @@ export const en: Translation = {
     openApp: "Open the app",
   },
   nav: {
+    pending_one: ", {{count}} pending",
+    pending_other: ", {{count}} pending",
     main: "Main navigation",
     more: "More",
     collapse: "Collapse navigation",
@@ -583,6 +585,56 @@ export const en: Translation = {
       memberships: "Member management in the interface",
       sso: "Single sign-on (OIDC, SAML)",
       quantitative: "Quantitative risk assessment",
+    },
+  },
+  approvals: {
+    description: "Everything waiting for your approval, oldest first.",
+    list: "Pending approvals",
+    empty: "Nothing is waiting for your approval.",
+    auditor: "As an auditor you approve nothing. GRC managers' approvals appear here.",
+    kinds: { mapping_suggestion: "Mapping suggestion", risk_assessment: "Risk assessment" },
+    submittedBy: "submitted by {{name}} on {{date}}",
+    proposedOn: "proposed by the AI on {{date}}",
+    open: { mapping_suggestion: "View suggestion", risk_assessment: "View risks" },
+    approve: "Approve",
+    reject: "Reject",
+    reason: "Reason",
+    reasonMissing: "Please give a reason.",
+    confirm: {
+      cancel: "Cancel",
+      risk_assessment: {
+        approve: {
+          title: "Approve risk assessment?",
+          ok: "Approve",
+          body: "“{{title}}” will then count as approved. The next assessment is due no later than four years after the assessment date.",
+        },
+        reject: {
+          title: "Reject risk assessment?",
+          ok: "Reject",
+          body: "“{{title}}” goes back to whoever submitted it, with your reason.",
+        },
+      },
+      mapping_suggestion: {
+        approve: {
+          title: "Approve mapping suggestion?",
+          ok: "Approve",
+          body: "The mapping for “{{title}}” will then apply to your tenant.",
+        },
+        reject: {
+          title: "Reject mapping suggestion?",
+          ok: "Reject",
+          body: "The mapping for “{{title}}” won't be adopted.",
+        },
+      },
+    },
+    announce: {
+      approve: "“{{title}}” approved.",
+      reject: "“{{title}}” rejected.",
+    },
+    errors: {
+      conflict:
+        "This was already decided, probably by someone else. The list now shows the current state.",
+      failed: "The decision couldn't be saved. Please try again.",
     },
   },
   patterns: {

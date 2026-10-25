@@ -1,4 +1,5 @@
 import { activityHandlers } from "./handlers/activity";
+import { approvalHandlers } from "./handlers/approvals";
 import { authHandlers } from "./handlers/auth";
 import { complianceHandlers } from "./handlers/compliance";
 import { organizationHandlers } from "./handlers/organization";
@@ -19,4 +20,5 @@ export const handlers = [
   ...riskHandlers,
   ...activityHandlers,
   ...searchHandlers,
+  ...approvalHandlers,
 ];

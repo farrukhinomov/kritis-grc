@@ -1,0 +1,30 @@
+[
+  {
+    "id": "ra-n-2026",
+    "scope_id": "sc-nord",
+    "title_de": "Risikobewertung Wasserwerk Nord 2026",
+    "assessed_on": "2026-10-20",
+    "status": "submitted",
+    "risk_ids": ["rk-n-power", "rk-n-flood", "rk-n-sabotage", "rk-n-supply"],
+    "summary_de": "Alle vier Risiken des Wasserwerks neu bewertet. Der Stromausfall bleibt das größte Risiko; die Notstromversorgung senkt es auf hoch.",
+    "submitted_by_id": "u-yilmaz",
+    "submitted_at": "2026-10-21T14:05:00Z",
+    "decided_by_id": null,
+    "decided_at": null,
+    "decision_note_de": null
+  },
+  {
+    "id": "ra-s-2025",
+    "scope_id": "sc-sued",
+    "title_de": "Risikobewertung Wasserwerk Süd 2025",
+    "assessed_on": "2025-11-03",
+    "status": "approved",
+    "risk_ids": ["rk-s-cyber", "rk-s-drought", "rk-s-staff"],
+    "summary_de": "Erste Bewertung nach Inbetriebnahme der neuen Leittechnik.",
+    "submitted_by_id": "u-becker",
+    "submitted_at": "2025-11-04T09:30:00Z",
+    "decided_by_id": "u-kramer",
+    "decided_at": "2025-11-10T11:00:00Z",
+    "decision_note_de": null
+  }
+]

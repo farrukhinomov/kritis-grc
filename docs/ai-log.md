@@ -345,3 +345,15 @@ Each milestone gets one entry with four parts:
 ### Changed
 - **A long Scope name stretched its card and the page.** The button now reads "Assets anzeigen" and carries the Scope in its accessible name, which starts with the visible text.
 - **The Activity Log showed stored values** ("open → partial", "inherent_impact"). It uses the shared formatter.
+
+---
+
+## P-11 Approvals inbox (2026-10-25)
+
+### Accepted
+- **Risk Assessments enter the seed.** The glossary defines them as dated, approved reviews of a Critical Facility's Risks; one is submitted and waiting, one approved. The seed test checks that approvals come from someone other than the author.
+- **Four eyes on Risk Assessments.** Whoever submitted an assessment can't approve or reject it; the server refuses with `own_submission`, and the inbox doesn't offer it to them.
+- **A rejection needs a reason.** It goes back to the author, who has to know what to rework.
+- **One inbox across modules.** `/approvals` gathers Mapping Suggestions and Risk Assessments, oldest first, and its total feeds the navigation's badge, so the count and the list can't disagree.
+- **The badge says its number in words.** The digit is hidden from screen readers; the link reads "Freigaben, 5 offen".
+- **An approved Risk Assessment is due again four years after its date**, calculated on read, as the law asks for one at least every four years.

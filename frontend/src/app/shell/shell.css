@@ -345,3 +345,26 @@
   font-family: inherit;
   font-size: 12px;
 }
+
+/* ---------- Counts in the navigation ---------- */
+
+.grc-nav-count {
+  min-width: 20px;
+  margin-inline-start: auto;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--grc-primary);
+  color: var(--grc-on-primary);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+}
+
+.grc-shell-tab .grc-nav-count {
+  position: absolute;
+  top: 4px;
+  margin-inline-start: 22px;
+  min-width: 18px;
+  line-height: 18px;
+}

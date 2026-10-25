@@ -403,6 +403,52 @@ export interface ActivityEntry {
   changes: FieldChange[];
 }
 
+export type RiskAssessmentStatus = "submitted" | "approved" | "rejected";
+
+/**
+ * A dated review of all Risks of one Critical Facility. The law asks for one at least
+ * every four years; it counts once someone other than its author has approved it.
+ */
+export interface RiskAssessment {
+  id: string;
+  scope_id: string;
+  scope_name: string;
+  title_de: string;
+  assessed_on: string;
+  status: RiskAssessmentStatus;
+  risk_ids: string[];
+  summary_de: string;
+  submitted_by_id: string;
+  submitted_by_name: string;
+  submitted_at: string;
+  decided_by_id: string | null;
+  decided_by_name: string | null;
+  decided_at: string | null;
+  decision_note_de: string | null;
+  /** Four years after the assessment, once approved; calculated, never stored. */
+  next_due: string | null;
+}
+
+export type ApprovalKind = "mapping_suggestion" | "risk_assessment";
+
+/** One thing waiting for the current user's approval, wherever it comes from. */
+export interface ApprovalItem {
+  kind: ApprovalKind;
+  id: string;
+  title: string;
+  detail: string;
+  /** The Scope it belongs to, where there is one; a Mapping belongs to the Tenant. */
+  scope_id: string | null;
+  submitted_by_name: string | null;
+  submitted_at: string;
+}
+
+/** Everything the user may approve right now, oldest first, with the count for the badge. */
+export interface Approvals {
+  items: ApprovalItem[];
+  total: number;
+}
+
 // ---------- Search ----------
 
 export interface RequirementHit {

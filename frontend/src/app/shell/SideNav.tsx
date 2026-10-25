@@ -7,6 +7,7 @@ import { duration, ease } from "@/shared/theme/motion";
 import { AnimatedIcon } from "@/shared/ui/AnimatedIcon/AnimatedIcon";
 
 import { NAV_ITEMS, type NavEntry } from "./navigation";
+import { NavCount } from "./NavCount";
 
 const ICON_SIZE = 20;
 
@@ -66,6 +67,7 @@ function SideNavLink({ item, collapsed }: { item: NavEntry; collapsed: boolean }
           )}
           <AnimatedIcon preset={item.icon} size={ICON_SIZE} />
           <span className={collapsed ? "grc-visually-hidden" : undefined}>{label}</span>
+          <NavCount item={item} />
         </>
       )}
     </NavLink>

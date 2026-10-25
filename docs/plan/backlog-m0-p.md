@@ -259,7 +259,7 @@ As a GRC Manager, I want to see how my measures change the risk picture.
 ### P-11 Approvals inbox
 **Labels:** `module:frontend`, `type:feature`, `prio:should` · **Estimate:** 1.5 h · **Depends on:** P-02
 
-- [ ] Lists everything waiting for my approval (Mapping Suggestions, Risk Assessments), with approve/reject and a badge count in the shell.
+- [x] Lists everything waiting for my approval (Mapping Suggestions, Risk Assessments), with approve/reject and a badge count in the shell.
 
 ### P-12 Deadlines timeline
 **Labels:** `module:frontend`, `type:feature`, `prio:should` · **Estimate:** 2 h · **Depends on:** P-02
