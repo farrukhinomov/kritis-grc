@@ -35,8 +35,8 @@ function present(data: TenantData, implementation: StoredImplementation): Implem
   return { ...implementation, owner_name: owner?.display_name ?? null };
 }
 
-/** "§ 8" before "§ 12": paragraphs sort by number, not as text. */
-const paragraphNumber = (paragraph: string) => Number.parseInt(paragraph.replace(/\D+/, ""), 10);
+/** "§ 8" before "§ 8a" before "§ 12": numbers compare as numbers, letters after them. */
+export const byParagraph = (a: string, b: string) => a.localeCompare(b, "de", { numeric: true });
 
 function label(data: TenantData, implementation: StoredImplementation): string {
   const requirement = data.requirements.find((r) => r.id === implementation.requirement_id);
@@ -158,9 +158,7 @@ const implementationRoutes = [
       rows.set(requirement.paragraph, row);
     }
     return HttpResponse.json<ParagraphSummary>({
-      rows: [...rows.values()].toSorted(
-        (a, b) => paragraphNumber(a.paragraph) - paragraphNumber(b.paragraph),
-      ),
+      rows: [...rows.values()].toSorted((a, b) => byParagraph(a.paragraph, b.paragraph)),
     });
   }),
 

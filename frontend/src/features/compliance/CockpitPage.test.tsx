@@ -1,5 +1,10 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { http } from "msw";
+
+import { problem } from "@/mocks/http";
+import { server } from "@/mocks/server";
+import { setSimulation } from "@/mocks/simulation";
 
 import { WIDE_SCREEN_QUERY } from "@/shared/lib/breakpoints";
 import { matchMediaQueries } from "@/test/media";
@@ -179,5 +184,86 @@ describe("a Tenant without Implementations", () => {
     renderRoute("/t/wasserverband-musterland/compliance");
 
     expect(await screen.findByText("Noch keine Umsetzungen erfasst.")).toBeVisible();
+  });
+});
+
+describe("the cockpit's history and focus", () => {
+  it("leaves no duplicate history entry behind the in-app back button", async () => {
+    const { router } = await openCockpit();
+    await userEvent.click(within(await list("Paragraphen")).getByRole("button", { name: /§ 13/ }));
+    await userEvent.click(
+      within(await list("Anforderungen")).getByRole("button", { name: /§ 13 Abs. 1 / }),
+    );
+    await (await column("Umsetzung")).findByText("Deniz Yılmaz");
+    // The level before may still be animating out with its own back button.
+    await waitFor(() => {
+      expect(screen.getAllByRole("button", { name: "Zurück" })).toHaveLength(1);
+    });
+
+    await userEvent.click(screen.getByRole("button", { name: "Zurück" }));
+    await list("Anforderungen");
+    await router.navigate(-1);
+
+    expect(await list("Paragraphen")).toBeInTheDocument();
+    expect(new URLSearchParams(router.state.location.search).get("paragraph")).toBeNull();
+  });
+
+  it("drops a link's levels that don't exist, so one back press is enough", async () => {
+    const { router } = await openCockpit("?paragraph=§ 13&requirement=gibt-es-nicht");
+    await list("Anforderungen");
+
+    await waitFor(() => {
+      expect(new URLSearchParams(router.state.location.search).get("requirement")).toBeNull();
+    });
+    await userEvent.click(screen.getByRole("button", { name: "Zurück" }));
+
+    expect(await list("Paragraphen")).toBeInTheDocument();
+  });
+
+  it("keeps the columns while another facility loads", async () => {
+    matchMediaQueries(WIDE_SCREEN_QUERY);
+    await openCockpit("?paragraph=§ 13&requirement=req-k-13-1");
+    await (await column("Umsetzung")).findByText("Teilweise umgesetzt");
+    // Slow answers, so the moment between choosing and the new numbers is visible.
+    setSimulation({ latency: "short" });
+
+    await choose("Geltungsbereich", "Wasserwerk Süd");
+
+    expect(screen.getByRole("list", { name: "Anforderungen" })).toBeInTheDocument();
+    expect(await (await column("Umsetzung")).findByText("Offen")).toBeInTheDocument();
+  });
+
+  it("forgets a keyboard move that led nowhere, so a later click keeps its focus", async () => {
+    matchMediaQueries(WIDE_SCREEN_QUERY);
+    server.use(
+      http.get("/api/v1/tenants/:tenant/requirements", ({ request }) =>
+        new URL(request.url).searchParams.get("paragraph") === "§ 12"
+          ? problem(503, "service_unavailable", "Down.")
+          : undefined,
+      ),
+    );
+    await openCockpit();
+    const paragraphs = within(await list("Paragraphen"));
+    paragraphs.getByRole("button", { name: /§ 12/ }).focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await screen.findByText("Dieser Bereich konnte nicht geladen werden.");
+
+    await userEvent.click(paragraphs.getByRole("button", { name: /§ 16/ }));
+    await list("Anforderungen");
+
+    expect(paragraphs.getByRole("button", { name: /§ 16/ })).toHaveFocus();
+  });
+
+  it("keeps focus on the facility picker on a phone after moving in a list", async () => {
+    await openCockpit("?paragraph=§ 13");
+    within(await list("Anforderungen"))
+      .getAllByRole("button")[0]!
+      .focus();
+    await userEvent.keyboard("{ArrowDown}");
+
+    await choose("Geltungsbereich", "Wasserwerk Süd");
+    await list("Anforderungen");
+
+    expect(document.activeElement).not.toBe(document.body);
   });
 });

@@ -2,7 +2,15 @@ import "./patterns.css";
 
 import { Button, Typography } from "antd";
 import { AnimatePresence, m } from "motion/react";
-import { type ReactNode, useEffect, useId, useRef, useState } from "react";
+import {
+  type KeyboardEvent,
+  type MouseEvent,
+  type ReactNode,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 
 import { useIsWideScreen } from "@/shared/lib/breakpoints";
@@ -115,26 +123,34 @@ function StackedColumns({ label, columns, onBack }: ColumnDrillDownProps) {
   );
 }
 
+/** Keys that open or close a level; moving within a list doesn't. */
+const ACTIVATION_KEYS = new Set(["Enter", " ", "ArrowRight", "ArrowLeft"]);
+
+/** A level change this long after the user's action still counts as caused by it. */
+const ACTION_WINDOW_MS = 1500;
+
 /**
  * Drilling in or back replaces the screen, and the button that was used disappears with
  * it. Focus moves to the new level's title, so keyboard and screen reader users continue
- * there instead of at the top of the page. Only a change the user caused moves focus:
- * levels that appear while a deep link loads must not pull focus away from the page.
- * Returns the handler that records such a user action.
+ * there instead of at the top of the page. Only a change the user just caused by opening
+ * or closing a level moves focus: levels that appear while a deep link loads, or change
+ * because of a control outside, must not pull focus away. Returns the handler that
+ * records such an action.
  */
 function useFocusTitleOnDepthChange(depth: number, titleId: string) {
   const previousDepth = useRef(depth);
-  const userActed = useRef(false);
+  const actedAt = useRef(Number.NEGATIVE_INFINITY);
 
   useEffect(() => {
     if (previousDepth.current === depth) {
       return;
     }
     previousDepth.current = depth;
-    if (!userActed.current) {
+    const causedByUser = performance.now() - actedAt.current < ACTION_WINDOW_MS;
+    actedAt.current = Number.NEGATIVE_INFINITY;
+    if (!causedByUser) {
       return;
     }
-    userActed.current = false;
     const title = document.getElementById(titleId);
     if (title) {
       title.tabIndex = -1;
@@ -142,8 +158,13 @@ function useFocusTitleOnDepthChange(depth: number, titleId: string) {
     }
   }, [depth, titleId]);
 
-  return () => {
-    userActed.current = true;
+  return (event: KeyboardEvent | MouseEvent) => {
+    const onButton = event.target instanceof Element && event.target.closest("button") !== null;
+    const activates =
+      event.type === "click" ? onButton : ACTIVATION_KEYS.has((event as KeyboardEvent).key);
+    if (activates) {
+      actedAt.current = performance.now();
+    }
   };
 }
 

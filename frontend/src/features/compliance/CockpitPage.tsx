@@ -1,8 +1,8 @@
 import "./cockpit.css";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Alert, Select } from "antd";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -29,10 +29,7 @@ import { StatusBadge } from "@/shared/ui/StatusBadge/StatusBadge";
 import { DrillList } from "./DrillList";
 import { overallStatus } from "./status";
 import { useCockpitPlace } from "./useCockpitPlace";
-
-/** The version in force: the one that took effect last. */
-const currentVersion = (framework: Framework) =>
-  framework.versions.toSorted((a, b) => b.effective_from.localeCompare(a.effective_from))[0];
+import { currentVersion } from "./version";
 
 /** Critical Facilities first, as the KRITIS duties attach to them. */
 const facilitiesFirst = (a: ComplianceSummaryRow, b: ComplianceSummaryRow) =>
@@ -76,7 +73,7 @@ interface CockpitProps {
 
 function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
   const { t } = useTranslation();
-  const { place, selectFramework, selectScope, selectParagraph, selectRequirement, back } =
+  const { place, selectFramework, selectScope, selectParagraph, selectRequirement, back, discard } =
     useCockpitPlace();
   // Which column the keyboard is moving to; it takes focus once its items are there.
   const [focusLevel, setFocusLevel] = useState<number | null>(null);
@@ -98,6 +95,9 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
       scope: scope?.scope_id ?? "",
     }),
     enabled: Boolean(version && scope),
+    // Another facility keeps the columns on screen until its numbers arrive, instead of
+    // collapsing the drill-down and rebuilding it.
+    placeholderData: keepPreviousData,
   });
   const paragraph = paragraphs.data?.rows.find((row) => row.paragraph === place.paragraph);
 
@@ -116,14 +116,43 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
       limit: 100,
     }),
     enabled: Boolean(paragraph),
+    placeholderData: keepPreviousData,
   });
   const requirement = requirements.data?.items.find((item) => item.id === place.requirement);
   const implementationOf = (id: string) =>
     implementations.data?.items.find((item) => item.requirement_id === id);
 
+  // Levels from an old or edited link that don't exist leave the URL, so the screen, the
+  // URL and the back button agree. Placeholder data from the previous facility doesn't count.
+  const paragraphsSettled = paragraphs.isSuccess && !paragraphs.isPlaceholderData;
+  const requirementsSettled = requirements.isSuccess && !requirements.isPlaceholderData;
+  const unknownParagraph = paragraphsSettled && place.paragraph !== null && !paragraph;
+  const unknownRequirement = requirementsSettled && place.requirement !== null && !requirement;
+  useEffect(() => {
+    if (unknownParagraph) {
+      discard({ paragraph: null, requirement: null });
+    } else if (unknownRequirement) {
+      discard({ requirement: null });
+    }
+  }, [unknownParagraph, unknownRequirement, discard]);
+
+  // A keyboard move into a column that turned out empty or failed has nowhere to land; it
+  // is dropped rather than kept, or it would take focus away from a later mouse click.
+  const nowhereToLand =
+    requirements.isError || (requirementsSettled && requirements.data.items.length === 0);
+
   if (!framework || !scope) {
     return null;
   }
+
+  const openParagraph = (key: string) => {
+    setFocusLevel(null);
+    selectParagraph(key);
+  };
+  const openRequirement = (key: string) => {
+    setFocusLevel(null);
+    selectRequirement(key);
+  };
 
   const columns: DrillColumn[] = [
     {
@@ -146,7 +175,7 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
                   content: <ParagraphItem row={row} />,
                 }))}
                 selected={paragraph?.paragraph ?? null}
-                onSelect={selectParagraph}
+                onSelect={openParagraph}
                 onForward={(key) => {
                   selectParagraph(key);
                   setFocusLevel(1);
@@ -182,12 +211,12 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
                 ),
               }))}
               selected={requirement?.id ?? null}
-              onSelect={selectRequirement}
-              onForward={selectRequirement}
+              onSelect={openRequirement}
+              onForward={openRequirement}
               onBackward={() => {
                 setFocusLevel(0);
               }}
-              focusRequested={focusLevel === 1}
+              focusRequested={focusLevel === 1 && !nowhereToLand}
               onFocused={focused}
             />
           )}
@@ -227,7 +256,13 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
           onChange={selectScope}
         />
       </div>
-      <ColumnDrillDown label={t("compliance.drill")} columns={columns} onBack={back} />
+      <ColumnDrillDown
+        label={t("compliance.drill")}
+        columns={columns}
+        onBack={() => {
+          back({ requirement: Boolean(requirement) });
+        }}
+      />
     </>
   );
 }

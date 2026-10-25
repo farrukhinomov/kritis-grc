@@ -170,6 +170,15 @@ Each milestone gets one entry with four parts:
 - **Counts from the server again.** Paragraph counts come from `/compliance-paragraphs`, and the owner's name is embedded in the Implementation, for the same page-cap reasons as on the dashboard.
 - **One tab stop per column.** Arrow keys move within and between columns, Home and End jump to the ends, Tab leaves the cockpit. A tab stop per row would make the page tedious to cross by keyboard.
 
+- **Review findings that were real defects**, each with a test that fails without its fix (mutation-checked):
+  - The in-app back button replaced the URL and left the level's own history entry behind, so the next back gesture changed nothing. After a drill-down it now goes back in history; only a deep link without a parent entry shortens the URL in place.
+  - Levels from a link that don't exist (an old Requirement ID) stayed in the URL, and back needed two presses. They are dropped.
+  - Switching facility collapsed the columns until the new counts arrived. The previous facility's data stays on screen meanwhile.
+  - An arrow-key move into a column that failed or was empty stayed pending and later took focus from a mouse click.
+  - Any key press inside the stack counted as "the user changed the level", so a later change from the facility picker moved focus to a title about to disappear. Only opening or closing a level counts now, and only for a moment.
+  - "§ 8a" sorted as "§ 8"; paragraphs now compare numerically with letters after the number.
+  - The cockpit took the version with the latest date even if it lay in the future. It now takes the latest one in force.
+
 ### Changed
 - **Focus stole from the page on a deep link.** The drill-down moved focus to the deepest title whenever its depth changed, including while a deep link's columns loaded. Only a change the user caused moves focus now. Found in a headless screenshot.
 - **Accessible names ran together** ("§ 13 Abs. 1Resilienzmaßnahmen"), which screen readers would read the same way. Found by a test query, fixed with spaces in the markup.
