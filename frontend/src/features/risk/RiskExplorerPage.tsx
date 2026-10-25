@@ -3,15 +3,18 @@ import "./risk.css";
 
 import { useQuery } from "@tanstack/react-query";
 import { Button, Segmented, Select } from "antd";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import { scopesQuery } from "@/shared/api/organization";
 import { risksQuery } from "@/shared/api/risk";
 import type { RatingKind } from "@/shared/api/types";
 import { useIsWideScreen } from "@/shared/lib/breakpoints";
+import { combine } from "@/shared/lib/combineQueries";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
 import { RISK_CATEGORIES } from "@/shared/theme/semantic";
 import { PageHeader } from "@/shared/ui/PageHeader";
+import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 import { ResponsiveDrawer } from "@/shared/ui/patterns/ResponsiveDrawer";
 
 import { ExplorerMatrix } from "./ExplorerMatrix";
@@ -34,6 +37,23 @@ export function RiskExplorerPage() {
   const wide = useIsWideScreen();
   const place = useExplorerPlace();
   const scopes = useQuery(scopesQuery(tenant, { limit: 100 })).data?.items ?? [];
+
+  // The detail and the sheet go away with their URL parameter, whether closed by a button
+  // or by the back gesture, and take the focused element with them. Focus returns to what
+  // opened them, so keyboard and screen reader users continue where they were.
+  const cellKey = place.cell
+    ? `${String(place.cell.likelihood)}-${String(place.cell.impact)}`
+    : null;
+  const shown = useRef({ risk: place.risk, cell: cellKey });
+  useEffect(() => {
+    const before = shown.current;
+    shown.current = { risk: place.risk, cell: cellKey };
+    if (before.risk && !place.risk) {
+      focusMarked("risk", before.risk);
+    } else if (before.cell && !cellKey) {
+      focusMarked("cell", before.cell);
+    }
+  }, [place.risk, cellKey]);
 
   return (
     <>
@@ -86,7 +106,13 @@ export function RiskExplorerPage() {
             rating={place.rating}
             scope={place.scope}
             selected={place.cell}
-            onSelect={place.setCell}
+            onSelect={(cell) => {
+              if (wide || !cell) {
+                place.setCell(cell);
+              } else {
+                place.openCellSheet(cell);
+              }
+            }}
           />
         </section>
         {wide && (
@@ -142,9 +168,7 @@ export function RiskExplorerPage() {
           scope={place.scope}
           cell={place.cell}
           onOpen={place.openRisk}
-          onClose={() => {
-            place.setCell(null);
-          }}
+          onClose={place.closeCellSheet}
         />
       )}
       {place.risk && <RiskDetail tenant={tenant} riskId={place.risk} onClose={place.closeRisk} />}
@@ -168,7 +192,7 @@ function CellSheet({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
-  const risks =
+  const query = combine([
     useQuery(
       risksQuery(tenant, {
         rating,
@@ -177,7 +201,8 @@ function CellSheet({
         limit: 100,
         ...(scope ? { scope } : {}),
       }),
-    ).data?.items ?? [];
+    ),
+  ] as const);
 
   return (
     <ResponsiveDrawer
@@ -185,22 +210,38 @@ function CellSheet({
       onClose={onClose}
       title={t("risk.filters.cell", { likelihood: cell.likelihood, impact: cell.impact })}
     >
-      <ul className="grc-plain-list grc-cell-risks">
-        {risks.map((risk) => (
-          <li key={risk.id}>
-            <Button
-              type="link"
-              className="grc-risk-title"
-              onClick={() => {
-                onOpen(risk.id);
-              }}
-            >
-              <span lang="de">{risk.title_de}</span>
-            </Button>
-            <RatingChip rating={risk[rating]} />
-          </li>
-        ))}
-      </ul>
+      <QueryContent
+        query={query}
+        rows={4}
+        isEmpty={([result]) => result.items.length === 0}
+        empty={t("risk.table.empty")}
+      >
+        {([result]) => (
+          <ul className="grc-plain-list grc-cell-risks">
+            {result.items.map((risk) => (
+              <li key={risk.id}>
+                <Button
+                  type="link"
+                  className="grc-risk-title"
+                  data-risk={risk.id}
+                  onClick={() => {
+                    onOpen(risk.id);
+                  }}
+                >
+                  <span lang="de">{risk.title_de}</span>
+                </Button>
+                <RatingChip rating={risk[rating]} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </QueryContent>
     </ResponsiveDrawer>
   );
+}
+
+/** Focuses the control marked as opening a risk or a cell, if it is still on screen. */
+function focusMarked(kind: "risk" | "cell", value: string) {
+  const marked = [...document.querySelectorAll<HTMLElement>(`[data-${kind}]`)];
+  marked.find((element) => element.dataset[kind] === value)?.focus();
 }

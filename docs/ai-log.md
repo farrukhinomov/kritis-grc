@@ -225,6 +225,15 @@ Each milestone gets one entry with four parts:
 - **The glide happens in the risk's own detail.** The explorer's matrix shows counts, not risks, so nothing could move there. In the detail each rating is a marker in a 4×4 grid, and marking a Treatment's Implementation as implemented moves the Residual marker to its new cell through a shared layout animation. Reduced motion turns it into a jump, and the legend says every rating as text.
 - **The status mutation moved to `shared/`.** The risk detail and the Implementation drawer change a status the same way: optimistic, rolled back on error, 412 dialog, then risks and the Activity Log refetched.
 - **Partial work has its own effect text.** The method counts partial work for half a level, so "planned 2" alone would overstate what is already in effect.
+- **Review findings that were real defects**, each with a test that fails without its fix (mutation-checked):
+  - Closing the risk detail or the cell sheet dropped focus on the page body, because both leave with their URL parameter. Focus returns to the risk's title or the cell that opened them.
+  - On phones a cell's sheet replaced the history entry, so the back gesture left the explorer. It is now its own entry, and closing it goes back.
+  - The cell sheet had no loading, error or empty state. It goes through the same four states as every other area.
+  - With the risk engine down, an implemented Treatment read "would lower … once implemented". Without a Residual Rating the effect now says it is pending.
+  - A shared link with a page past the end showed an empty list without a pager. It moves to the last page.
+  - A cell with one risk was announced as "1 Risiken". Cell names have plural forms and name the cell's category.
+  - The marker glide took twice the longest motion token. It uses the token.
+  - The category filter, history replacement and page reset had no UI test, and the count assertions matched substrings. All are covered, and counts are checked in the cell's accessible name.
 
 ### Changed
 - **The matrix sat beside the table.** In the browser check the six-column table pushed the page sideways even at 1920 px, because the content width is capped. The matrix now sits above the table, Scope and Hazard moved under the title, and every table scrolls inside its own box if it is still too wide.

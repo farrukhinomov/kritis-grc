@@ -246,8 +246,14 @@ export const de = {
     matrix: {
       title: "Risikomatrix",
       caption: "Risikomatrix, {{rating}}: Anzahl der Risiken je Feld",
-      cellLabel:
+      cellLabel_one:
+        "Eintrittswahrscheinlichkeit {{likelihood}}, Auswirkung {{impact}}: {{count}} Risiko",
+      cellLabel_other:
         "Eintrittswahrscheinlichkeit {{likelihood}}, Auswirkung {{impact}}: {{count}} Risiken",
+      cellLabelCategory_one:
+        "Eintrittswahrscheinlichkeit {{likelihood}}, Auswirkung {{impact}}: {{count}} Risiko, Kategorie {{category}}",
+      cellLabelCategory_other:
+        "Eintrittswahrscheinlichkeit {{likelihood}}, Auswirkung {{impact}}: {{count}} Risiken, Kategorie {{category}}",
     },
     filters: {
       allScopes: "Alle Geltungsbereiche",
@@ -283,6 +289,7 @@ export const de = {
       treatments: "Maßnahmen",
       effectApplied_one: "senkt die {{dimension}} um {{count}} Stufe",
       effectApplied_other: "senkt die {{dimension}} um {{count}} Stufen",
+      effectPending: "Wirkung: Berechnung ausstehend",
       effectPlanned_one: "würde die {{dimension}} um {{count}} Stufe senken, sobald umgesetzt",
       effectPlanned_other: "würde die {{dimension}} um {{count}} Stufen senken, sobald umgesetzt",
       effectPartial:

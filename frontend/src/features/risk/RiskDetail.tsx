@@ -97,6 +97,7 @@ function RiskContent({ tenant, risk }: { tenant: string; risk: Risk }) {
               key={`${treatment.implementation_id}-${treatment.dimension}`}
               tenant={tenant}
               treatment={treatment}
+              pending={!risk.residual}
               effect={risk.residual?.explanation.find(
                 (item) =>
                   item.implementation_id === treatment.implementation_id &&
@@ -115,18 +116,27 @@ function RiskContent({ tenant, risk }: { tenant: string; risk: Risk }) {
   );
 }
 
-/** What a Treatment does now: fully, partly (partial work counts for half) or not yet. */
+/**
+ * What a Treatment does now: fully, partly (partial work counts for half) or not yet.
+ * Without a Residual Rating nothing is known about its effect, so it says so rather than
+ * claiming an implemented Treatment does nothing.
+ */
 function TreatmentEffectText({
   applied,
   planned,
   dimension,
+  pending,
 }: {
   applied: number;
   planned: number;
   dimension: string;
+  pending: boolean;
 }) {
   const { t } = useTranslation();
 
+  if (pending) {
+    return t("risk.detail.effectPending");
+  }
   if (applied >= planned) {
     return t("risk.detail.effectApplied", { count: planned, dimension });
   }
@@ -145,10 +155,12 @@ function TreatmentRow({
   tenant,
   treatment,
   effect,
+  pending,
 }: {
   tenant: string;
   treatment: Treatment;
   effect: TreatmentEffect | undefined;
+  pending: boolean;
 }) {
   const { t, i18n } = useTranslation();
   const canChange = useCan("change");
@@ -172,6 +184,7 @@ function TreatmentRow({
           applied={effect?.levels_applied ?? 0}
           planned={treatment.levels}
           dimension={dimension}
+          pending={pending}
         />
       </span>
       {canChange && implementation && implementation.status !== "implemented" && (

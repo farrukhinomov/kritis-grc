@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button, Pagination } from "antd";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import { risksQuery } from "@/shared/api/risk";
@@ -48,6 +49,15 @@ export function RiskTable({
       }),
     ),
   ] as const);
+  // A link can name a page that no longer exists (fewer risks, other filters); it moves to
+  // the last page instead of showing an empty list without a pager.
+  const [result] = query.data ?? [];
+  const lastPage = result ? Math.max(1, Math.ceil(result.page.total / PAGE_SIZE)) : page;
+  useEffect(() => {
+    if (page > lastPage) {
+      onPage(lastPage);
+    }
+  }, [page, lastPage, onPage]);
   const hazardName = (risk: Risk) =>
     i18n.language === "en" ? risk.hazard.name_en : risk.hazard.name_de;
   // The title opens the detail: a real button, so it works by keyboard and is announced.
@@ -55,6 +65,7 @@ export function RiskTable({
     <Button
       type="link"
       className="grc-risk-title"
+      data-risk={risk.id}
       onClick={() => {
         onOpen(risk.id);
       }}

@@ -68,17 +68,25 @@ export function ExplorerMatrix({ tenant, rating, scope, selected, onSelect }: Ex
                           type="button"
                           className={`grc-explorer-cell${cell ? ` grc-risk-${cell.worst_category}` : ""}`}
                           aria-pressed={pressed}
+                          data-cell={`${String(likelihood)}-${String(impact)}`}
                           disabled={count === 0 && !pressed}
                           onClick={() => {
                             onSelect(pressed ? null : { likelihood, impact });
                           }}
                         >
                           <span className="grc-visually-hidden">
-                            {t("risk.matrix.cellLabel", { likelihood, impact, count })}
+                            {cell
+                              ? t("risk.matrix.cellLabelCategory", {
+                                  likelihood,
+                                  impact,
+                                  count,
+                                  category: t(`dashboard.riskCategories.${cell.worst_category}`),
+                                })
+                              : t("risk.matrix.cellLabel", { likelihood, impact, count })}
                           </span>
                           <span aria-hidden>{count > 0 ? count : ""}</span>
                           {cell && (
-                            <span className="grc-explorer-cell-category">
+                            <span aria-hidden className="grc-explorer-cell-category">
                               {t(`dashboard.riskCategories.${cell.worst_category}`)}
                             </span>
                           )}

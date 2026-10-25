@@ -21,6 +21,8 @@ function parseCell(value: string | null): Cell | null {
     : null;
 }
 
+const cellParam = (cell: Cell) => `${String(cell.likelihood)}-${String(cell.impact)}`;
+
 /**
  * What the explorer shows, kept in the URL like the cockpit: a reload or a shared link
  * opens the same view, and opening a risk is a history entry, so back closes it.
@@ -29,7 +31,7 @@ function parseCell(value: string | null): Cell | null {
 export function useExplorerPlace() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
-  const opened = (useLocation().state as { explorer?: string } | null)?.explorer === "risk";
+  const opened = (useLocation().state as { explorer?: string } | null)?.explorer;
 
   const rating = RATINGS.find((item) => item === params.get("rating")) ?? "residual";
   const rawCategory = params.get("category");
@@ -39,7 +41,9 @@ export function useExplorerPlace() {
     (rawCategory === "pending" && rating === "residual" ? "pending" : null);
   const page = Math.max(1, Number.parseInt(params.get("page") ?? "1", 10) || 1);
 
-  const set = (change: Record<string, string | null>, options: { push?: boolean } = {}) => {
+  // A pushed entry is marked with what it opened, so closing it can go back instead of
+  // stacking another entry; anything else (a filter, a shared link) is replaced.
+  const set = (change: Record<string, string | null>, options: { push?: "risk" | "cell" } = {}) => {
     setParams(
       (current) => {
         const next = new URLSearchParams(current);
@@ -52,7 +56,7 @@ export function useExplorerPlace() {
         }
         return next;
       },
-      options.push ? { state: { explorer: "risk" } } : { replace: true },
+      options.push ? { state: { explorer: options.push } } : { replace: true },
     );
   };
 
@@ -73,20 +77,29 @@ export function useExplorerPlace() {
     setCategory: (value: CategoryFilter | null) => {
       set({ category: value, page: null });
     },
+    /** On wide screens a cell is a filter of the table. */
     setCell: (value: Cell | null) => {
-      set({
-        cell: value ? `${String(value.likelihood)}-${String(value.impact)}` : null,
-        page: null,
-      });
+      set({ cell: value ? cellParam(value) : null, page: null });
+    },
+    /** On phones a cell opens a sheet, which the back gesture must close. */
+    openCellSheet: (value: Cell) => {
+      set({ cell: cellParam(value) }, { push: "cell" });
+    },
+    closeCellSheet: () => {
+      if (opened === "cell") {
+        void navigate(-1);
+        return;
+      }
+      set({ cell: null });
     },
     setPage: (value: number) => {
       set({ page: value === 1 ? null : String(value) });
     },
     openRisk: (id: string) => {
-      set({ risk: id }, { push: true });
+      set({ risk: id }, { push: "risk" });
     },
     closeRisk: () => {
-      if (opened) {
+      if (opened === "risk") {
         void navigate(-1);
         return;
       }

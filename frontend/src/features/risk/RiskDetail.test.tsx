@@ -103,6 +103,29 @@ describe("a risk's detail", () => {
     ).toBeInTheDocument();
     expect(markerCell("residual")).toBe(-1);
     expect(markerCell("inherent")).not.toBe(-1);
+    const treatments = within(detail.getByRole("region", { name: "Maßnahmen" }));
+    await treatments.findByText(/§ 13 Abs. 3 Nr. 1/);
+    expect(treatments.getAllByText(/Wirkung: Berechnung ausstehend/)).toHaveLength(2);
+    expect(treatments.queryByText(/sobald umgesetzt/)).not.toBeInTheDocument();
+  });
+
+  it("closes with its button by going back, and returns focus to the risk", async () => {
+    const { router } = renderRoute("/t/muster-stadtwerke/risks");
+    const title = await screen.findByRole("button", {
+      name: "Längerer Stromausfall legt Pumpwerk Nord still",
+    });
+    await userEvent.click(title);
+    await screen.findByRole("dialog");
+
+    await userEvent.click(screen.getByRole("button", { name: "Schließen" }));
+
+    await waitFor(() => {
+      expect(new URLSearchParams(router.state.location.search).get("risk")).toBeNull();
+    });
+    expect(router.state.historyAction).toBe("POP");
+    expect(
+      screen.getByRole("button", { name: "Längerer Stromausfall legt Pumpwerk Nord still" }),
+    ).toHaveFocus();
   });
 
   it("closes with the back gesture after it was opened from the table", async () => {

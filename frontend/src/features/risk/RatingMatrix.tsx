@@ -30,7 +30,7 @@ export function RatingMatrix({ risk }: { risk: Risk }) {
                 <m.span
                   key={kind}
                   layoutId={`${risk.id}-${kind}`}
-                  transition={{ duration: duration.slow * 2, ease: ease.standard }}
+                  transition={{ duration: duration.slow, ease: ease.standard }}
                   className={`grc-rating-marker grc-rating-marker-${kind}`}
                 />
               ))}

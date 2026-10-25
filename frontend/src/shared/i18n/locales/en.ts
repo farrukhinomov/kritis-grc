@@ -244,7 +244,12 @@ export const en: Translation = {
     matrix: {
       title: "Risk matrix",
       caption: "Risk matrix, {{rating}}: number of risks per cell",
-      cellLabel: "Likelihood {{likelihood}}, impact {{impact}}: {{count}} risks",
+      cellLabel_one: "Likelihood {{likelihood}}, impact {{impact}}: {{count}} risk",
+      cellLabel_other: "Likelihood {{likelihood}}, impact {{impact}}: {{count}} risks",
+      cellLabelCategory_one:
+        "Likelihood {{likelihood}}, impact {{impact}}: {{count}} risk, category {{category}}",
+      cellLabelCategory_other:
+        "Likelihood {{likelihood}}, impact {{impact}}: {{count}} risks, category {{category}}",
     },
     filters: {
       allScopes: "All scopes",
@@ -272,6 +277,7 @@ export const en: Translation = {
       treatments: "Treatments",
       effectApplied_one: "lowers the {{dimension}} by {{count}} level",
       effectApplied_other: "lowers the {{dimension}} by {{count}} levels",
+      effectPending: "effect: calculation pending",
       effectPlanned_one: "would lower the {{dimension}} by {{count}} level once implemented",
       effectPlanned_other: "would lower the {{dimension}} by {{count}} levels once implemented",
       effectPartial:
