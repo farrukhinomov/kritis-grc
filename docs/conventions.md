@@ -44,7 +44,8 @@ This applies to all source code, tests, migrations, Dockerfiles and CI/CD workfl
 
 ## Risk engine (FastAPI)
 
-- Layout: `routers/` (HTTP only), `domain/` (pure functions, no I/O), `schemas/`.
+- Layout: `routers/` (HTTP only), `domain/` (pure functions, no I/O), `schemas/`. Runs on uvicorn via `python -m risk_engine`, with plain ASGI middleware for request context (not `BaseHTTPMiddleware`). Tests use Starlette's TestClient with `httpx2`.
+- Errors are RFC 9457 Problem Details, like the public API.
 - No database. It can only be called by Django's service account (IAM). `/docs` is turned off in production.
 - `POST /v1/risk-scores:batch` takes Risks with their Inherent Rating and Treatments. It returns the Residual Rating, category and explanations, plus `method_version` ([ADR 0014](adr/0014-qualitative-versioned-risk-method.md)).
 - Django's client is generated from FastAPI's OpenAPI with datamodel-code-generator. CI fails if the generated client is out of date.

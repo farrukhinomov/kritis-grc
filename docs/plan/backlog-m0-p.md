@@ -45,11 +45,11 @@ As a developer, I want a running Django project in the agreed structure, so that
 
 As a developer, I want the stateless risk engine running with its final contract shape, so that Django's generated client can be wired early.
 
-- [ ] `services/risk-engine/` with uv, Python 3.13 and FastAPI. Layout: `routers/`, `domain/`, `schemas/`.
-- [ ] `POST /v1/risk-scores:batch` with the agreed request/response schemas, including `method_version`. The domain function implements the residual-rating rule with unit tests: full and half effect, floor at the lowest level.
-- [ ] `/health/live` and `/health/ready`, plus the same JSON logging, request ID and `traceparent` propagation as Django.
-- [ ] `/docs` and `/redoc` are disabled when `ENV=production`, and the OpenAPI JSON is exported to a file in CI.
-- [ ] Multi-stage Dockerfile, non-root, uvicorn.
+- [x] `services/risk-engine/` with uv, Python 3.13 and FastAPI. Layout: `routers/`, `domain/`, `schemas/`.
+- [x] `POST /v1/risk-scores:batch` with the agreed request/response schemas, including `method_version`. The domain function implements the residual-rating rule with unit tests: full and half effect, floor at the lowest level.
+- [x] `/health/live` and `/health/ready`, plus the same JSON logging, request ID and `traceparent` propagation as Django.
+- [x] `/docs` and `/redoc` are disabled when `ENV=production`, and the OpenAPI JSON is exported to a file by `python -m risk_engine.export_openapi` (wired into CI in M0-06).
+- [x] Multi-stage Dockerfile, non-root, uvicorn.
 
 ### M0-04 Frontend skeleton
 **Labels:** `module:frontend`, `type:chore`, `prio:must` · **Estimate:** 3 h · **Depends on:** M0-01

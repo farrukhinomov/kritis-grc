@@ -24,6 +24,14 @@ uv run mypy src manage.py            # strict; needs the variables from backend/
 PYTHONPATH=src uv run lint-imports   # module and layer boundaries
 ```
 
+Risk engine (run in `services/risk-engine/`, details in [its README](services/risk-engine/README.md)):
+
+```bash
+uv run pytest
+uv run ruff check . && uv run ruff format --check .
+uv run mypy src tests
+```
+
 _Frontend and `docker compose` commands follow with M0-04 and M0-05._
 
 ## Non-negotiable rules
