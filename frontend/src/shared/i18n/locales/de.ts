@@ -409,25 +409,33 @@ export const de = {
       below:
         "Mit {{people}} versorgten Personen liegt die Anlage unter dem Regelschwellenwert von {{threshold}} Personen nach {{thresholdCitation}} KRITIS-DachG. Sie gilt damit voraussichtlich nicht als kritische Anlage nach {{definitionCitation}} KRITIS-DachG.",
       registration:
-        "Sobald die Anlage als kritische Anlage gilt, ist sie innerhalb von {{months}} Monaten beim Bundesamt für Bevölkerungsschutz und Katastrophenhilfe zu registrieren ({{registrationCitation}} KRITIS-DachG).",
+        "Gilt die Anlage nach Inkrafttreten der Rechtsverordnung als kritische Anlage, ist sie innerhalb von {{months}} Monaten beim Bundesamt für Bevölkerungsschutz und Katastrophenhilfe zu registrieren ({{registrationCitation}} KRITIS-DachG).",
       preliminaryTitle: "Vorläufiges Ergebnis",
       preliminary:
         "Die konkreten Schwellenwerte legt eine Rechtsverordnung fest, die noch nicht in Kraft ist. Bis dahin ist der Regelschwellenwert ein Anhaltspunkt, und es besteht noch keine Pflicht zur Registrierung.",
       change: "Angaben ändern",
+      restart: "Weitere Anlage prüfen",
     },
     create: {
       title: "Kritische Anlage anlegen",
       name: "Name der Anlage",
       location: "Standort",
-      date: "Geplante Registrierung",
+      date: "Angenommene Registrierung",
       dateHint:
-        "Vorbelegt mit heute plus {{months}} Monaten. Daraus berechnen sich die prognostizierten Fristen.",
+        "Eine Annahme für die Planung, vorbelegt mit heute plus {{months}} Monaten. Die Frist von {{months}} Monaten beginnt erst, wenn die Anlage nach der Rechtsverordnung als kritisch gilt. Aus dem Datum berechnen sich die prognostizierten Fristen.",
       nameMissing: "Bitte geben Sie einen Namen an.",
       locationMissing: "Bitte geben Sie den Standort an.",
       dateMissing: "Bitte geben Sie ein Datum an.",
       submit: "Als kritische Anlage anlegen",
       failed: "Die Anlage konnte nicht angelegt werden. Bitte versuchen Sie es erneut.",
       readOnly: "Nur GRC-Manager können eine kritische Anlage anlegen.",
+      errors: {
+        missing: "Bitte füllen Sie dieses Feld aus.",
+        tooLong: "Dieser Text ist zu lang.",
+        dateInvalid: "Bitte geben Sie ein gültiges Datum an.",
+        dateInPast: "Das Datum darf nicht in der Vergangenheit liegen.",
+        invalid: "Bitte prüfen Sie diese Angabe.",
+      },
     },
     created: {
       title: "{{name}} angelegt",

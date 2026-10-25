@@ -3,21 +3,23 @@ import { Alert, Button, Form, Input, Tag } from "antd";
 import { useEffect, useId, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
+import { ApiError } from "@/shared/api/client";
+import { resourceKey } from "@/shared/api/keys";
 import {
   applicabilityCheckQuery,
   createCriticalFacility,
   type NewCriticalFacility,
 } from "@/shared/api/organization";
-import { resourceKey } from "@/shared/api/keys";
 import type { ApplicabilityQuestion, ApplicabilityResult, Scope } from "@/shared/api/types";
 import { combine } from "@/shared/lib/combineQueries";
+import { addMonths, localToday } from "@/shared/lib/dates";
 import { formatDate } from "@/shared/lib/format";
 import { useIdempotencyKey } from "@/shared/lib/useIdempotencyKey";
 import { useCan } from "@/shared/session/sessionContext";
 import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 
 /** A citation never breaks between "§" and its number. */
-const keepTogether = (citation: string) => citation.replaceAll(" ", "\u00a0");
+const keepTogether = (citation: string) => citation.replaceAll(" ", " ");
 
 /** What each deadline is for, so a date never stands without its duty. */
 type Obligation = "riskAnalysis" | "measures" | "incidents" | "management";
@@ -28,28 +30,66 @@ const OBLIGATIONS: Partial<Record<string, Obligation>> = {
   "§ 20": "management",
 };
 
+/** The form's fields, and the server's names for them in its field errors. */
+const FIELDS = {
+  name: "name",
+  location: "location",
+  "critical_facility.registration.date": "date",
+} as const;
+
+type FieldMessage = "missing" | "tooLong" | "dateInvalid" | "dateInPast";
+const MESSAGES: Partial<Record<string, FieldMessage>> = {
+  required: "missing",
+  too_long: "tooLong",
+  invalid_date: "dateInvalid",
+  in_past: "dateInPast",
+};
+
 interface CheckResultProps {
   tenant: string;
   question: ApplicabilityQuestion;
+  headingRef: (element: HTMLElement | null) => void;
+  created: Scope | null;
+  onCreated: (scope: Scope) => void;
+  onChange: () => void;
   onRestart: () => void;
 }
 
-export function CheckResult({ tenant, question, onRestart }: CheckResultProps) {
+export function CheckResult({
+  tenant,
+  question,
+  headingRef,
+  created,
+  onCreated,
+  onChange,
+  onRestart,
+}: CheckResultProps) {
   const { t } = useTranslation();
   const query = combine([useQuery(applicabilityCheckQuery(tenant, question))] as const);
   const headingId = useId();
 
   return (
     <section aria-labelledby={headingId} className="grc-applicability-result">
-      <h2 id={headingId} className="grc-applicability-result-title">
+      <h2 id={headingId} ref={headingRef} tabIndex={-1} className="grc-applicability-result-title">
         {t("applicability.result.title")}
       </h2>
       <QueryContent query={query} rows={5} isEmpty={() => false} empty="">
         {([result]) => (
           <>
             <Explanation result={result} />
-            <Button onClick={onRestart}>{t("applicability.result.change")}</Button>
-            {result.applies && <CreateFacility tenant={tenant} result={result} />}
+            {created ? (
+              <>
+                <CreatedFacility scope={created} />
+                <Button onClick={onRestart}>{t("applicability.result.restart")}</Button>
+              </>
+            ) : (
+              <>
+                <Button onClick={onChange}>{t("applicability.result.change")}</Button>
+                {result.applies && (
+                  <CreateFacility tenant={tenant} result={result} onCreated={onCreated} />
+                )}
+              </>
+            )}
           </>
         )}
       </QueryContent>
@@ -59,6 +99,7 @@ export function CheckResult({ tenant, question, onRestart }: CheckResultProps) {
 
 function Explanation({ result }: { result: ApplicabilityResult }) {
   const { t, i18n } = useTranslation();
+  const verdict = useRef<HTMLHeadingElement>(null);
   const number = new Intl.NumberFormat(i18n.language);
   const values = {
     people: number.format(result.people_supplied),
@@ -69,9 +110,20 @@ function Explanation({ result }: { result: ApplicabilityResult }) {
     months: result.registration_within_months,
   };
 
+  // The verdict arrives after the question was sent; focus waits for it, so it is what a
+  // screen reader reads first.
+  useEffect(() => {
+    verdict.current?.focus();
+  }, []);
+
   return (
     <div className="grc-applicability-explanation">
-      <h3 className="grc-applicability-verdict" data-applies={result.applies}>
+      <h3
+        ref={verdict}
+        tabIndex={-1}
+        className="grc-applicability-verdict"
+        data-applies={result.applies}
+      >
         {t(result.applies ? "applicability.result.applies" : "applicability.result.doesNotApply")}
       </h3>
       <p>
@@ -92,32 +144,52 @@ function Explanation({ result }: { result: ApplicabilityResult }) {
   );
 }
 
-/** Three months from today: when a facility that counts as critical has to be registered. */
-function defaultRegistrationDate(months: number): string {
-  const date = new Date();
-  date.setMonth(date.getMonth() + months);
-  return date.toISOString().slice(0, 10);
-}
-
 interface FacilityFields {
   name: string;
   location: string;
   date: string;
 }
 
-function CreateFacility({ tenant, result }: { tenant: string; result: ApplicabilityResult }) {
+function CreateFacility({
+  tenant,
+  result,
+  onCreated,
+}: {
+  tenant: string;
+  result: ApplicabilityResult;
+  onCreated: (scope: Scope) => void;
+}) {
   const { t } = useTranslation();
   const canChange = useCan("change");
   const client = useQueryClient();
   const key = useIdempotencyKey();
   const [form] = Form.useForm<FacilityFields>();
+  const today = localToday();
   const create = useMutation({
-    mutationFn: (facility: NewCriticalFacility) =>
-      createCriticalFacility(tenant, facility, key.current()),
-    onSuccess: () => {
+    mutationFn: ({
+      facility,
+      idempotencyKey,
+    }: {
+      facility: NewCriticalFacility;
+      idempotencyKey: string;
+    }) => createCriticalFacility(tenant, facility, idempotencyKey),
+    onSuccess: (scope) => {
       key.renew();
+      onCreated(scope);
     },
-    // The dashboard's deadlines and the cockpit's Scope choice list the Scopes.
+    onError: (error) => {
+      // The server's objections belong next to the fields they are about.
+      if (error instanceof ApiError && error.status === 422) {
+        form.setFields(
+          error.errors.flatMap(({ field, code }) => {
+            const name = FIELDS[field as keyof typeof FIELDS] as keyof FacilityFields | undefined;
+            const message = MESSAGES[code] ?? "invalid";
+            return name ? [{ name, errors: [t(`applicability.create.errors.${message}`)] }] : [];
+          }),
+        );
+      }
+    },
+    // The dashboard's deadlines widget lists the Scopes, and the Activity Log records it.
     onSettled: () =>
       Promise.all([
         client.invalidateQueries({ queryKey: resourceKey(tenant, "scopes") }),
@@ -125,12 +197,10 @@ function CreateFacility({ tenant, result }: { tenant: string; result: Applicabil
       ]),
   });
 
-  if (create.data) {
-    return <CreatedFacility scope={create.data} />;
-  }
   if (!canChange) {
     return <p className="grc-meta">{t("applicability.create.readOnly")}</p>;
   }
+  const fieldError = create.error instanceof ApiError && create.error.status === 422;
 
   return (
     <Form<FacilityFields>
@@ -138,13 +208,9 @@ function CreateFacility({ tenant, result }: { tenant: string; result: Applicabil
       layout="vertical"
       requiredMark={false}
       className="grc-applicability-form"
-      initialValues={{ date: defaultRegistrationDate(result.registration_within_months) }}
-      onValuesChange={() => {
-        // A changed facility is a new request, not a retry of the last one.
-        key.renew();
-      }}
+      initialValues={{ date: addMonths(today, result.registration_within_months) }}
       onFinish={(values) => {
-        create.mutate({
+        const facility: NewCriticalFacility = {
           name: values.name.trim(),
           location: values.location.trim(),
           critical_facility: {
@@ -153,7 +219,8 @@ function CreateFacility({ tenant, result }: { tenant: string; result: Applicabil
             people_supplied: result.people_supplied,
             registration: { status: "planned", date: values.date },
           },
-        });
+        };
+        create.mutate({ facility, idempotencyKey: key.forPayload(facility) });
       }}
     >
       <h3 className="grc-applicability-form-title">{t("applicability.create.title")}</h3>
@@ -179,11 +246,19 @@ function CreateFacility({ tenant, result }: { tenant: string; result: Applicabil
         name="date"
         label={t("applicability.create.date")}
         extra={t("applicability.create.dateHint", { months: result.registration_within_months })}
-        rules={[{ required: true, message: t("applicability.create.dateMissing") }]}
+        rules={[
+          { required: true, message: t("applicability.create.dateMissing") },
+          {
+            validator: (_, value: string | undefined) =>
+              value && value < today
+                ? Promise.reject(new Error(t("applicability.create.errors.dateInPast")))
+                : Promise.resolve(),
+          },
+        ]}
       >
-        <Input type="date" />
+        <Input type="date" min={today} />
       </Form.Item>
-      {create.isError && (
+      {create.isError && !fieldError && (
         <Alert
           type="error"
           showIcon

@@ -397,24 +397,33 @@ export const en: Translation = {
       below:
         "Supplying {{people}} people, the facility stays below the default threshold of {{threshold}} people under {{thresholdCitation}} KRITIS-DachG. It therefore probably doesn't count as a critical facility under {{definitionCitation}} KRITIS-DachG.",
       registration:
-        "Once the facility counts as critical, it has to be registered with the Federal Office of Civil Protection and Disaster Assistance within {{months}} months ({{registrationCitation}} KRITIS-DachG).",
+        "If the facility counts as critical once the ordinance is in force, it has to be registered with the Federal Office of Civil Protection and Disaster Assistance within {{months}} months ({{registrationCitation}} KRITIS-DachG).",
       preliminaryTitle: "Preliminary result",
       preliminary:
         "The specific thresholds are set by an ordinance that isn't in force yet. Until then the default threshold is a guide, and there is no duty to register yet.",
       change: "Change answers",
+      restart: "Check another facility",
     },
     create: {
       title: "Create critical facility",
       name: "Facility name",
       location: "Location",
-      date: "Planned registration",
-      dateHint: "Set to today plus {{months}} months. The projected deadlines follow from it.",
+      date: "Assumed registration",
+      dateHint:
+        "An assumption for planning, set to today plus {{months}} months. The {{months}}-month period only starts once the facility counts as critical under the ordinance. The projected deadlines follow from this date.",
       nameMissing: "Please enter a name.",
       locationMissing: "Please enter the location.",
       dateMissing: "Please enter a date.",
       submit: "Create as critical facility",
       failed: "The facility couldn't be created. Please try again.",
       readOnly: "Only GRC managers can create a critical facility.",
+      errors: {
+        missing: "Please fill in this field.",
+        tooLong: "This text is too long.",
+        dateInvalid: "Please enter a valid date.",
+        dateInPast: "The date can't be in the past.",
+        invalid: "Please check this entry.",
+      },
     },
     created: {
       title: "{{name}} created",

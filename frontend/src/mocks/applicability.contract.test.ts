@@ -152,6 +152,53 @@ describe("a Critical Facility created from the check", () => {
     );
   });
 
+  it.each([
+    [
+      "with a confirmed Registration, which only the authority can confirm",
+      facility({
+        critical_facility: {
+          ...WATER,
+          people_supplied: 540000,
+          registration: { status: "confirmed", date: "2027-03-01" },
+        },
+      }),
+      "critical_facility.registration.status",
+      "invalid_choice",
+    ],
+    [
+      "below the threshold",
+      facility({
+        critical_facility: {
+          ...WATER,
+          people_supplied: 120000,
+          registration: { status: "planned", date: "2027-03-01" },
+        },
+      }),
+      "critical_facility.people_supplied",
+      "below_threshold",
+    ],
+    [
+      "with a Registration in the past",
+      facility({
+        critical_facility: {
+          ...WATER,
+          people_supplied: 540000,
+          registration: { status: "planned", date: "2025-01-01" },
+        },
+      }),
+      "critical_facility.registration.date",
+      "in_past",
+    ],
+  ])("is refused %s", async (_, input, field, code) => {
+    const error = await failure(createCriticalFacility(EMPTY, input, `key-${code}`));
+
+    expect(error).toMatchObject({ status: 422, code: "validation_error" });
+    expect((error as { errors: { field: string; code: string }[] }).errors).toContainEqual({
+      field,
+      code,
+    });
+  });
+
   it("can't be created by an Auditor", async () => {
     setMockSession("auditor");
 

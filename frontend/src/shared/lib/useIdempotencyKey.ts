@@ -7,10 +7,25 @@ import { useRef } from "react";
  */
 export function useIdempotencyKey() {
   const key = useRef(crypto.randomUUID());
+  const sent = useRef<string | null>(null);
   return {
     current: () => key.current,
     renew: () => {
       key.current = crypto.randomUUID();
+      sent.current = null;
+    },
+    /**
+     * The key for this payload: the same as last time for an identical payload, a new one
+     * as soon as anything that is sent differs. Edits that change nothing sent, such as a
+     * space trimmed away, keep the retry a retry.
+     */
+    forPayload: (payload: unknown) => {
+      const fingerprint = JSON.stringify(payload);
+      if (sent.current !== null && sent.current !== fingerprint) {
+        key.current = crypto.randomUUID();
+      }
+      sent.current = fingerprint;
+      return key.current;
     },
   };
 }

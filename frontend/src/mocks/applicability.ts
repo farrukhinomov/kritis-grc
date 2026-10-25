@@ -29,7 +29,11 @@ export function serviceFor(sector: unknown, service: unknown) {
   );
 }
 
-/** Reaching the threshold counts, as thresholds are minimum values of supply. */
+/**
+ * Reaching the threshold counts, as it does under the thresholds of the IT security
+ * ordinance. Whether the KRITIS ordinance words it the same way is open while it is a
+ * draft; this is the place to change when it is in force.
+ */
 export function checkApplicability(
   definition: CriticalServiceDefinition,
   question: ApplicabilityQuestion,

@@ -195,6 +195,11 @@ export function parseIfMatch(header: string | null): number | null {
 
 const MAX_NAME = 200;
 
+/** Legal dates follow the German calendar, whatever the server's own time zone. */
+function berlinToday(): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date());
+}
+
 /** A new Critical Facility, as the Applicability Check sends it. */
 export function validateNewFacility(body: unknown): Result<NewCriticalFacility> {
   if (!isRecord(body) || !isRecord(body.critical_facility)) {
@@ -214,15 +219,23 @@ export function validateNewFacility(body: unknown): Result<NewCriticalFacility> 
     errors.push({ field: "critical_facility.critical_service", code: "invalid_choice" });
   }
   const people = facility.people_supplied;
+  const service = serviceFor(facility.sector, facility.critical_service);
   if (typeof people !== "number" || !Number.isInteger(people) || people <= 0) {
     errors.push({ field: "critical_facility.people_supplied", code: "invalid" });
+  } else if (service && people < service.threshold) {
+    // Only a facility the check found critical is created here; a facility below the
+    // threshold would carry deadlines it doesn't have.
+    errors.push({ field: "critical_facility.people_supplied", code: "below_threshold" });
   }
+  // A new facility can only plan its Registration; confirming it is the authority's act.
   const registration = facility.registration;
-  if (!isRecord(registration) || !["planned", "confirmed"].includes(String(registration.status))) {
+  if (!isRecord(registration) || registration.status !== "planned") {
     errors.push({ field: "critical_facility.registration.status", code: "invalid_choice" });
   }
   if (!isRecord(registration) || !isIsoDate(registration.date)) {
     errors.push({ field: "critical_facility.registration.date", code: "invalid_date" });
+  } else if (registration.date < berlinToday()) {
+    errors.push({ field: "critical_facility.registration.date", code: "in_past" });
   }
   return errors.length > 0
     ? { ok: false, errors }

@@ -2,14 +2,16 @@ import "./applicability.css";
 
 import { useQuery } from "@tanstack/react-query";
 import { Button, InputNumber, Radio, Steps } from "antd";
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { criticalServicesQuery } from "@/shared/api/organization";
-import type { ApplicabilityQuestion, CriticalService, Sector } from "@/shared/api/types";
+import type { ApplicabilityQuestion, CriticalService, Scope, Sector } from "@/shared/api/types";
 import { useIsWideScreen } from "@/shared/lib/breakpoints";
+import { combine } from "@/shared/lib/combineQueries";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
 import { PageHeader } from "@/shared/ui/PageHeader";
+import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 
 import { CheckResult } from "./CheckResult";
 
@@ -39,21 +41,47 @@ export function ApplicabilityPage() {
   const { t } = useTranslation();
   const tenant = useCurrentMembership().tenant.slug;
   const catalogue = useQuery(criticalServicesQuery(tenant));
-  const services = catalogue.data?.items ?? [];
   const [step, setStep] = useState<Step>("sector");
   const [sector, setSector] = useState<Sector | null>(null);
   const [service, setService] = useState<CriticalService | null>(null);
   const [people, setPeople] = useState<number | null>(null);
   const [question, setQuestion] = useState<ApplicabilityQuestion | null>(null);
+  // Kept here, not in the result, so changing the answers can't offer the same facility again.
+  const [created, setCreated] = useState<Scope | null>(null);
   const peopleId = useId();
   const wide = useIsWideScreen();
+  const stepHeading = useRef<HTMLElement>(null);
+  const moved = useRef(false);
 
+  // A step replaces the one whose button was just pressed, and focus would fall to the
+  // page. It moves to the new step's question instead, so keyboard and screen reader
+  // users continue there; on the first render nothing has moved yet.
+  useEffect(() => {
+    if (moved.current) {
+      stepHeading.current?.focus();
+    }
+  }, [step]);
+
+  const go = (target: Step) => {
+    moved.current = true;
+    setStep(target);
+  };
+  const restart = () => {
+    setSector(null);
+    setService(null);
+    setPeople(null);
+    setQuestion(null);
+    setCreated(null);
+    go("sector");
+  };
+
+  const services = catalogue.data?.items ?? [];
   const definition = services.find(
     (item) => item.sector === sector && item.critical_service === service,
   );
   const validPeople = people !== null && Number.isInteger(people) && people > 0;
-  const go = (target: Step) => {
-    setStep(target);
+  const questionRef = (element: HTMLElement | null) => {
+    stepHeading.current = element;
   };
 
   return (
@@ -78,41 +106,54 @@ export function ApplicabilityPage() {
       )}
       <div className="grc-applicability-panel">
         {step === "sector" && (
-          <fieldset className="grc-applicability-fieldset">
-            <legend>{t("applicability.sector.question")}</legend>
-            <Radio.Group
-              className="grc-applicability-options"
-              value={sector}
-              onChange={(event) => {
-                setSector(event.target.value as Sector);
-                setService(null);
-              }}
-              options={SECTORS.map((item) => ({
-                value: item,
-                disabled: !services.some((entry) => entry.sector === item),
-                label: t(`applicability.sectors.${item}`),
-              }))}
-            />
-            <p className="grc-meta">
-              {t("applicability.sector.notAvailable")} {t("applicability.sector.basis")}
-            </p>
-            <div className="grc-applicability-actions">
-              <Button
-                type="primary"
-                disabled={sector === null}
-                onClick={() => {
-                  go("service");
-                }}
-              >
-                {t("applicability.next")}
-              </Button>
-            </div>
-          </fieldset>
+          <QueryContent
+            query={combine([catalogue] as const)}
+            rows={6}
+            isEmpty={() => false}
+            empty=""
+          >
+            {() => (
+              <fieldset className="grc-applicability-fieldset">
+                <legend ref={questionRef} tabIndex={-1}>
+                  {t("applicability.sector.question")}
+                </legend>
+                <Radio.Group
+                  className="grc-applicability-options"
+                  value={sector}
+                  onChange={(event) => {
+                    setSector(event.target.value as Sector);
+                    setService(null);
+                  }}
+                  options={SECTORS.map((item) => ({
+                    value: item,
+                    disabled: !services.some((entry) => entry.sector === item),
+                    label: t(`applicability.sectors.${item}`),
+                  }))}
+                />
+                <p className="grc-meta">
+                  {t("applicability.sector.notAvailable")} {t("applicability.sector.basis")}
+                </p>
+                <div className="grc-applicability-actions">
+                  <Button
+                    type="primary"
+                    disabled={sector === null}
+                    onClick={() => {
+                      go("service");
+                    }}
+                  >
+                    {t("applicability.next")}
+                  </Button>
+                </div>
+              </fieldset>
+            )}
+          </QueryContent>
         )}
 
         {step === "service" && sector && (
           <fieldset className="grc-applicability-fieldset">
-            <legend>{t("applicability.service.question")}</legend>
+            <legend ref={questionRef} tabIndex={-1}>
+              {t("applicability.service.question")}
+            </legend>
             <Radio.Group
               className="grc-applicability-options"
               value={service}
@@ -169,7 +210,12 @@ export function ApplicabilityPage() {
               }
             }}
           >
-            <label htmlFor={peopleId} className="grc-applicability-label">
+            <label
+              ref={questionRef}
+              tabIndex={-1}
+              htmlFor={peopleId}
+              className="grc-applicability-label"
+            >
               {t("applicability.supply.label")}
             </label>
             <InputNumber
@@ -205,9 +251,13 @@ export function ApplicabilityPage() {
           <CheckResult
             tenant={tenant}
             question={question}
-            onRestart={() => {
+            headingRef={questionRef}
+            created={created}
+            onCreated={setCreated}
+            onChange={() => {
               go("supply");
             }}
+            onRestart={restart}
           />
         )}
       </div>

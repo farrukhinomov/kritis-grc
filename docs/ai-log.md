@@ -272,11 +272,23 @@ Each milestone gets one entry with four parts:
 
 ### Accepted
 - **The rule lives on the server.** The wizard sends Sector, Critical Service and the number of people supplied, and words the structured answer. A threshold compared in the browser would be a second copy of a legal rule.
-- **Only verified law is cited.** The research note gives § 2 Nr. 3 (definition), § 4 Abs. 1 (sectors), § 5 Abs. 2 (default threshold of 500,000) and § 8 Abs. 1 (registration within three months). A suggested reference to a designation in individual cases came from secondary sources only and was left out.
+- **Only verified law is cited.** The research note gives § 2 Nr. 3 (definition), § 4 Abs. 1 (sectors) and § 5 Abs. 2 (default threshold of 500,000); § 8 Abs. 1 (registration within three months) is quoted verbatim in the seed's Requirement text. A suggested reference to a designation in individual cases came from secondary sources only and was left out.
+- **Reaching the threshold counts.** That is how the IT security ordinance words its thresholds; whether the KRITIS ordinance will say the same is open while it is a draft. The rule sits in one place in the mock, marked as the one to check when the ordinance is in force.
 - **Every result is preliminary.** The thresholds ordinance is a draft, so the default threshold is a guide and there is no duty to register yet; the result says so in its own box, which is a note, not an alert.
 - **All ten sectors are shown, only water is selectable.** The law's list stays visible, and one sentence says the prototype has thresholds for water only, instead of a hint under every option.
 - **The facility is created with a planned Registration.** Its deadlines come from the server and are labelled as projected.
 - **One Idempotency-Key helper for every creating POST in the mock**, shared by Evidence and Critical Facilities, and one key hook in `shared/lib`.
+
+- **Review findings that were real defects**, each with a test that fails without its fix (mutation-checked):
+  - The default Registration date came from UTC, so shortly after midnight it was a day early, and 30 November plus three months rolled into March. It is now the local date with the month end kept, the same calculation the deadlines use.
+  - The pre-filled date read as if the three-month period were already running, next to a note saying there is no duty to register yet. The date is labelled as an assumption, and the period is said to start only once the ordinance makes the facility critical.
+  - Focus fell to the page at every step. It moves to each step's question and, once loaded, to the verdict.
+  - A failing catalogue left every sector disabled without an explanation. The step has loading, error and retry states.
+  - "Change answers" after creating a facility could create the same facility again. After creating, only a new check is offered.
+  - The mock accepted a confirmed Registration, a facility below the threshold and a date in the past. All three are refused, and the form refuses past dates too.
+  - Every keystroke renewed the Idempotency-Key, so a retry after a lost answer could create a second facility once a trimmed space was typed. The key now changes only when what is sent changes.
+  - Field errors from the server showed as a general failure. They appear at their fields.
+  - The focus test passed with the focus code removed, because the page body contains every text. It checks the focused element itself.
 
 ### Changed
 - **The four steps took a phone's whole first screen.** Phones get one line instead ("Schritt 2 von 4: …").

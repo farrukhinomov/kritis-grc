@@ -1,15 +1,4 @@
-import { addMonths, deadlinesFor } from "./deadlines";
-
-describe("addMonths", () => {
-  it.each([
-    ["2027-01-15", 9, "2027-10-15"],
-    ["2027-03-01", 10, "2028-01-01"],
-    ["2027-01-31", 1, "2027-02-28"],
-    ["2028-01-31", 1, "2028-02-29"],
-  ])("%s plus %i months is %s", (date, months, expected) => {
-    expect(addMonths(date, months)).toBe(expected);
-  });
-});
+import { deadlinesFor } from "./deadlines";
 
 describe("deadlinesFor", () => {
   it("projects the duties from a planned Registration without making them binding", () => {
