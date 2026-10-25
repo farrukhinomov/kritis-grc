@@ -2,6 +2,8 @@
 export const de = {
   app: {
     name: "GRC-Plattform",
+    languageUnavailable:
+      "Englisch konnte gerade nicht geladen werden. Bitte versuchen Sie es erneut.",
     language: "Sprache",
     skipToContent: "Zum Inhalt springen",
     prototypeBadge: "Prototyp – Demodaten",

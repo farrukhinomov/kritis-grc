@@ -3,6 +3,7 @@ import type { Translation } from "./de";
 export const en: Translation = {
   app: {
     name: "GRC Platform",
+    languageUnavailable: "English could not be loaded right now. Please try again.",
     language: "Language",
     skipToContent: "Skip to content",
     prototypeBadge: "Prototype – demo data",

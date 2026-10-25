@@ -141,3 +141,21 @@ Each milestone gets one entry with four parts:
 
 ### Rejected
 - **"Color empty matrix cells by the category they would have."** That needs the risk method's 4×4 table in the frontend, a copy of the risk engine's logic that could drift from it. Only occupied cells are colored, by the risks actually in them.
+
+---
+
+## Load only the active UI language (#35, 2026-10-25)
+
+### Accepted
+- **German stays bundled, English loads on demand.** German is the default, the fallback when a load fails and the typed source of every key, so it can't be lazy. English texts and Ant Design's English locale load together, before i18next switches, so no screen ever shows two languages.
+- **No new dependency.** The loader is a ten-line i18next backend, the pattern the i18next docs describe; the official plugin would add a package for the same lines.
+
+- **Review findings that were real defects**, each with a test that fails without its fix:
+  - A failed English load still switched i18next to "en": the page claimed English while showing German, dates and Requirement titles turned English, and the switch offered no way back. A single `selectLanguage` now loads first and switches only on success; the user is told when English isn't available.
+  - Reporting the failure as final turned off i18next's retries and blocked English until a full reload. Failures now retry twice, and every new attempt forces a fresh load.
+  - Startup waited for the language without a limit, so a stalled request meant a blank page. Rendering now waits at most 3 seconds.
+  - The initial German language overwrote a remembered English choice whenever English failed at startup. Only a successful switch is remembered now.
+- **Tests that share i18next's instance were order-dependent.** `vi.resetModules()` re-runs the module but keeps i18next itself, so a second copy replaced the first one's loader. Startup is now a function applied to a fresh instance per test.
+
+### Changed
+- **The saving is smaller today than estimated.** Measured: 261 → 260 KB gzipped, not the ~4 KB guessed. Ant Design already ships English as its built-in default, so its locale file saves only about 1 KB. The point is the trend: from now on every screen's English text stays out of the first download.
