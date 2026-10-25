@@ -99,6 +99,8 @@ services:
       COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
     volumes:
       - ./frontend:/app
+      # Demo fixtures for the mock API, at the path the frontend expects them (../seed).
+      - ./seed:/seed:ro
       # The container's own node_modules, so host-installed native modules never leak in.
       - frontend-node-modules:/app/node_modules
     ports:

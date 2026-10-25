@@ -29,6 +29,19 @@ export default tseslint.config(
       "react-refresh/only-export-components": ["error", { allowConstantExport: true }],
       "no-restricted-syntax": ["error", ...RAW_COLOR_SELECTORS],
       "no-console": "error",
+      // One place talks HTTP, so error handling, headers and the API contract stay uniform.
+      "no-restricted-globals": [
+        "error",
+        { name: "fetch", message: "Use the typed API functions in shared/api instead." },
+      ],
+      "no-restricted-properties": [
+        "error",
+        ...["window", "globalThis", "self"].map((object) => ({
+          object,
+          property: "fetch",
+          message: "Use the typed API functions in shared/api instead.",
+        })),
+      ],
     },
   },
   {
@@ -38,6 +51,10 @@ export default tseslint.config(
   {
     files: ["**/*.test.{ts,tsx}", "src/test/**", "src/mocks/**"],
     rules: { "@typescript-eslint/no-non-null-assertion": "off" },
+  },
+  {
+    files: ["src/shared/api/client.ts", "**/*.test.{ts,tsx}"],
+    rules: { "no-restricted-globals": "off", "no-restricted-properties": "off" },
   },
   {
     files: ["eslint.config.js", "eslint/**/*.js"],

@@ -23,7 +23,7 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
 
-    "paths": { "@/*": ["./src/*"] }
+    "paths": { "@/*": ["./src/*"], "@seed/*": ["../seed/*"] }
   },
   "include": ["src"],
   // Test code is checked by tsconfig.test.json, so test globals (describe, expect) and

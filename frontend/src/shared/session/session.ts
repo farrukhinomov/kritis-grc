@@ -16,7 +16,7 @@ export interface Membership {
 }
 
 export interface Session {
-  user: { displayName: string; email: string };
+  user: { id: string; displayName: string; email: string };
   memberships: readonly Membership[];
 }
 
@@ -26,10 +26,14 @@ export interface Session {
  * not the shape.
  */
 export const DEMO_SESSION: Session = {
-  user: { displayName: "Alex Kramer", email: "alex.kramer@example.com" },
+  user: { id: "u-kramer", displayName: "Alex Kramer", email: "alex.kramer@example.com" },
   memberships: [
     {
-      tenant: { slug: "muster-stadtwerke", name: "Muster-Stadtwerke GmbH", theme: "saar-green" },
+      tenant: {
+        slug: "muster-stadtwerke",
+        name: "Muster-Stadtwerke Saar GmbH",
+        theme: "saar-green",
+      },
       role: "grc_manager",
     },
     {

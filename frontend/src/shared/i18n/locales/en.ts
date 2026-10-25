@@ -80,6 +80,19 @@ export const en: Translation = {
       storage: "File storage",
     },
   },
+  dev: {
+    simulation: {
+      open: "Simulation",
+      title: "Simulate the mock API",
+      latency: "Response time",
+      latencies: { off: "Instant", short: "400 ms", long: "1.5 s" },
+      failureRate: "Failure rate",
+      conflict: "Next change causes a conflict (412)",
+      riskEngineDown: "Risk engine unreachable",
+      reset: "Reset demo data",
+      hint: "Only visible in development. Settings are kept in this browser.",
+    },
+  },
   notFound: {
     title: "Page not found",
     backHome: "Back to start",

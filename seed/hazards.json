@@ -1,0 +1,65 @@
+[
+  {
+    "id": "hz-flood",
+    "category": "natural",
+    "name_de": "Hochwasser",
+    "name_en": "Flooding",
+    "description_de": "Überflutung von Brunnenfeld oder Betriebsgebäuden nach Starkregen oder Flusshochwasser."
+  },
+  {
+    "id": "hz-drought",
+    "category": "natural",
+    "name_de": "Hitze und Dürre",
+    "name_en": "Heat and drought",
+    "description_de": "Rohwasserknappheit und Spitzenverbrauch in langen Hitzeperioden."
+  },
+  {
+    "id": "hz-storm",
+    "category": "natural",
+    "name_de": "Sturm",
+    "name_en": "Storm",
+    "description_de": "Schäden an Freileitungen, Gebäuden und Zufahrten."
+  },
+  {
+    "id": "hz-power",
+    "category": "technical",
+    "name_de": "Stromausfall",
+    "name_en": "Power outage",
+    "description_de": "Länger andauernder Ausfall der öffentlichen Stromversorgung."
+  },
+  {
+    "id": "hz-control",
+    "category": "technical",
+    "name_de": "Ausfall Prozessleitsystem",
+    "name_en": "Control system failure",
+    "description_de": "Ausfall oder Fehlfunktion der Steuerung, etwa durch Hardwaredefekt."
+  },
+  {
+    "id": "hz-supply",
+    "category": "technical",
+    "name_de": "Lieferausfall Betriebsmittel",
+    "name_en": "Supply failure",
+    "description_de": "Ausfall der Lieferung von Desinfektionsmitteln oder Ersatzteilen."
+  },
+  {
+    "id": "hz-sabotage",
+    "category": "human",
+    "name_de": "Sabotage und unbefugter Zutritt",
+    "name_en": "Sabotage and intrusion",
+    "description_de": "Gezielte Beschädigung oder Kontamination durch Dritte."
+  },
+  {
+    "id": "hz-cyber",
+    "category": "human",
+    "name_de": "Cyberangriff auf Leittechnik",
+    "name_en": "Cyber attack on control systems",
+    "description_de": "Manipulation oder Verschlüsselung der Prozessleittechnik."
+  },
+  {
+    "id": "hz-staff",
+    "category": "human",
+    "name_de": "Personalausfall",
+    "name_en": "Staff shortage",
+    "description_de": "Ausfall von Schlüsselpersonal, etwa bei einer Pandemie."
+  }
+]

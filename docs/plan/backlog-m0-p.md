@@ -177,14 +177,14 @@ As a user, I want a consistent, polished interface on every device, so that the 
 
 As a developer, I want realistic data behind a mock API shaped like the real one, so that M1 can swap mocks for real endpoints one at a time.
 
-- [ ] `seed/` JSON fixtures:
+- [x] `seed/` JSON fixtures:
   - Muster-Stadtwerke Saar GmbH, with Wasserwerk Nord and Süd (planned Registrations), Assets and dependencies.
   - KRITIS-DachG and BSIG 2025 Requirements, with German statute text and English summaries.
   - The 7 Platform Mappings, Implementations, Evidence, Hazards, Risks with Treatments, Activity Log entries and Mapping Suggestions.
   - All fictional, no personal data.
-- [ ] MSW handlers follow the agreed API: tenant in the path, snake_case, Problem Details errors, `{items, page}` lists, `ETag`/`If-Match` with a simulated 412, and `Idempotency-Key`.
-- [ ] Typed API layer in `shared/api` used by every screen. No screen calls `fetch` directly.
-- [ ] A dev-only toggle simulates latency and failures, to exercise skeletons, error states and rollback.
+- [x] MSW handlers follow the agreed API: tenant in the path, snake_case, Problem Details errors, `{items, page}` lists, `ETag`/`If-Match` with a simulated 412, and `Idempotency-Key`.
+- [x] Typed API layer in `shared/api` used by every screen. No screen calls `fetch` directly.
+- [x] A dev-only toggle simulates latency and failures, to exercise skeletons, error states and rollback.
 
 ### P-03 Login with demo role picker
 **Labels:** `module:frontend`, `type:feature`, `prio:must` · **Estimate:** 1 h · **Depends on:** P-02

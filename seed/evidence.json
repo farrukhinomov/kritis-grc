@@ -1,0 +1,125 @@
+[
+  {
+    "id": "ev-1",
+    "implementation_id": "im-009",
+    "kind": "file",
+    "title": "Notfallhandbuch Wasserwerk Nord",
+    "file": {
+      "name": "notfallhandbuch-ww-nord-2026-09.pdf",
+      "size_bytes": 1843200,
+      "content_type": "application/pdf"
+    },
+    "url": null,
+    "referenced_implementation_id": null,
+    "added_by_id": "u-yilmaz",
+    "added_at": "2026-09-30T14:02:00Z"
+  },
+  {
+    "id": "ev-2",
+    "implementation_id": "im-013",
+    "kind": "reference",
+    "title": "Krisenmanagement (BSIG § 30 Abs. 2 Nr. 2)",
+    "file": null,
+    "url": null,
+    "referenced_implementation_id": "im-034",
+    "added_by_id": "u-kramer",
+    "added_at": "2026-10-08T10:15:00Z"
+  },
+  {
+    "id": "ev-3",
+    "implementation_id": "im-014",
+    "kind": "reference",
+    "title": "Krisenmanagement (BSIG § 30 Abs. 2 Nr. 2)",
+    "file": null,
+    "url": null,
+    "referenced_implementation_id": "im-034",
+    "added_by_id": "u-kramer",
+    "added_at": "2026-10-08T10:16:00Z"
+  },
+  {
+    "id": "ev-4",
+    "implementation_id": "im-031",
+    "kind": "file",
+    "title": "Beschluss der Geschäftsführung",
+    "file": {
+      "name": "gf-beschluss-2026-09-02.pdf",
+      "size_bytes": 248320,
+      "content_type": "application/pdf"
+    },
+    "url": null,
+    "referenced_implementation_id": null,
+    "added_by_id": "u-kramer",
+    "added_at": "2026-09-03T08:40:00Z"
+  },
+  {
+    "id": "ev-5",
+    "implementation_id": "im-033",
+    "kind": "link",
+    "title": "ISO-27001-Zertifikat (Zertifizierungsstelle)",
+    "file": null,
+    "url": "https://zertifikate.example.org/muster-stadtwerke-saar",
+    "referenced_implementation_id": null,
+    "added_by_id": "u-becker",
+    "added_at": "2026-06-12T11:20:00Z"
+  },
+  {
+    "id": "ev-6",
+    "implementation_id": "im-039",
+    "kind": "file",
+    "title": "Teilnahmenachweise Awareness-Schulung 2026",
+    "file": {
+      "name": "awareness-2026-teilnahme.xlsx",
+      "size_bytes": 96512,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "url": null,
+    "referenced_implementation_id": null,
+    "added_by_id": "u-becker",
+    "added_at": "2026-07-01T09:00:00Z"
+  },
+  {
+    "id": "ev-7",
+    "implementation_id": "im-035",
+    "kind": "file",
+    "title": "IT-Notfallhandbuch",
+    "file": {
+      "name": "it-notfallhandbuch-v4.pdf",
+      "size_bytes": 2310144,
+      "content_type": "application/pdf"
+    },
+    "url": null,
+    "referenced_implementation_id": null,
+    "added_by_id": "u-becker",
+    "added_at": "2026-05-20T15:30:00Z"
+  },
+  {
+    "id": "ev-8",
+    "implementation_id": "im-015",
+    "kind": "file",
+    "title": "Prüfprotokoll Netzersatzanlage Nord",
+    "file": {
+      "name": "nea-nord-pruefung-2026-08.pdf",
+      "size_bytes": 512000,
+      "content_type": "application/pdf"
+    },
+    "url": null,
+    "referenced_implementation_id": null,
+    "added_by_id": "u-yilmaz",
+    "added_at": "2026-08-28T13:10:00Z"
+  },
+  {
+    "id": "ev-9",
+    "implementation_id": "im-045",
+    "kind": "file",
+    "title": "Registrierungsbestätigung BSI",
+    "file": {
+      "name": "bsi-registrierung-2026-03-03.pdf",
+      "size_bytes": 131072,
+      "content_type": "application/pdf"
+    },
+    "url": null,
+    "referenced_implementation_id": null,
+    "added_by_id": "u-kramer",
+    "added_at": "2026-03-03T16:45:00Z"
+  }
+]

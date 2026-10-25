@@ -1,0 +1,205 @@
+[
+  {
+    "id": "ac-01",
+    "occurred_at": "2026-09-03T08:40:00Z",
+    "actor_id": "u-kramer",
+    "action": "created",
+    "object_type": "evidence",
+    "object_id": "ev-4",
+    "object_label": "Beschluss der Geschäftsführung",
+    "changes": []
+  },
+  {
+    "id": "ac-02",
+    "occurred_at": "2026-09-03T08:42:00Z",
+    "actor_id": "u-kramer",
+    "action": "updated",
+    "object_type": "implementation",
+    "object_id": "im-031",
+    "object_label": "§ 20 Abs. 1 · Wasserwerk Nord",
+    "changes": [
+      {
+        "field": "status",
+        "from": "open",
+        "to": "implemented"
+      }
+    ]
+  },
+  {
+    "id": "ac-03",
+    "occurred_at": "2026-09-03T08:43:00Z",
+    "actor_id": "u-kramer",
+    "action": "updated",
+    "object_type": "implementation",
+    "object_id": "im-032",
+    "object_label": "§ 20 Abs. 1 · Wasserwerk Süd",
+    "changes": [
+      {
+        "field": "status",
+        "from": "open",
+        "to": "implemented"
+      }
+    ]
+  },
+  {
+    "id": "ac-04",
+    "occurred_at": "2026-09-30T14:02:00Z",
+    "actor_id": "u-yilmaz",
+    "action": "created",
+    "object_type": "evidence",
+    "object_id": "ev-1",
+    "object_label": "Notfallhandbuch Wasserwerk Nord",
+    "changes": []
+  },
+  {
+    "id": "ac-05",
+    "occurred_at": "2026-09-30T14:05:00Z",
+    "actor_id": "u-yilmaz",
+    "action": "updated",
+    "object_type": "implementation",
+    "object_id": "im-009",
+    "object_label": "§ 13 Abs. 3 Nr. 1 · Wasserwerk Nord",
+    "changes": [
+      {
+        "field": "status",
+        "from": "partial",
+        "to": "implemented"
+      }
+    ]
+  },
+  {
+    "id": "ac-06",
+    "occurred_at": "2026-10-02T09:15:00Z",
+    "actor_id": "u-becker",
+    "action": "updated",
+    "object_type": "implementation",
+    "object_id": "im-005",
+    "object_label": "§ 12 Abs. 1 · Wasserwerk Nord",
+    "changes": [
+      {
+        "field": "status",
+        "from": "open",
+        "to": "partial"
+      },
+      {
+        "field": "owner",
+        "from": "Alex Kramer",
+        "to": "Jana Becker"
+      }
+    ]
+  },
+  {
+    "id": "ac-07",
+    "occurred_at": "2026-10-06T11:00:00Z",
+    "actor_id": "u-yilmaz",
+    "action": "created",
+    "object_type": "risk",
+    "object_id": "rk-n-power",
+    "object_label": "Längerer Stromausfall legt Pumpwerk Nord still",
+    "changes": []
+  },
+  {
+    "id": "ac-08",
+    "occurred_at": "2026-10-08T10:12:00Z",
+    "actor_id": "u-kramer",
+    "action": "approved",
+    "object_type": "mapping",
+    "object_id": "map-t-1",
+    "object_label": "§ 13 Abs. 3 Nr. 3 ← § 30 Abs. 2 Nr. 2",
+    "changes": []
+  },
+  {
+    "id": "ac-09",
+    "occurred_at": "2026-10-08T10:15:00Z",
+    "actor_id": "u-kramer",
+    "action": "created",
+    "object_type": "evidence",
+    "object_id": "ev-2",
+    "object_label": "Krisenmanagement (BSIG § 30 Abs. 2 Nr. 2)",
+    "changes": []
+  },
+  {
+    "id": "ac-10",
+    "occurred_at": "2026-10-08T10:18:00Z",
+    "actor_id": "u-kramer",
+    "action": "updated",
+    "object_type": "implementation",
+    "object_id": "im-013",
+    "object_label": "§ 13 Abs. 3 Nr. 3 · Wasserwerk Nord",
+    "changes": [
+      {
+        "field": "status",
+        "from": "partial",
+        "to": "implemented"
+      }
+    ]
+  },
+  {
+    "id": "ac-11",
+    "occurred_at": "2026-10-14T13:30:00Z",
+    "actor_id": "u-yilmaz",
+    "action": "updated",
+    "object_type": "implementation",
+    "object_id": "im-011",
+    "object_label": "§ 13 Abs. 3 Nr. 2 · Wasserwerk Nord",
+    "changes": [
+      {
+        "field": "due_date",
+        "from": "2027-03-31",
+        "to": "2027-05-31"
+      }
+    ]
+  },
+  {
+    "id": "ac-12",
+    "occurred_at": "2026-10-15T07:55:00Z",
+    "actor_id": "u-becker",
+    "action": "updated",
+    "object_type": "risk",
+    "object_id": "rk-s-cyber",
+    "object_label": "Cyberangriff auf Prozessleitsystem Süd",
+    "changes": [
+      {
+        "field": "inherent_impact",
+        "from": "2",
+        "to": "3"
+      }
+    ]
+  },
+  {
+    "id": "ac-13",
+    "occurred_at": "2026-10-20T16:20:00Z",
+    "actor_id": "u-yilmaz",
+    "action": "updated",
+    "object_type": "implementation",
+    "object_id": "im-015",
+    "object_label": "§ 13 Abs. 3 Nr. 4 · Wasserwerk Nord",
+    "changes": [
+      {
+        "field": "status",
+        "from": "open",
+        "to": "partial"
+      }
+    ]
+  },
+  {
+    "id": "ac-14",
+    "occurred_at": "2026-10-21T07:30:00Z",
+    "actor_id": "u-kramer",
+    "action": "created",
+    "object_type": "mapping_suggestion",
+    "object_id": "sug-1",
+    "object_label": "§ 13 Abs. 3 Nr. 2 ← § 30 Abs. 2 Nr. 9",
+    "changes": []
+  },
+  {
+    "id": "ac-15",
+    "occurred_at": "2026-10-22T08:05:00Z",
+    "actor_id": "u-wolff",
+    "action": "commented",
+    "object_type": "implementation",
+    "object_id": "im-025",
+    "object_label": "§ 16 Abs. 3 · Wasserwerk Nord",
+    "changes": []
+  }
+]

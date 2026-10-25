@@ -1,15 +1,21 @@
 import "@testing-library/jest-dom/vitest";
 import "@/shared/i18n";
 
-import { cleanup } from "@testing-library/react";
+import { cleanup, configure } from "@testing-library/react";
 import i18n from "i18next";
 
+import { resetDb } from "@/mocks/db";
 import { server } from "@/mocks/server";
+import { resetSimulation } from "@/mocks/simulation";
 
 import { installMatchMedia, installResizeObserver, resetMediaQueries } from "./media";
 
 installMatchMedia();
 installResizeObserver();
+
+// Routes load their code lazily; the first test to reach a chunk waits for it to be
+// transformed, which under coverage instrumentation can take longer than the 1 s default.
+configure({ asyncUtilTimeout: 3000 });
 
 // Any request without a mock fails the test instead of silently hitting the network.
 beforeAll(() => {
@@ -18,6 +24,8 @@ beforeAll(() => {
 afterEach(async () => {
   cleanup();
   resetMediaQueries();
+  resetSimulation();
+  resetDb();
   localStorage.clear();
   server.resetHandlers();
   await i18n.changeLanguage("de");

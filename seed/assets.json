@@ -1,0 +1,162 @@
+[
+  {
+    "id": "as-n-wells",
+    "scope_id": "sc-nord",
+    "name": "Brunnenfeld Nord",
+    "kind": "technical_system",
+    "criticality": "high",
+    "depends_on": [
+      "as-n-pumps"
+    ],
+    "description": "Zwölf Vertikalfilterbrunnen, Rohwassergewinnung."
+  },
+  {
+    "id": "as-n-plant",
+    "scope_id": "sc-nord",
+    "name": "Aufbereitungsanlage Nord",
+    "kind": "technical_system",
+    "criticality": "high",
+    "depends_on": [
+      "as-n-wells",
+      "as-n-scada",
+      "as-n-power",
+      "as-chlorine"
+    ],
+    "description": "Enteisenung, Entmanganung, Desinfektion."
+  },
+  {
+    "id": "as-n-pumps",
+    "scope_id": "sc-nord",
+    "name": "Pumpwerk Nord",
+    "kind": "technical_system",
+    "criticality": "high",
+    "depends_on": [
+      "as-n-power",
+      "as-n-scada"
+    ],
+    "description": "Förderpumpen ins Netz und in den Hochbehälter."
+  },
+  {
+    "id": "as-n-reservoir",
+    "scope_id": "sc-nord",
+    "name": "Hochbehälter Kappenberg",
+    "kind": "building",
+    "criticality": "medium",
+    "depends_on": [
+      "as-n-pumps"
+    ],
+    "description": "Speicher mit 12.000 m³ für etwa einen Tag Bedarf."
+  },
+  {
+    "id": "as-n-scada",
+    "scope_id": "sc-nord",
+    "name": "Prozessleitsystem Nord",
+    "kind": "it_system",
+    "criticality": "high",
+    "depends_on": [
+      "as-dc",
+      "as-n-power"
+    ],
+    "description": "Steuerung und Überwachung der Anlage."
+  },
+  {
+    "id": "as-n-power",
+    "scope_id": "sc-nord",
+    "name": "Netzanschluss und Notstrom Nord",
+    "kind": "utility",
+    "criticality": "high",
+    "depends_on": [
+      "as-grid"
+    ],
+    "description": "Mittelspannungsanschluss und Netzersatzanlage (48 h)."
+  },
+  {
+    "id": "as-s-wells",
+    "scope_id": "sc-sued",
+    "name": "Talsperrenentnahme Süd",
+    "kind": "technical_system",
+    "criticality": "high",
+    "depends_on": [
+      "as-s-pumps"
+    ],
+    "description": "Oberflächenwasserentnahme aus der Talsperre."
+  },
+  {
+    "id": "as-s-plant",
+    "scope_id": "sc-sued",
+    "name": "Aufbereitungsanlage Süd",
+    "kind": "technical_system",
+    "criticality": "high",
+    "depends_on": [
+      "as-s-wells",
+      "as-s-scada",
+      "as-s-power",
+      "as-chlorine"
+    ],
+    "description": "Flockung, Filtration, UV-Desinfektion."
+  },
+  {
+    "id": "as-s-pumps",
+    "scope_id": "sc-sued",
+    "name": "Pumpwerk Süd",
+    "kind": "technical_system",
+    "criticality": "high",
+    "depends_on": [
+      "as-s-power",
+      "as-s-scada"
+    ],
+    "description": "Förderpumpen ins Netz."
+  },
+  {
+    "id": "as-s-scada",
+    "scope_id": "sc-sued",
+    "name": "Prozessleitsystem Süd",
+    "kind": "it_system",
+    "criticality": "high",
+    "depends_on": [
+      "as-dc",
+      "as-s-power"
+    ],
+    "description": "Steuerung und Überwachung der Anlage."
+  },
+  {
+    "id": "as-s-power",
+    "scope_id": "sc-sued",
+    "name": "Netzanschluss und Notstrom Süd",
+    "kind": "utility",
+    "criticality": "high",
+    "depends_on": [
+      "as-grid"
+    ],
+    "description": "Mittelspannungsanschluss und Netzersatzanlage (24 h)."
+  },
+  {
+    "id": "as-dc",
+    "scope_id": "sc-org",
+    "name": "Rechenzentrum Verwaltung",
+    "kind": "it_system",
+    "criticality": "medium",
+    "depends_on": [
+      "as-grid"
+    ],
+    "description": "Zentrale IT, Fernwirkserver und Leitwarte."
+  },
+  {
+    "id": "as-grid",
+    "scope_id": "sc-org",
+    "name": "Stromversorgung (Verteilnetzbetreiber)",
+    "kind": "supplier",
+    "criticality": "high",
+    "depends_on": [],
+    "description": "Externer Verteilnetzbetreiber, kein eigener Einfluss."
+  },
+  {
+    "id": "as-chlorine",
+    "scope_id": "sc-org",
+    "name": "Chemikalienlieferant",
+    "kind": "supplier",
+    "criticality": "medium",
+    "depends_on": [],
+    "description": "Lieferung von Desinfektionsmitteln, ein einziger Lieferant."
+  }
+]

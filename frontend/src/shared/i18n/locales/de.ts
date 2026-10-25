@@ -79,6 +79,19 @@ export const de = {
       storage: "Dateispeicher",
     },
   },
+  dev: {
+    simulation: {
+      open: "Simulation",
+      title: "Mock-API simulieren",
+      latency: "Antwortzeit",
+      latencies: { off: "Sofort", short: "400 ms", long: "1,5 s" },
+      failureRate: "Fehlerquote",
+      conflict: "Nächste Änderung erzeugt einen Konflikt (412)",
+      riskEngineDown: "Risiko-Engine nicht erreichbar",
+      reset: "Demodaten zurücksetzen",
+      hint: "Nur in der Entwicklung sichtbar. Einstellungen bleiben in diesem Browser gespeichert.",
+    },
+  },
   notFound: {
     title: "Seite nicht gefunden",
     backHome: "Zur Startseite",

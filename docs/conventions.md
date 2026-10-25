@@ -96,6 +96,10 @@ See [ADR 0017](adr/0017-http-standard-responses-no-envelope.md), [ADR 0018](adr/
 - pnpm with a committed lockfile. Vite, React 19, TypeScript in strict mode, **Ant Design 6**, React Router.
 - Tool versions held back on purpose: TypeScript 6.0 until typescript-eslint supports 7, and ESLint 9 until eslint-plugin-jsx-a11y supports 10.
 - Mocks: MSW, shared by the prototype and the tests. Tests fail on any request without a mock (`onUnhandledFrame: "error"`).
+  - The mock API serves `seed/` and behaves like the real one: routes under `/api/v1/tenants/{slug}/…`, Problem Details with field errors, `{items, page}` lists capped at 100, 404 for Tenants without a Membership, `If-Match` (428 when missing, 412 when stale), `Idempotency-Key` replay, and an Activity Log entry for every write. Calculated values (deadlines, Residual Rating) are derived on read.
+  - A contract test drives it through the typed API functions, so the screens and the future backend share one specification.
+  - In development, a simulation panel adds latency, failures, a 412 conflict or an unreachable risk engine. Production builds don't contain it.
+- HTTP lives only in `shared/api`: typed resource functions plus TanStack `queryOptions` with Tenant-first query keys. A lint rule rejects `fetch` anywhere else.
 - Pages and the Tenant shell are lazy-loaded per route. React gets its own long-cached vendor chunk; Ant Design is split by usage, so a screen downloads only the components it renders. Motion loads its animation features after the first render (`LazyMotion` with `m.*` components; a full `motion.*` component fails at runtime). Initial JavaScript stays below 300 KB gzipped. Routes live under `/t/{tenant_slug}/…`.
 - Feature folders mirror the backend modules (`features/compliance`, `features/risk`, …), plus `shared/ui` and `shared/api`.
 - Server state: TanStack Query. UI-only state: local state or Zustand. No Redux. Each route is code-split.

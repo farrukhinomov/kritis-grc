@@ -62,7 +62,7 @@ printf '%s' "<value>" | gcloud secrets versions add <secret-name> --data-file=-
 
 ## Manual setup: Vercel
 
-1. Import the repository, root directory `frontend/`, framework preset *Vite*.
+1. Import the repository, root directory `frontend/`, framework preset *Vite*. Keep *Include files outside the root directory in the Build Step* on: the prototype build reads the demo fixtures from `seed/`.
 2. **Turn the Git integration's automatic deployments off.** GitHub Actions deploys after the backend is live (M0-08).
 3. Add the domain `grc.inomov.online`; the DNS record already comes from OpenTofu.
 4. The `/api/*` rewrite, caching opt-out and security headers live in `frontend/vercel.json` (M0-08).
