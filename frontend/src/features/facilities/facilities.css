@@ -1,0 +1,85 @@
+.grc-facilities {
+  display: grid;
+  gap: 24px;
+}
+
+.grc-facility-cards {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
+}
+
+.grc-facility-card,
+.grc-facility-assets {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  justify-items: start;
+  padding: 20px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 14px;
+  background: var(--grc-surface);
+}
+
+.grc-facility-card[data-selected="true"] {
+  border-color: var(--grc-primary);
+}
+
+.grc-facility-assets {
+  justify-items: stretch;
+}
+
+.grc-facility-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.grc-facility-card > .grc-meta {
+  margin: 0;
+}
+
+.grc-asset-name.ant-btn {
+  justify-content: flex-start;
+  height: auto;
+  padding: 0;
+  white-space: normal;
+  text-align: start;
+}
+
+.grc-asset-card {
+  display: grid;
+  gap: 4px;
+}
+
+.grc-asset-detail {
+  display: grid;
+  gap: 20px;
+}
+
+.grc-asset-detail p {
+  margin: 0;
+}
+
+.grc-asset-risk {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* A long Scope name may wrap; the button keeps its height and padding while it does. */
+.grc-facility-show.ant-btn {
+  max-width: 100%;
+  height: auto;
+  min-height: 32px;
+  padding-block: 4px;
+  white-space: normal;
+}
+
+/* Touch targets of at least 44 px where fingers tap. */
+@media (pointer: coarse), (max-width: 767.98px) {
+  .grc-asset-name.ant-btn,
+  .grc-facility-show.ant-btn {
+    min-height: 44px;
+  }
+}

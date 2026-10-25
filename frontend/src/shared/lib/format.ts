@@ -42,3 +42,10 @@ export function formatRelative(isoDateTime: string, language: string, now: Date 
   }
   return format.format(0, "minute");
 }
+
+/** A moment with date and time, in the user's locale and time zone. */
+export function formatDateTime(isoDateTime: string, language: string): string {
+  return new Intl.DateTimeFormat(language, { dateStyle: "medium", timeStyle: "short" }).format(
+    new Date(isoDateTime),
+  );
+}

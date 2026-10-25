@@ -1,0 +1,40 @@
+.grc-settings {
+  display: grid;
+  gap: 16px;
+  max-width: 720px;
+}
+
+.grc-settings-panel {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 14px;
+  background: var(--grc-surface);
+}
+
+.grc-settings-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.grc-settings-panel > .grc-meta {
+  margin: 0;
+}
+
+.grc-settings-options.ant-radio-group {
+  display: grid;
+  gap: 8px;
+}
+
+/* Full-width options of at least 44 px, as everywhere touch matters. */
+.grc-settings-options .ant-radio-wrapper {
+  align-items: center;
+  min-height: 44px;
+  margin: 0;
+}
+
+.grc-settings-option {
+  display: grid;
+}

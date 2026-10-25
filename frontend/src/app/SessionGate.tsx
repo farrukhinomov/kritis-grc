@@ -15,7 +15,9 @@ export function SessionGate() {
   if (isPending) {
     return <PageSkeleton />;
   }
-  if (isError) {
+  // Only a session that never loaded stops the app. A failed reload keeps the one it
+  // has, as every other query does; a 401 still signs out, as it drops the session.
+  if (isError && session === undefined) {
     return <ErrorPanel onRetry={() => void refetch()} />;
   }
   if (!session) {

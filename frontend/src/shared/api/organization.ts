@@ -14,12 +14,18 @@ import type {
   Scope,
   Tenant,
 } from "./types";
+import type { ThemeName } from "@/shared/theme/semantic";
 
 export const tenantQuery = (tenant: string) =>
   queryOptions({
     queryKey: resourceKey(tenant, "tenant"),
     queryFn: ({ signal }) => apiGet<Tenant>(tenantPath(tenant, []), signal),
   });
+
+/** Every member of the Tenant sees the new Theme, so it belongs to the Tenant, not the user. */
+export function updateTenantTheme(tenant: string, theme: ThemeName): Promise<Tenant> {
+  return apiRequest<Tenant>(tenantPath(tenant, []), { method: "PATCH", body: { theme } });
+}
 
 export const membersQuery = (tenant: string) =>
   queryOptions({

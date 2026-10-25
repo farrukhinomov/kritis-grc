@@ -2,10 +2,12 @@ import { infiniteQueryOptions } from "@tanstack/react-query";
 
 import { apiGet, tenantPath } from "./client";
 import { resourceKey } from "./keys";
-import type { ActivityEntry, CursorPage } from "./types";
+import type { ActivityAction, ActivityEntry, CursorPage } from "./types";
 
 export interface ActivityFilter {
   object_id?: string;
+  object_type?: string;
+  action?: ActivityAction;
   limit?: number;
 }
 

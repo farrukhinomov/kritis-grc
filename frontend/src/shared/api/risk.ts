@@ -12,6 +12,8 @@ export const hazardsQuery = (tenant: string) =>
 
 export interface RiskFilter extends PageParams {
   scope?: string;
+  /** Only the risks that name this Asset. */
+  asset?: string;
   /** Highest Residual Rating first; risks not yet rated follow, by inherent score. */
   ordering?: "-residual_score";
   /** Which rating `category`, `likelihood` and `impact` refer to; residual by default. */

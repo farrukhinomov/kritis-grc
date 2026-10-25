@@ -1,11 +1,12 @@
 import { HttpResponse } from "msw";
 
 import type { Scope } from "@/shared/api/types";
+import { THEME_NAMES, type ThemeName } from "@/shared/theme/semantic";
 
 import { CRITICAL_SERVICES, checkApplicability, serviceFor } from "../applicability";
 import { logActivity, nextId } from "../db";
 import { deadlinesFor } from "../deadlines";
-import { jsonBody, listResponse, notFound, problem, tenantRoute } from "../http";
+import { isRecord, jsonBody, listResponse, notFound, problem, tenantRoute } from "../http";
 import { idempotency } from "../idempotency";
 import type { StoredScope } from "../seed";
 import { validateNewFacility } from "../validation";
@@ -23,6 +24,30 @@ function present(scope: StoredScope): Scope {
 
 export const organizationHandlers = [
   tenantRoute("get", "", ({ data }) => HttpResponse.json(data.tenant)),
+
+  tenantRoute("patch", "", async ({ data, request }) => {
+    const body = await jsonBody(request);
+    const theme = isRecord(body) ? body.theme : undefined;
+    if (!THEME_NAMES.some((name) => name === theme)) {
+      return problem(422, "validation_error", "Choose one of the Themes.", [
+        { field: "theme", code: "invalid_choice" },
+      ]);
+    }
+    const from = data.tenant.theme;
+    // Choosing the Theme already set changes nothing, and nothing is logged.
+    if (theme === from) {
+      return HttpResponse.json(data.tenant);
+    }
+    data.tenant.theme = theme as ThemeName;
+    logActivity(data, {
+      action: "updated",
+      object_type: "tenant",
+      object_id: data.tenant.slug,
+      object_label: data.tenant.name,
+      changes: [{ field: "theme", from, to: data.tenant.theme }],
+    });
+    return HttpResponse.json(data.tenant);
+  }),
 
   tenantRoute("get", "/members", ({ data, url }) => listResponse(data.members, url)),
 
