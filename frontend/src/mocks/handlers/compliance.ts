@@ -1,6 +1,8 @@
 import { HttpResponse } from "msw";
 
 import type {
+  ComplianceSummary,
+  ComplianceSummaryRow,
   Evidence,
   FieldChange,
   Implementation,
@@ -65,11 +67,16 @@ const implementationRoutes = [
       data.requirements.find((r) => r.id === requirementId)?.framework_version_id ?? "";
     let items = byParam(data.implementations, params.get("scope"), (i) => i.scope_id);
     items = byParam(items, params.get("requirement"), (i) => i.requirement_id);
-    items = byParam(items, params.get("status"), (i) => i.status);
+    items = byParam(items, params.get("owner"), (i) => i.owner_id ?? "");
     items = byParam(items, params.get("framework_version"), (i) => versionOf(i.requirement_id));
-    const status = params.get("status");
-    if (status !== null && !STATUSES.has(status)) {
+    // "any of" as a comma-separated list, the way Django filters read it.
+    const statusParam = params.get("status");
+    const statuses = statusParam ? statusParam.split(",") : undefined;
+    if (statuses?.some((status) => !STATUSES.has(status))) {
       return problem(400, "invalid_filter", "Unknown status.");
+    }
+    if (statuses) {
+      items = items.filter((i) => statuses.includes(i.status));
     }
     const orderingName = params.get("ordering");
     const ordering = orderingName === null ? undefined : ORDERINGS[orderingName];
@@ -77,6 +84,33 @@ const implementationRoutes = [
       return problem(400, "invalid_ordering", "Unknown ordering.");
     }
     return listResponse(ordering ? items.toSorted(ordering) : items, url);
+  }),
+
+  tenantRoute("get", "/compliance-summary", ({ data }) => {
+    const frameworkOf = (requirementId: string) => {
+      const versionId = data.requirements.find((r) => r.id === requirementId)?.framework_version_id;
+      return data.frameworks.find((f) => f.versions.some((v) => v.id === versionId));
+    };
+    const rows = new Map<string, ComplianceSummaryRow>();
+    for (const implementation of data.implementations) {
+      const framework = frameworkOf(implementation.requirement_id);
+      const scope = data.scopes.find((s) => s.id === implementation.scope_id);
+      if (!framework || !scope) {
+        continue;
+      }
+      const key = `${scope.id} ${framework.id}`;
+      const row = rows.get(key) ?? {
+        scope_id: scope.id,
+        scope_name: scope.name,
+        scope_kind: scope.kind,
+        framework_id: framework.id,
+        framework_name: framework.name,
+        counts: { open: 0, partial: 0, implemented: 0, not_applicable: 0 },
+      };
+      row.counts[implementation.status] += 1;
+      rows.set(key, row);
+    }
+    return HttpResponse.json<ComplianceSummary>({ rows: [...rows.values()] });
   }),
 
   tenantRoute("get", "/implementations/:id", ({ data, params }) => {

@@ -22,6 +22,15 @@ export function useMembership(tenantSlug: string | undefined): Membership | unde
   return useSession().memberships.find((membership) => membership.tenant.slug === tenantSlug);
 }
 
+/** The Membership of the Tenant being shown; only pages inside the Tenant shell call it. */
+export function useCurrentMembership(): Membership {
+  const membership = useContext(MembershipContext);
+  if (!membership) {
+    throw new Error("useCurrentMembership needs the Tenant shell around it.");
+  }
+  return membership;
+}
+
 /**
  * Whether the current Membership allows an action. Outside a Tenant nothing is allowed,
  * so a write control rendered in the wrong place stays disabled rather than open.

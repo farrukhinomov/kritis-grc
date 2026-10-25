@@ -77,3 +77,12 @@ export function ColumnsSkeleton({ columns }: { columns: number }) {
     </Loading>
   );
 }
+
+/** The body of a dashboard widget: a few lines of text under its own heading. */
+export function WidgetSkeleton({ rows }: { rows: number }) {
+  return (
+    <Loading className="grc-skeleton-widget">
+      <Skeleton active title={false} paragraph={{ rows }} />
+    </Loading>
+  );
+}

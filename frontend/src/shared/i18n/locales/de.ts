@@ -86,6 +86,76 @@ export const de = {
     prototypeHint:
       "Dieser Prototyp hat keine eigenen Konten. Bitte nutzen Sie einen der Demo-Zugänge oben.",
   },
+  dashboard: {
+    description: "Wo Ihre Organisation bei KRITIS-Dachgesetz und NIS2 steht.",
+    stale: "Nicht aktuell: die Aktualisierung ist fehlgeschlagen.",
+    loadError: "Dieser Bereich konnte nicht geladen werden.",
+    statuses: {
+      open: "Offen",
+      partial: "Teilweise umgesetzt",
+      implemented: "Umgesetzt",
+      not_applicable: "Nicht anwendbar",
+    },
+    riskCategories: {
+      low: "Niedrig",
+      medium: "Mittel",
+      high: "Hoch",
+      critical: "Kritisch",
+    },
+    compliance: {
+      title: "Compliance je Framework und Anlage",
+      counts: "{{implemented}} von {{applicable}} umgesetzt, {{partial}} teilweise",
+      empty: "Noch keine Umsetzungen erfasst.",
+    },
+    deadlines: {
+      title: "Fristen",
+      inDays_zero: "heute fällig",
+      inDays_one: "in {{count}} Tag",
+      inDays_other: "in {{count}} Tagen",
+      overdue_one: "{{count}} Tag überfällig",
+      overdue_other: "{{count}} Tage überfällig",
+      projected: "prognostiziert",
+      projectedHint:
+        "Prognostiziert: berechnet aus der geplanten Registrierung. Verbindlich werden die Fristen erst mit dem bestätigten Datum.",
+      empty: "Keine kritische Anlage mit Registrierung erfasst.",
+    },
+    matrix: {
+      title: "Restrisiko-Matrix",
+      caption:
+        "Anzahl der Risiken nach Restrisiko: Auswirkung (Zeilen) und Eintrittswahrscheinlichkeit (Spalten)",
+      likelihood: "Eintrittswahrscheinlichkeit",
+      impact: "Auswirkung",
+      axes: "Zeilen: Auswirkung · Spalten: Eintrittswahrscheinlichkeit",
+    },
+    topRisks: {
+      title: "Top-5-Risiken",
+    },
+    risks: {
+      empty: "Noch keine Risiken erfasst.",
+      calculationPending: "Berechnung ausstehend",
+      pending_one: "{{count}} Risiko wartet noch auf die Berechnung des Restrisikos.",
+      pending_other: "{{count}} Risiken warten noch auf die Berechnung des Restrisikos.",
+    },
+    mine: {
+      title: "Meine offenen Umsetzungen",
+      due: "fällig am {{date}}",
+      more: "{{shown}} von {{total}} angezeigt",
+      empty: "Ihnen sind keine offenen Umsetzungen zugewiesen.",
+    },
+    activity: {
+      title: "Letzte Aktivitäten",
+      unknownActor: "Unbekannt",
+      empty: "Noch keine Aktivitäten.",
+      actions: {
+        created: "{{actor}} hat {{object}} angelegt",
+        updated: "{{actor}} hat {{object}} geändert",
+        deleted: "{{actor}} hat {{object}} gelöscht",
+        approved: "{{actor}} hat {{object}} freigegeben",
+        rejected: "{{actor}} hat {{object}} abgelehnt",
+        commented: "{{actor}} hat {{object}} kommentiert",
+      },
+    },
+  },
   patterns: {
     back: "Zurück",
     close: "Schließen",

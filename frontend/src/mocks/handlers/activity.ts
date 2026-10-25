@@ -44,7 +44,10 @@ export const activityHandlers = [
       }
       start = index + 1;
     }
-    const items = newestFirst.slice(start, start + limit);
+    const items = newestFirst.slice(start, start + limit).map((entry) => ({
+      ...entry,
+      actor_name: data.members.find((member) => member.id === entry.actor_id)?.display_name ?? "",
+    }));
     const last = items.at(-1);
     const hasMore = start + limit < newestFirst.length;
 

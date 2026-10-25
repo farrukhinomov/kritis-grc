@@ -1,7 +1,7 @@
-import type { ActivityEntry, Evidence } from "@/shared/api/types";
+import type { Evidence } from "@/shared/api/types";
 
 import { DEMO_ACCOUNTS, SHOWCASE_TENANTS } from "./accounts";
-import { SEED, type SeedData } from "./seed";
+import { SEED, type SeedData, type StoredActivity } from "./seed";
 
 interface StoredResponse {
   status: number;
@@ -67,7 +67,7 @@ export function nextId(prefix: string): string {
 /** Every change lands in the Activity Log, as the backend's database triggers ensure. */
 export function logActivity(
   data: TenantData,
-  entry: Omit<ActivityEntry, "id" | "occurred_at" | "actor_id">,
+  entry: Omit<StoredActivity, "id" | "occurred_at" | "actor_id">,
   actorId: string = ACTOR_ID,
 ): void {
   data.activity.push({

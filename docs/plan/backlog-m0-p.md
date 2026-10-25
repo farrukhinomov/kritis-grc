@@ -197,15 +197,15 @@ As a developer, I want realistic data behind a mock API shaped like the real one
 
 As a GRC Manager, I want to see where I stand at a glance.
 
-- [ ] Six widgets:
+- [x] Six widgets:
   1. Compliance per Framework and Critical Facility, with the bar fill and count-up animation.
   2. Deadline countdowns, marked as projected.
   3. Residual risk matrix.
   4. Top 5 risks.
   5. My open Implementations.
   6. Recent activity.
-- [ ] Each widget loads, errors and empties independently, with its own error boundary.
-- [ ] Phone layout stacks the widgets in priority order.
+- [x] Each widget loads, errors and empties independently, with its own error boundary.
+- [x] Phone layout stacks the widgets in priority order.
 
 ### P-05 Compliance cockpit
 **Labels:** `module:frontend`, `module:compliance`, `type:feature`, `prio:must` · **Estimate:** 4 h · **Depends on:** P-02

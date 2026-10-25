@@ -13,7 +13,8 @@ describe("a page that fails to render", () => {
   it("shows the error inside the shell, so the user can navigate away", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
 
-    renderRoute("/t/muster-stadtwerke/dashboard");
+    // Any screen still served by the placeholder page.
+    renderRoute("/t/muster-stadtwerke/risks");
 
     expect(await screen.findByText("Dieser Bereich konnte nicht angezeigt werden.")).toBeVisible();
     const navigation = screen.getByRole("navigation", { name: "Hauptnavigation" });

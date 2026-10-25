@@ -30,6 +30,9 @@ import type {
   Treatment,
 } from "@/shared/api/types";
 
+/** The name is looked up on every read, as the backend joins it. */
+export type StoredActivity = Omit<ActivityEntry, "actor_name">;
+
 /**
  * The demo fixtures, typed as what the server stores. Values the server calculates
  * (deadlines, scores, residual ratings) are not in the files; the mock API derives them
@@ -64,7 +67,7 @@ export interface SeedData {
   evidence: Evidence[];
   hazards: Hazard[];
   risks: StoredRisk[];
-  activity: ActivityEntry[];
+  activity: StoredActivity[];
 }
 
 // JSON imports widen string unions to `string`. The cast is checked where it matters:

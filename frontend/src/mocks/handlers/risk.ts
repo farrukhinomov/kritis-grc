@@ -1,9 +1,10 @@
 import { HttpResponse } from "msw";
 
-import type { Risk } from "@/shared/api/types";
+import type { Risk, RiskMatrix, RiskMatrixCell } from "@/shared/api/types";
+import { RISK_CATEGORIES } from "@/shared/theme/semantic";
 
 import type { TenantData } from "../db";
-import { listResponse, notFound, tenantRoute } from "../http";
+import { listResponse, notFound, problem, tenantRoute } from "../http";
 import { assess, rate } from "../riskMethod";
 import type { StoredRisk } from "../seed";
 import { getSimulation } from "../simulation";
@@ -26,16 +27,63 @@ function present(risk: StoredRisk, data: TenantData): Risk {
   };
 }
 
+/**
+ * Highest Residual Rating first. A risk the engine hasn't rated yet must not look
+ * harmless, so unrated risks come last but in inherent order, never mixed in at zero.
+ */
+export function byResidualScore(a: Risk, b: Risk): number {
+  if (a.residual && b.residual) {
+    return b.residual.score - a.residual.score || b.inherent.score - a.inherent.score;
+  }
+  if (a.residual || b.residual) {
+    return a.residual ? -1 : 1;
+  }
+  return b.inherent.score - a.inherent.score;
+}
+
 export const riskHandlers = [
   tenantRoute("get", "/hazards", ({ data, url }) => listResponse(data.hazards, url)),
 
   tenantRoute("get", "/risks", ({ data, url }) => {
     const scope = url.searchParams.get("scope");
-    const risks = data.risks.filter((risk) => scope === null || risk.scope_id === scope);
-    return listResponse(
-      risks.map((risk) => present(risk, data)),
-      url,
-    );
+    const ordering = url.searchParams.get("ordering");
+    if (ordering !== null && ordering !== "-residual_score") {
+      return problem(400, "invalid_ordering", "Unknown ordering.");
+    }
+    const risks = data.risks
+      .filter((risk) => scope === null || risk.scope_id === scope)
+      .map((risk) => present(risk, data));
+    return listResponse(ordering === null ? risks : risks.toSorted(byResidualScore), url);
+  }),
+
+  tenantRoute("get", "/risk-matrix", ({ data }) => {
+    const risks = data.risks.map((risk) => present(risk, data));
+    const cells = new Map<string, RiskMatrixCell>();
+    for (const { residual } of risks) {
+      if (!residual) {
+        continue;
+      }
+      const key = `${String(residual.likelihood)} ${String(residual.impact)}`;
+      const cell = cells.get(key) ?? {
+        likelihood: residual.likelihood,
+        impact: residual.impact,
+        count: 0,
+        worst_category: residual.category,
+      };
+      cell.count += 1;
+      if (
+        RISK_CATEGORIES.indexOf(residual.category) > RISK_CATEGORIES.indexOf(cell.worst_category)
+      ) {
+        cell.worst_category = residual.category;
+      }
+      cells.set(key, cell);
+    }
+    const rated = [...cells.values()].reduce((sum, cell) => sum + cell.count, 0);
+    return HttpResponse.json<RiskMatrix>({
+      cells: [...cells.values()],
+      pending: risks.length - rated,
+      total: risks.length,
+    });
   }),
 
   tenantRoute("get", "/risks/:id", ({ data, params }) => {

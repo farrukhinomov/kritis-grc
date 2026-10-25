@@ -152,6 +152,21 @@ export type ImplementationChange = Partial<
   Pick<Implementation, "status" | "owner_id" | "due_date" | "note_de">
 >;
 
+/** How many of one Scope's Implementations of one Framework are in each status. */
+export interface ComplianceSummaryRow {
+  scope_id: string;
+  scope_name: string;
+  scope_kind: ScopeKind;
+  framework_id: string;
+  framework_name: string;
+  counts: Record<ImplementationStatus, number>;
+}
+
+/** An aggregate, not a list: it is never paged, so no row can go missing. */
+export interface ComplianceSummary {
+  rows: ComplianceSummaryRow[];
+}
+
 export type EvidenceKind = "file" | "link" | "reference";
 
 export interface EvidenceFile {
@@ -247,6 +262,21 @@ export interface ResidualRating extends Rating {
   explanation: TreatmentEffect[];
 }
 
+/** All Risks of one cell of the Residual Rating matrix. */
+export interface RiskMatrixCell {
+  likelihood: number;
+  impact: number;
+  count: number;
+  worst_category: RiskCategory;
+}
+
+/** Only occupied cells are listed; `pending` counts Risks without a Residual Rating. */
+export interface RiskMatrix {
+  cells: RiskMatrixCell[];
+  pending: number;
+  total: number;
+}
+
 export interface Risk {
   id: string;
   scope_id: string;
@@ -276,6 +306,8 @@ export interface ActivityEntry {
   id: string;
   occurred_at: string;
   actor_id: string;
+  /** Embedded, so a reader never needs the whole member list to name who did it. */
+  actor_name: string;
   action: ActivityAction;
   object_type: string;
   object_id: string;
