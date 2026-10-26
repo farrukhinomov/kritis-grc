@@ -121,5 +121,16 @@
     "referenced_implementation_id": null,
     "added_by_id": "u-kramer",
     "added_at": "2026-03-03T16:45:00Z"
+  },
+  {
+    "id": "ev-10",
+    "implementation_id": "im-018",
+    "kind": "reference",
+    "title": "Personalsicherheit, Zugriffskontrolle und Asset-Management (BSIG § 30 Abs. 2 Nr. 9)",
+    "file": null,
+    "url": null,
+    "referenced_implementation_id": "im-041",
+    "added_by_id": "u-kramer",
+    "added_at": "2026-10-13T08:40:00Z"
   }
 ]

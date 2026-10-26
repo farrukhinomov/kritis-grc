@@ -21,7 +21,10 @@ export function CoverageGrid({
   const { t, i18n } = useTranslation();
   const english = i18n.language === "en";
   const cells = new Map(
-    matrix.cells.map((cell) => [`${cell.target_requirement_id} ${cell.source_requirement_id}`, cell]),
+    matrix.cells.map((cell) => [
+      `${cell.target_requirement_id} ${cell.source_requirement_id}`,
+      cell,
+    ]),
   );
   const paragraphs = [...new Set(matrix.rows.map((row) => row.paragraph))];
 
@@ -40,7 +43,12 @@ export function CoverageGrid({
               </span>
             </td>
             {matrix.columns.map((column) => (
-              <th key={column.id} scope="col" className="grc-coverage-column" title={column.title_de}>
+              <th
+                key={column.id}
+                scope="col"
+                className="grc-coverage-column"
+                title={column.title_de}
+              >
                 <span aria-hidden="true">{shortCitation(column.citation)}</span>
                 <span className="grc-visually-hidden">
                   {column.citation} {LAW_ABBREVIATIONS[column.framework_key]}
@@ -66,15 +74,21 @@ export function CoverageGrid({
                         {cell && (
                           <button
                             type="button"
-                            className="grc-coverage-mark"
-                            data-coverage={cell.coverage}
-                            data-reused={cell.reused_in.length > 0}
+                            className="grc-coverage-cell-button"
+                            data-cell={`${row.id} ${column.id}`}
                             aria-label={cellLabel(t, cell, row, column)}
                             title={cellLabel(t, cell, row, column)}
                             onClick={() => {
                               onOpen(cell);
                             }}
-                          />
+                          >
+                            <span
+                              className="grc-coverage-mark"
+                              data-coverage={cell.coverage}
+                              data-reused={cell.reused_in.length > 0}
+                              aria-hidden="true"
+                            />
+                          </button>
                         )}
                       </td>
                     );
@@ -118,33 +132,34 @@ export function CoverageList({
                 const source = byId.get(cell.source_requirement_id);
                 return (
                   source && (
-                      <li key={cell.source_requirement_id}>
-                        <button
-                          type="button"
-                          className="grc-coverage-pair"
-                          aria-label={cellLabel(t, cell, row, source)}
-                          onClick={() => {
-                            onOpen(cell);
-                          }}
-                        >
-                          <span
-                            className="grc-coverage-mark"
-                            data-coverage={cell.coverage}
-                            data-reused={cell.reused_in.length > 0}
-                            aria-hidden="true"
-                          />
-                          <span>
-                            {t("coverage.by", {
-                              source: `${source.citation} ${LAW_ABBREVIATIONS[source.framework_key]}`,
-                            })}
-                            <span className="grc-meta">
-                              {" · "}
-                              {t(`coverage.levels.${cell.coverage}`)}
-                              {cell.reused_in.length > 0 && ` · ${t("coverage.reused")}`}
-                            </span>
+                    <li key={cell.source_requirement_id}>
+                      <button
+                        type="button"
+                        className="grc-coverage-pair"
+                        data-cell={`${row.id} ${source.id}`}
+                        aria-label={cellLabel(t, cell, row, source)}
+                        onClick={() => {
+                          onOpen(cell);
+                        }}
+                      >
+                        <span
+                          className="grc-coverage-mark"
+                          data-coverage={cell.coverage}
+                          data-reused={cell.reused_in.length > 0}
+                          aria-hidden="true"
+                        />
+                        <span>
+                          {t("coverage.by", {
+                            source: `${source.citation} ${LAW_ABBREVIATIONS[source.framework_key]}`,
+                          })}
+                          <span className="grc-meta">
+                            {" · "}
+                            {t(`coverage.levels.${cell.coverage}`)}
+                            {cell.reused_in.length > 0 && ` · ${t("coverage.reused")}`}
                           </span>
-                        </button>
-                      </li>
+                        </span>
+                      </button>
+                    </li>
                   )
                 );
               })}

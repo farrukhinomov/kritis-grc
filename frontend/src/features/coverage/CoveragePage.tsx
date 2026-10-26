@@ -1,6 +1,7 @@
 import "./coverage.css";
 
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 
@@ -38,6 +39,25 @@ export function CoveragePage() {
     [...(matrix?.rows ?? []), ...(matrix?.columns ?? [])].find((item) => item.id === id);
   const target = cell && find(cell.target_requirement_id);
   const source = cell && find(cell.source_requirement_id);
+
+  const pair =
+    params.get("target") && params.get("source")
+      ? `${params.get("target") ?? ""} ${params.get("source") ?? ""}`
+      : null;
+  // The details leave with their URL parameters and take focus with them; it returns to
+  // the cell that opened them, or to the heading after a link.
+  const shown = useRef(pair);
+  useEffect(() => {
+    const before = shown.current;
+    shown.current = pair;
+    if (before && !pair) {
+      // Compared, not put into a selector: the value comes from the URL.
+      const button = [...document.querySelectorAll<HTMLElement>("[data-cell]")].find(
+        (element) => element.dataset.cell === before,
+      );
+      (button ?? document.querySelector<HTMLElement>("h1"))?.focus();
+    }
+  }, [pair]);
 
   const open = (chosen: CoverageCell) => {
     setParams(
@@ -110,8 +130,11 @@ export function CoveragePage() {
           </div>
         )}
       </QueryContent>
-      {cell && target && source && (
-        <CellDetail cell={cell} target={target} source={source} onClose={close} />
+      {pair && matrix && (
+        <CellDetail
+          found={cell && target && source ? { cell, target, source } : null}
+          onClose={close}
+        />
       )}
     </>
   );

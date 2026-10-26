@@ -5,30 +5,43 @@ import { LAW_ABBREVIATIONS } from "@/shared/lib/laws";
 import type { CoverageCell, CoverageRequirement } from "@/shared/api/types";
 import { ResponsiveDrawer } from "@/shared/ui/patterns/ResponsiveDrawer";
 
-/** One pair of Requirements: every Mapping between them, its reasons and gaps, and reuse. */
-export function CellDetail({
-  cell,
-  target,
-  source,
-  onClose,
-}: {
+interface Found {
   cell: CoverageCell;
   target: CoverageRequirement;
   source: CoverageRequirement;
-  onClose: () => void;
-}) {
-  const { t, i18n } = useTranslation();
-  const english = i18n.language === "en";
+}
+
+/**
+ * One pair of Requirements: every Mapping between them, its reasons and gaps, and reuse.
+ * A pair from a link may have no Mapping, or none any more; the drawer then says so.
+ */
+export function CellDetail({ found, onClose }: { found: Found | null; onClose: () => void }) {
+  const { t } = useTranslation();
 
   return (
     <ResponsiveDrawer
       open
       onClose={onClose}
-      title={t("coverage.pair", {
-        target: `${target.citation} ${LAW_ABBREVIATIONS[target.framework_key]}`,
-        source: `${source.citation} ${LAW_ABBREVIATIONS[source.framework_key]}`,
-      })}
+      title={
+        found
+          ? t("coverage.pair", {
+              target: `${found.target.citation} ${LAW_ABBREVIATIONS[found.target.framework_key]}`,
+              source: `${found.source.citation} ${LAW_ABBREVIATIONS[found.source.framework_key]}`,
+            })
+          : t("coverage.unknownTitle")
+      }
     >
+      {found ? <Details {...found} /> : <p className="grc-meta">{t("coverage.unknownPair")}</p>}
+    </ResponsiveDrawer>
+  );
+}
+
+function Details({ cell, target, source }: Found) {
+  const { t, i18n } = useTranslation();
+  const english = i18n.language === "en";
+
+  return (
+    <>
       <div className="grc-coverage-detail">
         <dl className="grc-facts">
           <dt>{LAW_ABBREVIATIONS[target.framework_key]}</dt>
@@ -56,7 +69,8 @@ export function CellDetail({
                 <p lang="de">{mapping.justification_de}</p>
                 {mapping.gap_note_de && (
                   <p>
-                    <strong>{t("coverage.gap")}</strong> <span lang="de">{mapping.gap_note_de}</span>
+                    <strong>{t("coverage.gap")}</strong>{" "}
+                    <span lang="de">{mapping.gap_note_de}</span>
                   </p>
                 )}
               </li>
@@ -68,14 +82,16 @@ export function CellDetail({
             {t("coverage.reuseTitle")}
           </h3>
           <p className={cell.reused_in.length > 0 ? undefined : "grc-meta"}>
-            {cell.reused_in.length > 0
-              ? t("coverage.reusedIn", {
-                  facilities: cell.reused_in.map((item) => item.scope_name).join(", "),
-                })
-              : t("coverage.notReused")}
+            {cell.coverage === "partial"
+              ? t("coverage.partialOnly")
+              : cell.reused_in.length > 0
+                ? t("coverage.reusedIn", {
+                    facilities: cell.reused_in.map((item) => item.scope_name).join(", "),
+                  })
+                : t("coverage.notReused")}
           </p>
         </section>
       </div>
-    </ResponsiveDrawer>
+    </>
   );
 }

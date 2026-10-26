@@ -529,8 +529,13 @@ export const en: Translation = {
     kinds: { platform: "Platform mapping", tenant: "Tenant mapping" },
     gap: "Gap:",
     reuseTitle: "One implementation for both",
-    reusedIn: "The implementation already refers to the BSIG one: {{facilities}}.",
-    notReused: "No facility refers to the BSIG implementation yet.",
+    reusedIn: "The implementation already refers to the implemented BSIG one: {{facilities}}.",
+    notReused: "No facility refers to an implemented BSIG implementation yet.",
+    partialOnly:
+      "Only a full mapping lets one implementation count for both. This one is partial: you must implement and prove the uncovered part yourself.",
+    unknownTitle: "No mapping",
+    unknownPair:
+      "There is no mapping for these two requirements, or it no longer applies. Choose a cell in the overview.",
   },
   dependencies: {
     description:

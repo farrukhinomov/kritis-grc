@@ -543,8 +543,13 @@ export const de = {
     kinds: { platform: "Plattform-Mapping", tenant: "Mandanten-Mapping" },
     gap: "Lücke:",
     reuseTitle: "Eine Umsetzung für beide",
-    reusedIn: "Die Umsetzung verweist bereits auf die des BSIG: {{facilities}}.",
-    notReused: "Noch verweist keine Anlage auf die Umsetzung des BSIG.",
+    reusedIn: "Die Umsetzung verweist bereits auf die umgesetzte des BSIG: {{facilities}}.",
+    notReused: "Noch verweist keine Anlage auf eine umgesetzte Umsetzung des BSIG.",
+    partialOnly:
+      "Nur ein vollständiges Mapping lässt eine Umsetzung für beide zählen. Dieses ist teilweise: Den nicht abgedeckten Teil müssen Sie selbst umsetzen und nachweisen.",
+    unknownTitle: "Kein Mapping",
+    unknownPair:
+      "Für diese beiden Anforderungen gibt es kein Mapping, oder es gilt nicht mehr. Wählen Sie ein Feld in der Übersicht.",
   },
   dependencies: {
     description:

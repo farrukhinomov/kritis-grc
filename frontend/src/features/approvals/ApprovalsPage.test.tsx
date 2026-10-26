@@ -9,6 +9,7 @@ import { rejectRiskAssessment } from "@/shared/api/approvals";
 import { WIDE_SCREEN_QUERY } from "@/shared/lib/breakpoints";
 import { matchMediaQueries } from "@/test/media";
 import { renderRoute } from "@/test/render";
+import { coverageMatrixQuery } from "@/shared/api/compliance";
 import { deadlinesQuery } from "@/shared/api/organization";
 
 const DEMO = "muster-stadtwerke";
@@ -103,7 +104,9 @@ describe("the approvals inbox", () => {
   });
 
   it("approves a Mapping Suggestion from the inbox", async () => {
-    await openInbox();
+    const { client } = await openInbox();
+    const matrix = coverageMatrixQuery(DEMO);
+    await client.query(matrix);
     const suggestion = within(await item(/^§ 13 Abs\. 3 Nr\. 2/));
 
     await userEvent.click(suggestion.getByRole("button", { name: "Annehmen" }));
@@ -116,6 +119,8 @@ describe("the approvals inbox", () => {
         }),
       ).toBeNull();
     });
+    // The new Tenant Mapping adds a cell to the coverage matrix.
+    expect(client.getQueryState(matrix.queryKey)?.isInvalidated).toBe(true);
   });
 
   it("moves focus to the next item after a decision", async () => {

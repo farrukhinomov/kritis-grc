@@ -29,7 +29,12 @@ describe("the coverage heatmap", () => {
     // Fully and partly covered cells say so in words, not only in color.
     expect(table.getAllByRole("button", { name: /teilweise abgedeckt/ })).toHaveLength(7);
     expect(table.getAllByRole("button", { name: /vollständig abgedeckt/ })).toHaveLength(1);
-    expect(table.getByRole("button", { name: /§ 13 Abs\. 3 Nr\. 3.*eine Umsetzung zählt für beide/ })).toBeInTheDocument();
+    expect(
+      table.getByRole("button", { name: /^§ 13 Abs\. 3 Nr\. 5.*eine Umsetzung zählt für beide$/ }),
+    ).toBeInTheDocument();
+    expect(table.getAllByRole("button", { name: /eine Umsetzung zählt für beide/ })).toHaveLength(
+      1,
+    );
   });
 
   it("sums up what is covered", async () => {
@@ -47,10 +52,13 @@ describe("the coverage heatmap", () => {
     );
 
     const details = within(await screen.findByRole("dialog"));
-    expect(await details.findByText(/Unser Krisenstab ist für IT- und physische Vorfälle/)).toBeInTheDocument();
+    expect(
+      await details.findByText(/Unser Krisenstab ist für IT- und physische Vorfälle/),
+    ).toBeInTheDocument();
     expect(details.getByText("Mandanten-Mapping")).toBeInTheDocument();
-    expect(details.getByText(/Wasserwerk Nord/)).toBeInTheDocument();
     expect(details.getByText(/Alarmabläufe für Objektschutz-Vorfälle/)).toBeInTheDocument();
+    // Partial: the BSIG Implementation can't prove the whole duty, however it is referenced.
+    expect(details.getByText(/Nur ein vollständiges Mapping/)).toBeInTheDocument();
     const params = new URLSearchParams(router.state.location.search);
     expect(params.get("target")).toBe("req-k-13-3-3");
     expect(params.get("source")).toBe("req-b-30-2-2");
@@ -66,8 +74,56 @@ describe("the coverage heatmap", () => {
     await router.navigate(-1);
 
     await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+    expect(new URLSearchParams(router.state.location.search).has("target")).toBe(false);
+  });
+
+  it("returns focus to the cell that opened the details", async () => {
+    await openCoverage();
+    const cell = within(await grid()).getByRole("button", { name: /^§ 12 Abs\. 1 KRITIS-DachG/ });
+    await userEvent.click(cell);
+    await screen.findByRole("dialog");
+
+    await userEvent.click(screen.getByRole("button", { name: "Schließen" }));
+
+    await waitFor(() => {
+      expect(cell).toHaveFocus();
+    });
+  });
+
+  it("names the facilities where one Implementation counts for both", async () => {
+    await openCoverage();
+
+    await userEvent.click(
+      within(await grid()).getByRole("button", { name: /^§ 13 Abs\. 3 Nr\. 5 KRITIS-DachG/ }),
+    );
+
+    expect(
+      await within(await screen.findByRole("dialog")).findByText(/Wasserwerk Süd/),
+    ).toBeInTheDocument();
+  });
+
+  it("closes a linked pair into the page, not back out of it", async () => {
+    const { router } = renderRoute(`${PAGE}?target=req-k-12-1&source=req-b-30-2-1`);
+    await screen.findByRole("dialog");
+
+    await userEvent.click(screen.getByRole("button", { name: "Schließen" }));
+
+    await waitFor(() => {
       expect(new URLSearchParams(router.state.location.search).has("target")).toBe(false);
     });
+    expect(router.state.location.pathname).toBe(PAGE);
+  });
+
+  it("says so when the pair in the URL has no Mapping", async () => {
+    renderRoute(`${PAGE}?target=req-k-20-1&source=req-b-30-2-1`);
+
+    expect(
+      await within(await screen.findByRole("dialog")).findByText(
+        /Für diese beiden Anforderungen gibt es kein Mapping/,
+      ),
+    ).toBeInTheDocument();
   });
 });
 

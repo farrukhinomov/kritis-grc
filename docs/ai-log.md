@@ -425,7 +425,18 @@ Each milestone gets one entry with four parts:
 ### Accepted
 - **One aggregate for the grid.** `/coverage-matrix` crosses the KRITIS-DachG Requirements, grouped by paragraph, with the BSIG ones. Each pair that has a Mapping is one cell, rated by its strongest Mapping. Its details list every Mapping with its reasoning and gap.
 - **Only Mappings that apply.** Platform Mappings always apply; a Tenant Mapping only once approved.
-- **"Counts for both" means what Evidence says.** A cell names the facilities whose Implementation already refers to the BSIG Implementation as Evidence. A Mapping alone never changes an Implementation.
+- **"Counts for both" means what Evidence proves.** A cell names the facilities whose Implementation refers to the BSIG Implementation as Evidence, and only where a full Mapping applies and the BSIG Implementation is implemented. Under a partial Mapping, part of the duty stays uncovered, and the details say so. A Mapping alone never changes an Implementation.
 - **The heatmap is a real table.** It has row and column headers, and only the cells with a Mapping are buttons, each named with the pair, the coverage and the reuse. Full and partial differ in shape (a full and a half square), and reuse has a ring, so neither depends on color. Phones get the mapped pairs as a list.
-- **Short law names in citations.** "§ 30 Abs. 2 Nr. 1 BSIG", not the Framework's full name; the evidence suggestions and the heatmap share one mapping.
+- **Short law names in citations.** "§ 30 Abs. 2 Nr. 1 BSIG", not the Framework's full name ("NIS2 (BSIG 2025)"). The heatmap and the evidence suggestions share the mapping from Framework to abbreviation.
 - **Found while building:** the repository ignored every folder named `coverage`, including this feature's code, because the rule for the test report wasn't anchored. It is anchored to the report folder now.
+- **Review findings that were real defects**, each with a test that fails without its fix (mutation-checked where it is behavior):
+  - Prettier's ignore file had the same unanchored rule, so the feature was never format-checked. Anchored too.
+  - A partial Mapping was marked "counts for both", and so was a reference to an unfinished BSIG Implementation. Reuse now needs a full Mapping and an implemented source. The seed adds one such reference, for Süd, so the demo shows the case.
+  - Closing the details left focus on the page body, and a pair from a link that has no Mapping opened nothing. Focus returns to the cell, and an unknown pair opens the drawer with an explanation.
+  - The reuse ring and the focus ring were both outlines in the same green. Reuse is a dot in the corner now.
+  - Under forced colors, full and partial looked alike; the 28 px marks were the only targets; and the hidden caption could widen the page next to the table. Marks keep their shapes in system colors, the whole 44 px cell is the button, and the scroll container holds the hidden text.
+  - The matrix shared the Mappings' cache key, where pages of Mappings live. It has its own key now, refreshed by name after Mapping decisions, Evidence changes and new facilities.
+  - German tooltips in the English interface, borders lost under the sticky row headers, statute order taken from the seed's order (Nr. 10 would have come before Nr. 2 in a text sort), all versions of a Framework instead of the one in force, a diagonal that didn't mirror in right-to-left layouts, and tests that checked less than they claimed. All fixed.
+
+### Not built
+- **Sticky column headers.** The BSIG labels scroll out of view on a long page. Sticking them inside a container that scrolls sideways needs that container to scroll vertically too, which would give the page a second scroll area. With sixteen rows that isn't worth it.

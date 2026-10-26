@@ -10,19 +10,40 @@ import type {
 import type { TenantData } from "../db";
 import { tenantRoute } from "../http";
 
+/** "§ 13 Abs. 3 Nr. 10" as numbers, so Nr. 10 follows Nr. 9 as in the statute. */
+function statuteOrder(citation: string): number[] {
+  return [...citation.matchAll(/\d+/g)].map((match) => Number(match[0]));
+}
+
+function byStatute(a: string, b: string): number {
+  const [left, right] = [statuteOrder(a), statuteOrder(b)];
+  for (let index = 0; index < Math.max(left.length, right.length); index += 1) {
+    const difference = (left[index] ?? -1) - (right[index] ?? -1);
+    if (difference !== 0) {
+      return difference;
+    }
+  }
+  return 0;
+}
+
 /**
  * Which KRITIS-DachG Requirements the BSIG covers, as a grid of Requirement pairs. A cell
  * holds every Mapping between its two Requirements that applies to the Tenant: the
- * Platform's, and the Tenant's own once approved. It is rated by its strongest Mapping,
- * and it names the facilities whose Implementation already refers to the BSIG one as
- * Evidence, where one Implementation counts for both.
+ * Platform's, and the Tenant's own once approved. It is rated by its strongest Mapping.
+ * One Implementation counts for both only where a full Mapping applies and the facility's
+ * Implementation refers to an implemented BSIG one as Evidence: a partial Mapping leaves
+ * part of the duty uncovered, and an unfinished Implementation proves nothing.
  */
 function coverageMatrix(data: TenantData): CoverageMatrix {
   const requirementsOf = (key: Framework["key"]): CoverageRequirement[] => {
     const framework = data.frameworks.find((item) => item.key === key);
-    const versions = new Set(framework?.versions.map((version) => version.id));
+    // The version in force: the latest to take effect.
+    const current = framework?.versions
+      .toSorted((a, b) => a.effective_from.localeCompare(b.effective_from))
+      .at(-1);
     return data.requirements
-      .filter((item) => versions.has(item.framework_version_id))
+      .filter((item) => item.framework_version_id === current?.id)
+      .toSorted((a, b) => byStatute(a.citation, b.citation))
       .map((item) => ({
         id: item.id,
         citation: item.citation,
@@ -56,12 +77,13 @@ function coverageMatrix(data: TenantData): CoverageMatrix {
       if (mappings.length === 0) {
         continue;
       }
+      const full = mappings.some((mapping) => mapping.coverage === "full");
       const sources = new Set(
         data.implementations
-          .filter((item) => item.requirement_id === column.id)
+          .filter((item) => item.requirement_id === column.id && item.status === "implemented")
           .map((item) => item.id),
       );
-      const reused_in = data.implementations
+      const reused_in = (full ? data.implementations : [])
         .filter(
           (item) =>
             item.requirement_id === row.id &&
@@ -80,7 +102,7 @@ function coverageMatrix(data: TenantData): CoverageMatrix {
       cells.push({
         target_requirement_id: row.id,
         source_requirement_id: column.id,
-        coverage: mappings.some((mapping) => mapping.coverage === "full") ? "full" : "partial",
+        coverage: full ? "full" : "partial",
         mappings: mappings.map((mapping) => ({
           id: mapping.id,
           kind: mapping.kind,

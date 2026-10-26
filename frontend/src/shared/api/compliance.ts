@@ -255,12 +255,13 @@ export const mappingsQuery = (tenant: string, filter: MappingFilter = {}) =>
   });
 
 /**
- * An aggregate of the server's: every applying Mapping as a KRITIS-DachG by BSIG grid. Kept
- * under the Mappings' key, so every change to a Mapping refreshes it as well.
+ * An aggregate of the server's: every applying Mapping as a KRITIS-DachG by BSIG grid. Its
+ * own key, not one under the Mappings' lists, which hold pages of Mappings; the writes that
+ * change it (Mapping decisions, Evidence, facilities) refresh it by name.
  */
 export const coverageMatrixQuery = (tenant: string) =>
   queryOptions({
-    queryKey: resourceKey(tenant, "mappings", "coverage-matrix"),
+    queryKey: resourceKey(tenant, "coverage-matrix"),
     queryFn: ({ signal }) =>
       apiGet<CoverageMatrix>(tenantPath(tenant, ["coverage-matrix"]), signal),
   });

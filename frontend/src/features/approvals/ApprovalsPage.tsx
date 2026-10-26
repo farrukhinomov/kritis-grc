@@ -90,6 +90,7 @@ export function ApprovalsPage() {
         "approvals",
         "mapping-suggestions",
         "mappings",
+        "coverage-matrix",
         "risk-assessments",
         "deadlines",
         "activity",

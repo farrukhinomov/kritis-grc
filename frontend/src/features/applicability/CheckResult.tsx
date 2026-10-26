@@ -194,6 +194,8 @@ function CreateFacility({
       Promise.all([
         client.invalidateQueries({ queryKey: resourceKey(tenant, "scopes") }),
         client.invalidateQueries({ queryKey: resourceKey(tenant, "deadlines") }),
+        // The matrix names the facilities where an Implementation counts for both.
+        client.invalidateQueries({ queryKey: resourceKey(tenant, "coverage-matrix") }),
         client.invalidateQueries({ queryKey: resourceKey(tenant, "activity") }),
       ]),
   });
