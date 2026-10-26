@@ -274,7 +274,7 @@ As a GRC Manager, I want to see how my measures change the risk picture.
 ### P-14 Coverage heatmap
 **Labels:** `module:frontend`, `module:compliance`, `type:feature`, `prio:should` · **Estimate:** 2 h · **Depends on:** P-02
 
-- [ ] A KRITIS-DachG × BSIG grid showing Mappings (full/partial) and where one Implementation counts for both. Tapping a cell lists the details.
+- [x] A KRITIS-DachG × BSIG grid showing Mappings (full/partial) and where one Implementation counts for both. Tapping a cell lists the details.
 
 ### P-15 Standard screens
 **Labels:** `module:frontend`, `type:feature`, `prio:must` · **Estimate:** 3 h · **Depends on:** P-02

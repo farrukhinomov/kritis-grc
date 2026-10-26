@@ -523,6 +523,29 @@ export const de = {
     noRisks: "Kein Risiko nennt dieses Asset.",
     unknownAsset: "Dieses Asset gibt es in diesem Geltungsbereich nicht.",
   },
+  coverage: {
+    description:
+      "Wo das BSIG die Pflichten des KRITIS-DachG bereits abdeckt, und wo eine Umsetzung für beide zählt.",
+    empty: "Noch keine Mappings zwischen KRITIS-DachG und BSIG.",
+    caption: "Abdeckung: KRITIS-DachG nach BSIG",
+    axes: "{{rows}} ↓ · {{columns}} →",
+    list: "Mappings nach KRITIS-DachG-Anforderung",
+    legend: "Legende",
+    pair: "{{target}} durch {{source}}",
+    by: "durch {{source}}",
+    levels: { full: "vollständig abgedeckt", partial: "teilweise abgedeckt" },
+    reused: "eine Umsetzung zählt für beide",
+    totals_one:
+      "{{count}} Paar mit Mapping: {{full}} vollständig, {{partial}} teilweise; bei {{reused}} zählt eine Umsetzung bereits für beide.",
+    totals_other:
+      "{{count}} Paare mit Mapping: {{full}} vollständig, {{partial}} teilweise; bei {{reused}} zählt eine Umsetzung bereits für beide.",
+    mappings: "Mappings",
+    kinds: { platform: "Plattform-Mapping", tenant: "Mandanten-Mapping" },
+    gap: "Lücke:",
+    reuseTitle: "Eine Umsetzung für beide",
+    reusedIn: "Die Umsetzung verweist bereits auf die des BSIG: {{facilities}}.",
+    notReused: "Noch verweist keine Anlage auf die Umsetzung des BSIG.",
+  },
   dependencies: {
     description:
       "Wovon Ihre kritischen Anlagen abhängen: Assets, ihre Abhängigkeiten und die Lieferanten am Ende der Kette.",

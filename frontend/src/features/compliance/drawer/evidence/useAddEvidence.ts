@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { addEvidence, evidenceQuery } from "@/shared/api/compliance";
+import { addEvidence, coverageMatrixQuery, evidenceQuery } from "@/shared/api/compliance";
 import { resourceKey } from "@/shared/api/keys";
 import type { NewEvidence } from "@/shared/api/types";
 
@@ -17,6 +17,8 @@ export function useRefreshEvidence({ tenant, implementationId }: EvidenceTarget)
     Promise.all([
       client.invalidateQueries({ queryKey: evidenceQuery(tenant, implementationId).queryKey }),
       client.invalidateQueries({ queryKey: resourceKey(tenant, "activity") }),
+      // A reference to another Implementation makes it count for both in the coverage matrix.
+      client.invalidateQueries({ queryKey: coverageMatrixQuery(tenant).queryKey }),
     ]);
 }
 

@@ -4,6 +4,7 @@ import { ApiError, apiGet, apiRequest, tenantPath } from "./client";
 import { resourceKey } from "./keys";
 import type {
   ComplianceSummary,
+  CoverageMatrix,
   ParagraphSummary,
   Evidence,
   Framework,
@@ -251,6 +252,17 @@ export const mappingsQuery = (tenant: string, filter: MappingFilter = {}) =>
     queryKey: resourceKey(tenant, "mappings", filter),
     queryFn: ({ signal }) =>
       apiGet<Page<Mapping>>(tenantPath(tenant, ["mappings"], { ...filter }), signal),
+  });
+
+/**
+ * An aggregate of the server's: every applying Mapping as a KRITIS-DachG by BSIG grid. Kept
+ * under the Mappings' key, so every change to a Mapping refreshes it as well.
+ */
+export const coverageMatrixQuery = (tenant: string) =>
+  queryOptions({
+    queryKey: resourceKey(tenant, "mappings", "coverage-matrix"),
+    queryFn: ({ signal }) =>
+      apiGet<CoverageMatrix>(tenantPath(tenant, ["coverage-matrix"]), signal),
   });
 
 export interface SuggestionFilter extends PageParams {

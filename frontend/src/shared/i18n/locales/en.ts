@@ -509,6 +509,29 @@ export const en: Translation = {
     noRisks: "No risk names this asset.",
     unknownAsset: "This asset doesn't exist in this scope.",
   },
+  coverage: {
+    description:
+      "Where the BSIG already covers the KRITIS-DachG duties, and where one implementation counts for both.",
+    empty: "No mappings between KRITIS-DachG and BSIG yet.",
+    caption: "Coverage: KRITIS-DachG by BSIG",
+    axes: "{{rows}} ↓ · {{columns}} →",
+    list: "Mappings by KRITIS-DachG requirement",
+    legend: "Legend",
+    pair: "{{target}} by {{source}}",
+    by: "by {{source}}",
+    levels: { full: "fully covered", partial: "partly covered" },
+    reused: "one implementation counts for both",
+    totals_one:
+      "{{count}} pair with a mapping: {{full}} full, {{partial}} partial; for {{reused}}, one implementation already counts for both.",
+    totals_other:
+      "{{count}} pairs with a mapping: {{full}} full, {{partial}} partial; for {{reused}}, one implementation already counts for both.",
+    mappings: "Mappings",
+    kinds: { platform: "Platform mapping", tenant: "Tenant mapping" },
+    gap: "Gap:",
+    reuseTitle: "One implementation for both",
+    reusedIn: "The implementation already refers to the BSIG one: {{facilities}}.",
+    notReused: "No facility refers to the BSIG implementation yet.",
+  },
   dependencies: {
     description:
       "What your critical facilities depend on: assets, their dependencies and the suppliers at the end of the chain.",

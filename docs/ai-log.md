@@ -417,3 +417,15 @@ Each milestone gets one entry with four parts:
 
 ### Rejected
 - **"Use antd's Tree for the phone view."** It renders a flat, virtualised list without levels, so a screen reader can't hear the hierarchy. Nested lists say it on their own.
+
+---
+
+## P-14 Coverage heatmap (2026-10-26)
+
+### Accepted
+- **One aggregate for the grid.** `/coverage-matrix` crosses the KRITIS-DachG Requirements, grouped by paragraph, with the BSIG ones. Each pair that has a Mapping is one cell, rated by its strongest Mapping. Its details list every Mapping with its reasoning and gap.
+- **Only Mappings that apply.** Platform Mappings always apply; a Tenant Mapping only once approved.
+- **"Counts for both" means what Evidence says.** A cell names the facilities whose Implementation already refers to the BSIG Implementation as Evidence. A Mapping alone never changes an Implementation.
+- **The heatmap is a real table.** It has row and column headers, and only the cells with a Mapping are buttons, each named with the pair, the coverage and the reuse. Full and partial differ in shape (a full and a half square), and reuse has a ring, so neither depends on color. Phones get the mapped pairs as a list.
+- **Short law names in citations.** "§ 30 Abs. 2 Nr. 1 BSIG", not the Framework's full name; the evidence suggestions and the heatmap share one mapping.
+- **Found while building:** the repository ignored every folder named `coverage`, including this feature's code, because the rule for the test report wasn't anchored. It is anchored to the report folder now.

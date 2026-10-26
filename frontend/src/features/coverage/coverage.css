@@ -1,0 +1,204 @@
+.grc-coverage {
+  display: grid;
+  gap: 16px;
+}
+
+.grc-coverage-totals {
+  margin: 0;
+  font-size: 15px;
+}
+
+.grc-coverage-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+}
+
+.grc-coverage-legend li {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/*
+ * A cell's mark: a full square for full coverage, a half-filled one for partial, so the
+ * two differ in shape as well as in color. A ring marks a pair whose Implementation
+ * already counts for both.
+ */
+.grc-coverage-mark {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 2px solid var(--grc-primary);
+  border-radius: 5px;
+  background: var(--grc-primary);
+}
+
+.grc-coverage-mark[data-coverage="partial"] {
+  background: linear-gradient(135deg, var(--grc-primary) 0 50%, var(--grc-surface) 50% 100%);
+}
+
+.grc-coverage-mark[data-reused="true"] {
+  outline: 2px solid var(--grc-status-success-solid);
+  outline-offset: 2px;
+}
+
+button.grc-coverage-mark {
+  cursor: pointer;
+}
+
+button.grc-coverage-mark:focus-visible {
+  outline: 3px solid var(--grc-focus-ring);
+  outline-offset: 3px;
+}
+
+.grc-coverage-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 14px;
+  background: var(--grc-surface);
+}
+
+.grc-coverage-grid {
+  border-collapse: collapse;
+}
+
+.grc-coverage-corner {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  padding: 8px 12px;
+  background: var(--grc-surface);
+  color: var(--grc-text-secondary);
+  font-size: 12px;
+  vertical-align: bottom;
+}
+
+.grc-coverage-column {
+  height: 96px;
+  padding: 8px 0;
+  color: var(--grc-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+/* Column labels run upwards, so fourteen of them fit beside the row headers. */
+.grc-coverage-column > span[aria-hidden] {
+  display: inline-block;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.grc-coverage-row {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  min-width: 260px;
+  max-width: 340px;
+  padding: 6px 12px;
+  border-inline-end: 1px solid var(--grc-border-subtle);
+  background: var(--grc-surface);
+  font-weight: 400;
+  text-align: start;
+}
+
+.grc-coverage-row .grc-meta {
+  font-size: 12px;
+}
+
+.grc-coverage-group {
+  border-top: 2px solid var(--grc-border-subtle);
+}
+
+/* 44 px cells, so every mark is a comfortable target. */
+.grc-coverage-cell {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--grc-border-subtle);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.grc-coverage-cell > .grc-coverage-mark {
+  width: 28px;
+  height: 28px;
+}
+
+.grc-coverage-list {
+  display: grid;
+  gap: 12px;
+}
+
+.grc-coverage-entry {
+  padding: 12px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 12px;
+  background: var(--grc-surface);
+}
+
+.grc-coverage-entry-title {
+  margin: 0 0 8px;
+}
+
+.grc-coverage-pair {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--grc-surface-sunken);
+  color: var(--grc-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.grc-coverage-pair:focus-visible {
+  outline: 3px solid var(--grc-focus-ring);
+  outline-offset: 2px;
+}
+
+.grc-coverage-detail {
+  display: grid;
+  gap: 20px;
+}
+
+.grc-coverage-detail p {
+  margin: 0 0 6px;
+}
+
+.grc-coverage-mappings {
+  display: grid;
+  gap: 16px;
+}
+
+.grc-coverage-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.grc-coverage-tag[data-coverage="full"] {
+  border-color: var(--grc-status-success-solid);
+  background: var(--grc-status-success-bg);
+  color: var(--grc-status-success-text);
+}
+
+.grc-coverage-tag[data-coverage="partial"] {
+  border-color: var(--grc-status-warning-solid);
+  background: var(--grc-status-warning-bg);
+  color: var(--grc-status-warning-text);
+}
