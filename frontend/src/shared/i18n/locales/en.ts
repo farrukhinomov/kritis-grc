@@ -113,7 +113,7 @@ export const en: Translation = {
       overdue_other: "{{count}} days overdue",
       projected: "projected",
       projectedHint:
-        "Projected: calculated from the planned registration. The deadlines become binding only with the confirmed date.",
+        "Projected: the registration is only planned. The deadlines become binding only with the confirmed date.",
       empty: "No critical facility with a registration recorded.",
     },
     matrix: {
@@ -516,6 +516,7 @@ export const en: Translation = {
     timeline: "Timeline",
     list: "All deadlines by date",
     today: "Today",
+    range: "{{from}} to {{to}}",
     binding: "binding",
     citation: "{{citation}} KRITIS-DachG",
     obligations: {

@@ -17,7 +17,7 @@ function present(scope: StoredScope): Scope {
     ...scope,
     critical_facility: facility && {
       ...facility,
-      deadlines: deadlinesFor(facility.registration),
+      deadlines: deadlinesFor(facility.registration, facility.sector),
     },
   };
 }

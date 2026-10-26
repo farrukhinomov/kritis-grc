@@ -15,8 +15,8 @@ describe("the deadlines", () => {
   it("list every legal deadline of every Critical Facility, soonest first", async () => {
     const result = await client().query(deadlinesQuery(DEMO));
 
-    const dates = result.items.map((item) => item.due_date);
-    expect(dates).toEqual(dates.toSorted());
+    const order = result.items.map((item) => `${item.due_date} ${item.scope_name}`);
+    expect(order).toEqual(order.toSorted());
     expect(new Set(result.items.map((item) => item.scope_name))).toEqual(
       new Set(["Wasserwerk Nord", "Wasserwerk Süd"]),
     );
@@ -83,6 +83,18 @@ describe("the deadlines", () => {
       ["sc-sued", "2029-11-03"],
       ["sc-nord", "2030-10-20"],
     ]);
+  });
+
+  it("leave out what an exempt sector doesn't owe, the Risk Assessment's renewal too", async () => {
+    const sued = tenantData(DEMO)!.scopes.find((scope) => scope.id === "sc-sued")!;
+    sued.critical_facility!.sector = "finance";
+
+    const result = await client().query(deadlinesQuery(DEMO));
+
+    const citations = result.items
+      .filter((item) => item.scope_id === "sc-sued")
+      .map((item) => item.citation);
+    expect(citations).toEqual(["§ 18", "§ 20"]);
   });
 
   it("are empty without a Critical Facility", async () => {

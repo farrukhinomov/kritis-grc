@@ -8,8 +8,6 @@ import { combine } from "@/shared/lib/combineQueries";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
 import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 
-import { entryId } from "@/features/deadlines/entryId";
-
 import { CountUp } from "../CountUp";
 import { daysUntil, formatDate } from "@/shared/lib/format";
 
@@ -37,7 +35,10 @@ export function DeadlinesWidget() {
               {deadlines.map((deadline) => {
                 const days = daysUntil(deadline.due_date);
                 return (
-                  <li key={entryId(deadline)} className="grc-deadline">
+                  <li
+                    key={`${deadline.scope_id} ${deadline.obligation} ${deadline.due_date}`}
+                    className="grc-deadline"
+                  >
                     <span className="grc-deadline-days" data-overdue={days < 0}>
                       {days < 0 ? (
                         t("dashboard.deadlines.overdue", { count: -days })
@@ -49,7 +50,8 @@ export function DeadlinesWidget() {
                       )}
                     </span>
                     <span className="grc-deadline-detail">
-                      <strong>{deadline.citation} KRITIS-DachG</strong> · {deadline.scope_name}
+                      <strong>{t("deadlines.citation", { citation: deadline.citation })}</strong>{" "}
+                      {t(`deadlines.obligations.${deadline.obligation}`)} · {deadline.scope_name}
                       <br />
                       {formatDate(deadline.due_date, i18n.language)}{" "}
                       {!deadline.binding && (

@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { DeadlineItem } from "@/shared/api/types";
@@ -9,37 +9,38 @@ import { entryId } from "./entryId";
 const DAY_MS = 24 * 60 * 60 * 1000;
 const dayNumber = (isoDate: string) => Date.parse(`${isoDate.slice(0, 10)}T00:00:00Z`) / DAY_MS;
 
+/**
+ * The narrowest track a wide screen leaves, and a marker's target. Markers closer than one
+ * target apart at that width would cover each other, so they share one marker instead.
+ */
+const NARROWEST_TRACK_PX = 420;
+const TARGET_PX = 44;
+/** Past this share of the track, today's label turns to the left so it stays inside. */
+const LABEL_FLIP_SHARE = 0.85;
+
 interface Marker {
-  key: string;
-  date: string;
-  binding: boolean;
-  /** The soonest-listed of its deadlines, whose list entry the marker leads to. */
   first: DeadlineItem;
+  last: DeadlineItem;
   citations: string[];
+  /** Projected as long as any of its deadlines is; a projected date is not yet law. */
+  binding: boolean;
 }
 
-/**
- * Deadlines of one facility that fall on one day share a marker: at this scale they would
- * sit on top of each other, and one marker naming all their citations reads better.
- */
-function markersOf(items: DeadlineItem[]): Marker[] {
-  const markers = new Map<string, Marker>();
+function markersOf(items: DeadlineItem[], minimumGapDays: number): Marker[] {
+  const markers: Marker[] = [];
   for (const item of items) {
-    const key = `${item.due_date} ${String(item.binding)}`;
-    const marker = markers.get(key);
-    if (marker) {
-      marker.citations.push(item.citation);
+    const current = markers.at(-1);
+    if (current && dayNumber(item.due_date) - dayNumber(current.first.due_date) < minimumGapDays) {
+      current.last = item;
+      current.binding &&= item.binding;
+      if (!current.citations.includes(item.citation)) {
+        current.citations.push(item.citation);
+      }
     } else {
-      markers.set(key, {
-        key,
-        date: item.due_date,
-        binding: item.binding,
-        first: item,
-        citations: [item.citation],
-      });
+      markers.push({ first: item, last: item, citations: [item.citation], binding: item.binding });
     }
   }
-  return [...markers.values()];
+  return markers;
 }
 
 /**
@@ -54,21 +55,39 @@ export function Timeline({ items, today }: { items: DeadlineItem[]; today: strin
   const lastYear = Math.max(Number(today.slice(0, 4)), ...years);
   const start = dayNumber(`${String(firstYear)}-01-01`);
   const end = dayNumber(`${String(lastYear + 1)}-01-01`);
+  const share = (isoDate: string) => (dayNumber(isoDate) - start) / (end - start);
   const at = (isoDate: string): CSSProperties => ({
-    insetInlineStart: `${String(((dayNumber(isoDate) - start) / (end - start)) * 100)}%`,
+    insetInlineStart: `${String(share(isoDate) * 100)}%`,
   });
+  const minimumGapDays = ((end - start) * TARGET_PX) / NARROWEST_TRACK_PX;
   const ticks = Array.from({ length: lastYear - firstYear + 1 }, (_, index) => firstYear + index);
   const names = new Map(items.map((item) => [item.scope_id, item.scope_name]));
-  const lanes = [...names].map(([id, name]) => ({
-    id,
-    name,
-    markers: markersOf(items.filter((item) => item.scope_id === id)),
-  }));
+  // By name, so the lanes keep their places when a deadline moves.
+  const lanes = [...names]
+    .toSorted(([, a], [, b]) => a.localeCompare(b))
+    .map(([id, name]) => ({
+      id,
+      name,
+      markers: markersOf(
+        items.filter((item) => item.scope_id === id),
+        minimumGapDays,
+      ),
+    }));
 
-  const open = (target: DeadlineItem) => {
+  const open = (event: MouseEvent, target: DeadlineItem) => {
+    // A modified or middle click is the browser's: a new tab or window for the link.
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+    event.preventDefault();
     const entry = document.getElementById(entryId(target));
-    entry?.focus({ preventScroll: true });
-    entry?.scrollIntoView({ block: "center" });
+    if (entry) {
+      // Moved here on purpose, so the entry shows where focus went even after a click.
+      entry.dataset.reached = "";
+      entry.addEventListener("blur", () => delete entry.dataset.reached, { once: true });
+      entry.focus({ preventScroll: true });
+      entry.scrollIntoView({ block: "center" });
+    }
   };
 
   return (
@@ -97,24 +116,24 @@ export function Timeline({ items, today }: { items: DeadlineItem[]; today: strin
               <span className="grc-timeline-lane-name">{lane.name}</span>
               <span className="grc-timeline-track">
                 {lane.markers.map((marker) => {
-                  const citations = marker.citations.join(", ");
+                  const from = formatDate(marker.first.due_date, i18n.language);
+                  const to = formatDate(marker.last.due_date, i18n.language);
                   const label = [
-                    t("deadlines.citation", { citation: citations }),
+                    t("deadlines.citation", { citation: marker.citations.join(", ") }),
                     lane.name,
-                    formatDate(marker.date, i18n.language),
+                    from === to ? from : t("deadlines.range", { from, to }),
                     marker.binding ? t("deadlines.binding") : t("dashboard.deadlines.projected"),
                   ].join(", ");
                   return (
                     <a
-                      key={marker.key}
+                      key={entryId(marker.first)}
                       href={`#${entryId(marker.first)}`}
                       className="grc-timeline-marker"
-                      style={at(marker.date)}
+                      style={at(marker.first.due_date)}
                       aria-label={label}
                       title={label}
                       onClick={(event) => {
-                        event.preventDefault();
-                        open(marker.first);
+                        open(event, marker.first);
                       }}
                     >
                       <span
@@ -131,7 +150,11 @@ export function Timeline({ items, today }: { items: DeadlineItem[]; today: strin
         </ul>
         {/* Spans the tracks only, so today's position matches the markers'. */}
         <div className="grc-timeline-overlay" aria-hidden="true">
-          <div className="grc-timeline-today" style={at(today)}>
+          <div
+            className="grc-timeline-today"
+            style={at(today)}
+            data-flip={share(today) > LABEL_FLIP_SHARE}
+          >
             <span>{t("deadlines.today")}</span>
           </div>
         </div>

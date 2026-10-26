@@ -113,7 +113,7 @@ export const de = {
       overdue_other: "{{count}} Tage überfällig",
       projected: "prognostiziert",
       projectedHint:
-        "Prognostiziert: berechnet aus der geplanten Registrierung. Verbindlich werden die Fristen erst mit dem bestätigten Datum.",
+        "Prognostiziert: Die Registrierung ist erst geplant. Verbindlich werden die Fristen erst mit dem bestätigten Datum.",
       empty: "Keine kritische Anlage mit Registrierung erfasst.",
     },
     matrix: {
@@ -531,6 +531,7 @@ export const de = {
     timeline: "Zeitstrahl",
     list: "Alle Fristen nach Datum",
     today: "Heute",
+    range: "{{from}} bis {{to}}",
     binding: "verbindlich",
     citation: "{{citation}} KRITIS-DachG",
     obligations: {
