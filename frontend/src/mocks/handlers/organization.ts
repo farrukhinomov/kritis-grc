@@ -5,7 +5,7 @@ import { THEME_NAMES, type ThemeName } from "@/shared/theme/semantic";
 
 import { CRITICAL_SERVICES, checkApplicability, serviceFor } from "../applicability";
 import { logActivity, nextId } from "../db";
-import { deadlinesFor } from "../deadlines";
+import { deadlinesFor, tenantDeadlines } from "../deadlines";
 import { isRecord, jsonBody, listResponse, notFound, problem, tenantRoute } from "../http";
 import { idempotency } from "../idempotency";
 import type { StoredScope } from "../seed";
@@ -17,7 +17,7 @@ function present(scope: StoredScope): Scope {
     ...scope,
     critical_facility: facility && {
       ...facility,
-      deadlines: deadlinesFor(facility.registration),
+      deadlines: deadlinesFor(facility.registration, facility.sector),
     },
   };
 }
@@ -48,6 +48,10 @@ export const organizationHandlers = [
     });
     return HttpResponse.json(data.tenant);
   }),
+
+  tenantRoute("get", "/deadlines", ({ data }) =>
+    HttpResponse.json({ items: tenantDeadlines(data) }),
+  ),
 
   tenantRoute("get", "/members", ({ data, url }) => listResponse(data.members, url)),
 

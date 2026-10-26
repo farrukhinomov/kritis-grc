@@ -76,6 +76,13 @@ time.grc-widget-muted {
   font-size: 13px;
 }
 
+.grc-widget-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 4px;
+}
+
 /* ---------- Compliance ---------- */
 
 .grc-compliance {

@@ -109,6 +109,32 @@ export interface Deadline {
   binding: boolean;
 }
 
+export type DeadlineObligation =
+  | "risk_analysis"
+  | "resilience_measures"
+  | "incident_reporting"
+  | "management_duties"
+  | "risk_assessment_renewal";
+
+/** What a deadline is calculated from. */
+export type DeadlineBasis =
+  "planned_registration" | "confirmed_registration" | "approved_risk_assessment";
+
+/** One legal deadline of one Critical Facility on the Tenant's timeline. */
+export interface DeadlineItem {
+  scope_id: string;
+  scope_name: string;
+  citation: string;
+  obligation: DeadlineObligation;
+  due_date: string;
+  binding: boolean;
+  basis: DeadlineBasis;
+}
+
+export interface Deadlines {
+  items: DeadlineItem[];
+}
+
 export interface CriticalFacilityDetails {
   sector: Sector;
   critical_service: CriticalService;

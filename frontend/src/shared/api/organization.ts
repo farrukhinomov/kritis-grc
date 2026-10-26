@@ -8,6 +8,7 @@ import type {
   Asset,
   CriticalFacilityDetails,
   CriticalServiceDefinition,
+  Deadlines,
   Member,
   Page,
   PageParams,
@@ -59,6 +60,13 @@ export const assetsQuery = (tenant: string, filter: AssetFilter = {}) =>
     queryKey: resourceKey(tenant, "assets", filter),
     queryFn: ({ signal }) =>
       apiGet<Page<Asset>>(tenantPath(tenant, ["assets"], { ...filter }), signal),
+  });
+
+/** An aggregate of the server's: every legal deadline of every Critical Facility. */
+export const deadlinesQuery = (tenant: string) =>
+  queryOptions({
+    queryKey: resourceKey(tenant, "deadlines"),
+    queryFn: ({ signal }) => apiGet<Deadlines>(tenantPath(tenant, ["deadlines"]), signal),
   });
 
 export const criticalServicesQuery = (tenant: string) =>

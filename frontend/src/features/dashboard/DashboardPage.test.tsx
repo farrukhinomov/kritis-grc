@@ -54,6 +54,12 @@ describe("the dashboard", () => {
     const deadlines = widget("Fristen");
     expect(await deadlines.findAllByText("prognostiziert")).toHaveLength(4);
     expect(deadlines.getAllByText(/^§ 12 KRITIS-DachG/)).not.toHaveLength(0);
+    // Two duties can share a citation, so each names its obligation.
+    expect(deadlines.getByText(/Risikoanalyse und Risikobewertung/)).toBeInTheDocument();
+    expect(deadlines.getByRole("link", { name: "Alle Fristen" })).toHaveAttribute(
+      "href",
+      "/t/muster-stadtwerke/deadlines",
+    );
   });
 
   it("places every rated risk in the matrix and names each cell's category", async () => {
@@ -71,7 +77,7 @@ describe("the dashboard", () => {
     await openDashboard();
 
     expect(
-      await widget("Fristen").findByText(/^Prognostiziert: berechnet aus der geplanten/),
+      await widget("Fristen").findByText(/^Prognostiziert: Die Registrierung ist erst geplant/),
     ).toBeVisible();
   });
 

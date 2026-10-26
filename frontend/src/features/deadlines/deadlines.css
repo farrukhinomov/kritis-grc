@@ -1,0 +1,210 @@
+.grc-deadlines {
+  display: grid;
+  gap: 20px;
+  max-width: 1080px;
+}
+
+.grc-deadlines-note {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--grc-status-info-bg);
+  color: var(--grc-status-info-text);
+}
+
+/* Solid for a binding deadline, hollow for a projected one: shape, not color alone. */
+.grc-deadline-marker {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--grc-primary);
+  border-radius: 50%;
+  background: var(--grc-surface);
+}
+
+.grc-deadline-marker[data-binding="true"] {
+  background: var(--grc-primary);
+}
+
+.grc-timeline {
+  padding: 16px 20px 20px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 14px;
+  background: var(--grc-surface);
+}
+
+.grc-timeline-legend {
+  display: flex;
+  gap: 20px;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+}
+
+.grc-timeline-legend li {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.grc-timeline-grid {
+  --grc-timeline-name: 160px;
+  position: relative;
+}
+
+/* The tracks keep half a target free at each end, so markers at the edges stay inside. */
+.grc-timeline-grid {
+  --grc-timeline-edge: 22px;
+}
+
+.grc-timeline-years {
+  position: relative;
+  height: 22px;
+  margin-inline: calc(var(--grc-timeline-name) + var(--grc-timeline-edge)) var(--grc-timeline-edge);
+  color: var(--grc-text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.grc-timeline-year {
+  position: absolute;
+  top: 0;
+  padding-inline-start: 4px;
+  border-inline-start: 1px solid var(--grc-border-subtle);
+}
+
+.grc-timeline-lane {
+  display: grid;
+  grid-template-columns: var(--grc-timeline-name) 1fr;
+  align-items: center;
+  min-height: 48px;
+  border-block-start: 1px solid var(--grc-border-subtle);
+}
+
+.grc-timeline-lane-name {
+  padding-inline-end: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.grc-timeline-track {
+  position: relative;
+  align-self: stretch;
+  margin-inline: var(--grc-timeline-edge);
+  background: linear-gradient(var(--grc-border-subtle), var(--grc-border-subtle)) center / 100% 1px
+    no-repeat;
+}
+
+/* A 44 px target around a 14 px dot, centred on the date in either writing direction. */
+.grc-timeline-marker {
+  position: absolute;
+  top: calc(50% - 22px);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-inline-start: -22px;
+  border-radius: 50%;
+}
+
+.grc-timeline-marker:hover .grc-deadline-marker {
+  outline: 4px solid var(--grc-surface-sunken);
+}
+
+.grc-timeline-marker:focus-visible {
+  outline: 3px solid var(--grc-focus-ring);
+}
+
+.grc-timeline-overlay {
+  position: absolute;
+  inset-block: 0;
+  inset-inline: calc(var(--grc-timeline-name) + var(--grc-timeline-edge)) var(--grc-timeline-edge);
+  pointer-events: none;
+}
+
+.grc-timeline-today {
+  position: absolute;
+  inset-block: 0;
+  border-inline-start: 2px dashed var(--grc-status-warning-solid);
+}
+
+.grc-timeline-today > span {
+  position: absolute;
+  bottom: -18px;
+  padding-inline-start: 4px;
+  color: var(--grc-status-warning-text);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.grc-timeline-today[data-flip="true"] > span {
+  inset-inline-end: 0;
+  padding-inline: 0 4px;
+}
+
+.grc-deadlines-list {
+  display: grid;
+  gap: 8px;
+}
+
+.grc-deadlines-entry {
+  display: grid;
+  grid-template-columns: 14px minmax(120px, 160px) 1fr auto;
+  gap: 4px 16px;
+  align-items: baseline;
+  padding: 12px 16px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 12px;
+  background: var(--grc-surface);
+  scroll-margin-block: 96px;
+}
+
+/* Focus moved here by a marker shows even after a pointer click; a click inside doesn't. */
+.grc-deadlines-entry:focus-visible,
+.grc-deadlines-entry[data-reached]:focus {
+  outline: 3px solid var(--grc-focus-ring);
+  outline-offset: 2px;
+}
+
+.grc-deadlines-entry > .grc-deadline-marker {
+  align-self: center;
+}
+
+.grc-deadlines-when {
+  display: grid;
+  font-variant-numeric: tabular-nums;
+}
+
+.grc-deadlines-when [data-overdue="true"] {
+  color: var(--grc-status-danger-text);
+}
+
+.grc-deadlines-what p {
+  margin: 0;
+}
+
+.grc-deadlines-title {
+  font-size: 15px;
+}
+
+.grc-deadlines-tag[data-binding="false"] {
+  border-color: var(--grc-status-info-solid);
+  background: var(--grc-status-info-bg);
+  color: var(--grc-status-info-text);
+}
+
+@media (max-width: 767px) {
+  .grc-deadlines-entry {
+    grid-template-columns: 14px 1fr;
+    padding: 12px;
+  }
+
+  .grc-deadlines-what,
+  .grc-deadlines-tag {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

@@ -105,6 +105,7 @@ export const de = {
     },
     deadlines: {
       title: "Fristen",
+      all: "Alle Fristen",
       inDays_zero: "heute fällig",
       inDays_one: "in {{count}} Tag",
       inDays_other: "in {{count}} Tagen",
@@ -112,7 +113,7 @@ export const de = {
       overdue_other: "{{count}} Tage überfällig",
       projected: "prognostiziert",
       projectedHint:
-        "Prognostiziert: berechnet aus der geplanten Registrierung. Verbindlich werden die Fristen erst mit dem bestätigten Datum.",
+        "Prognostiziert: Die Registrierung ist erst geplant. Verbindlich werden die Fristen erst mit dem bestätigten Datum.",
       empty: "Keine kritische Anlage mit Registrierung erfasst.",
     },
     matrix: {
@@ -521,6 +522,30 @@ export const de = {
     risks: "Risiken, die dieses Asset betreffen",
     noRisks: "Kein Risiko nennt dieses Asset.",
     unknownAsset: "Dieses Asset gibt es in diesem Geltungsbereich nicht.",
+  },
+  deadlines: {
+    description:
+      "Alle gesetzlichen Fristen Ihrer kritischen Anlagen, berechnet aus Registrierung und Risikobewertung.",
+    empty:
+      "Noch keine kritische Anlage mit Registrierung erfasst. Mit der Betroffenheitsprüfung legen Sie eine an.",
+    timeline: "Zeitstrahl",
+    list: "Alle Fristen nach Datum",
+    today: "Heute",
+    range: "{{from}} bis {{to}}",
+    binding: "verbindlich",
+    citation: "{{citation}} KRITIS-DachG",
+    obligations: {
+      risk_analysis: "Risikoanalyse und Risikobewertung",
+      resilience_measures: "Resilienzmaßnahmen und Resilienzplan",
+      incident_reporting: "Meldung von Vorfällen",
+      management_duties: "Pflichten der Geschäftsleitung",
+      risk_assessment_renewal: "Erneute Risikobewertung, spätestens alle vier Jahre",
+    },
+    basis: {
+      planned_registration: "Berechnet aus der geplanten Registrierung",
+      confirmed_registration: "Berechnet aus der bestätigten Registrierung",
+      approved_risk_assessment: "Berechnet aus der freigegebenen Risikobewertung",
+    },
   },
   activityLog: {
     description:

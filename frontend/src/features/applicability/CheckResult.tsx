@@ -193,6 +193,7 @@ function CreateFacility({
     onSettled: () =>
       Promise.all([
         client.invalidateQueries({ queryKey: resourceKey(tenant, "scopes") }),
+        client.invalidateQueries({ queryKey: resourceKey(tenant, "deadlines") }),
         client.invalidateQueries({ queryKey: resourceKey(tenant, "activity") }),
       ]),
   });

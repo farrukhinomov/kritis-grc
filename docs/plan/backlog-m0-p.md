@@ -264,7 +264,7 @@ As a GRC Manager, I want to see how my measures change the risk picture.
 ### P-12 Deadlines timeline
 **Labels:** `module:frontend`, `type:feature`, `prio:should` · **Estimate:** 2 h · **Depends on:** P-02
 
-- [ ] All legal deadlines per Critical Facility on one timeline, with projected and confirmed deadlines shown differently and the legal basis on each item. On phones it's a vertical list.
+- [x] All legal deadlines per Critical Facility on one timeline, with projected and confirmed deadlines shown differently and the legal basis on each item. On phones it's a vertical list.
 
 ### P-13 Asset dependency graph
 **Labels:** `module:frontend`, `module:assets`, `type:feature`, `prio:should` · **Estimate:** 3 h · **Depends on:** P-02
