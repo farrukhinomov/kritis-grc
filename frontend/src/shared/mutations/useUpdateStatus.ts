@@ -72,6 +72,8 @@ export function useUpdateStatus(tenant: string, implementation: Implementation |
       Promise.all([
         client.invalidateQueries({ queryKey: implementations }),
         client.invalidateQueries({ queryKey: resourceKey(tenant, "risks") }),
+        // Shows each Asset's highest Residual Rating, which follows the status too.
+        client.invalidateQueries({ queryKey: resourceKey(tenant, "dependency-graph") }),
         client.invalidateQueries({ queryKey: resourceKey(tenant, "activity") }),
       ]),
   });

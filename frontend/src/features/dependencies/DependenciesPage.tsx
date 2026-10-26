@@ -2,8 +2,8 @@ import "@/shared/ui/RiskChip/riskChip.css";
 import "./dependencies.css";
 
 import { useQuery } from "@tanstack/react-query";
-import { Segmented, Switch } from "antd";
-import { useCallback, useId, useState } from "react";
+import { Segmented, Skeleton, Switch } from "antd";
+import { lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 
@@ -16,8 +16,13 @@ import { AssetDetail } from "@/shared/ui/assets/AssetDetail";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 
-import { DependencyGraphView } from "./DependencyGraphView";
+import type { OpenAsset } from "./assetLabel";
 import { DependencyTree } from "./DependencyTree";
+
+// Phones never show the graph, so they never download the graph library.
+const DependencyGraphView = lazy(async () => ({
+  default: (await import("./DependencyGraphView")).DependencyGraphView,
+}));
 
 type View = "graph" | "list";
 
@@ -68,8 +73,26 @@ export function DependenciesPage() {
     },
     [setParams],
   );
-  const open = useCallback(
-    (item: GraphAsset) => {
+  // The details leave with their URL parameter and take focus with them; it returns to the
+  // button that opened them, which in the list may be one of several for the same Asset.
+  const trigger = useRef<string | null>(null);
+  const shown = useRef(assetId);
+  useEffect(() => {
+    const before = shown.current;
+    shown.current = assetId;
+    if (before && !assetId) {
+      // Compared, not put into a selector: the value may come from the URL.
+      const button = [...document.querySelectorAll<HTMLElement>("[data-entry]")].find(
+        (element) => element.dataset.entry === trigger.current,
+      );
+      (button ?? document.querySelector<HTMLElement>("h1"))?.focus();
+      trigger.current = null;
+    }
+  }, [assetId]);
+
+  const open: OpenAsset = useCallback(
+    (item: GraphAsset, entry: string) => {
+      trigger.current = entry;
       set({ asset: item.id }, true);
     },
     [set],
@@ -115,10 +138,17 @@ export function DependenciesPage() {
               </span>
             </div>
             {overlay && <p className="grc-meta">{t("dependencies.overlayHint")}</p>}
-            <QueryContent query={graph} rows={8} isEmpty={() => false} empty="">
+            <QueryContent
+              query={graph}
+              rows={8}
+              isEmpty={([data]) => data.assets.length === 0}
+              empty={t("dependencies.noAssets")}
+            >
               {([data]) =>
                 wide && view === "graph" ? (
-                  <DependencyGraphView graph={data} overlay={overlay} onOpen={open} />
+                  <Suspense fallback={<Skeleton active paragraph={{ rows: 8 }} />}>
+                    <DependencyGraphView graph={data} overlay={overlay} onOpen={open} />
+                  </Suspense>
                 ) : (
                   <DependencyTree graph={data} overlay={overlay} onOpen={open} />
                 )
@@ -127,11 +157,12 @@ export function DependenciesPage() {
           </div>
         )}
       </QueryContent>
-      {assetId && asset && (
+      {/* An Asset the graph doesn't hold still opens, and says that it isn't part of it. */}
+      {assetId && scope && graph.data && (
         <AssetDetail
           tenant={tenant}
-          scopeId={asset.scope_id}
-          assetId={asset.id}
+          scopeId={asset?.scope_id ?? scope.id}
+          assetId={assetId}
           onClose={() => {
             if (opened) {
               void navigate(-1);

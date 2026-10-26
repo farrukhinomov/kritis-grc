@@ -402,6 +402,18 @@ Each milestone gets one entry with four parts:
 - **Found while testing:**
   - The graph library makes a node without its own handlers let clicks through, so the buttons in the nodes couldn't be clicked. Asset nodes now take pointer events.
   - Pressing a node's button started panning the graph. The buttons are now excluded from panning.
+- **Review findings that were real defects**, each with a test that fails without its fix (mutation-checked where it is behavior):
+  - Closing the details left focus on the page body. It returns to the exact button that opened them; in the list one Asset can have several.
+  - Changing an Implementation's status didn't refresh the graph, whose overlay shows Residual Ratings. It does now.
+  - An Asset with one low and one still-pending Risk read as low. While any of its Risks is pending, the highest rating is unknown and says so.
+  - Own Assets that only need each other in a cycle left the graph empty. The first of each such group by name starts it.
+  - A facility without Assets showed a lone node and no explanation, and an unknown Asset in the URL opened nothing. Both now say what is the case.
+  - The graph library still exposed English instructions and every arrow as an image named by internal ids, plus a role description without a role. Arrows are hidden from screen readers (the list says the same), and the instructions are empty.
+  - Tab could reach nodes panned out of view. The graph now follows the focus, without animation under reduced motion.
+  - Arrowheads kept the library's own gray in every Theme; node and entry borders used the decorative border instead of the one that meets 3:1; the zoom buttons were 36 px on touch screens; hovering hid the risk color; phones downloaded the graph library without ever showing it; and the accessible names didn't follow the visible text. All fixed.
+
+### Not built
+- **Scope-limited Memberships.** The graph crosses Scopes to reach shared suppliers. What a member limited to one Scope may see of organization-level Assets is for the backend to decide; the mock has no such Memberships.
 
 ### Rejected
 - **"Use antd's Tree for the phone view."** It renders a flat, virtualised list without levels, so a screen reader can't hear the hierarchy. Nested lists say it on their own.

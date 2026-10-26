@@ -35,11 +35,6 @@
   stroke-width: 1.5;
 }
 
-.grc-graph .react-flow__arrowhead polyline {
-  fill: var(--grc-text-secondary);
-  stroke: var(--grc-text-secondary);
-}
-
 .grc-graph .react-flow__handle {
   width: 6px;
   height: 6px;
@@ -56,9 +51,17 @@
 .grc-graph .react-flow__controls-button {
   width: 36px;
   height: 36px;
-  border: 1px solid var(--grc-border-subtle);
+  border: 1px solid var(--grc-control-border);
   background: var(--grc-surface);
   color: var(--grc-text);
+}
+
+/* Touch screens get the graph too; their fingers need 44 px targets. */
+@media (pointer: coarse) {
+  .grc-graph .react-flow__controls-button {
+    width: 44px;
+    height: 44px;
+  }
 }
 
 .grc-graph .react-flow__controls-button svg {
@@ -75,7 +78,7 @@
   justify-items: start;
   width: 240px;
   padding: 10px 12px;
-  border: 1px solid var(--grc-border-subtle);
+  border: 1px solid var(--grc-control-border);
   border-radius: 10px;
   background: var(--grc-surface);
   color: var(--grc-text);
@@ -87,8 +90,9 @@ button.grc-graph-node {
   cursor: pointer;
 }
 
+/* The border carries the risk overlay, so hovering marks the node with its background. */
 button.grc-graph-node:hover {
-  border-color: var(--grc-primary);
+  background: var(--grc-surface-sunken);
 }
 
 button.grc-graph-node:focus-visible {
@@ -170,7 +174,7 @@ button.grc-graph-node:focus-visible {
   width: 100%;
   min-height: 44px;
   padding: 8px 12px;
-  border: 1px solid var(--grc-border-subtle);
+  border: 1px solid var(--grc-control-border);
   border-radius: 10px;
   background: var(--grc-surface);
   color: var(--grc-text);

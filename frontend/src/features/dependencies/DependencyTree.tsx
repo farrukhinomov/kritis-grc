@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 
-import type { DependencyGraph, GraphAsset } from "@/shared/api/types";
+import type { DependencyGraph } from "@/shared/api/types";
 
-import { assetLabel, riskChip } from "./assetLabel";
+import { assetLabel, type OpenAsset, riskChip } from "./assetLabel";
 import { asTree, type TreeEntry } from "./layout";
 
 /**
@@ -16,7 +16,7 @@ export function DependencyTree({
 }: {
   graph: DependencyGraph;
   overlay: boolean;
-  onOpen: (asset: GraphAsset) => void;
+  onOpen: OpenAsset;
 }) {
   const { t } = useTranslation();
 
@@ -45,7 +45,7 @@ function Entries({
   entries: TreeEntry[];
   label?: string;
   overlay: boolean;
-  onOpen: (asset: GraphAsset) => void;
+  onOpen: OpenAsset;
 }) {
   const { t } = useTranslation();
 
@@ -59,13 +59,14 @@ function Entries({
               type="button"
               className="grc-dependency-entry"
               data-repeated={repeated}
+              data-entry={key}
               aria-label={
                 repeated
                   ? `${asset.name}, ${t("dependencies.repeated")}`
                   : assetLabel(t, asset, overlay)
               }
               onClick={() => {
-                onOpen(asset);
+                onOpen(asset, key);
               }}
             >
               <span className="grc-graph-node-name">{asset.name}</span>

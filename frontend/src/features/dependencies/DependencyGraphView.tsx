@@ -9,6 +9,7 @@ import {
   type NodeProps,
   Position,
   ReactFlow,
+  useReactFlow,
 } from "@xyflow/react";
 import { useReducedMotion } from "motion/react";
 import { useMemo } from "react";
@@ -16,14 +17,18 @@ import { useTranslation } from "react-i18next";
 
 import type { DependencyGraph, GraphAsset } from "@/shared/api/types";
 
-import { assetLabel, riskChip } from "./assetLabel";
+import { assetLabel, type OpenAsset, riskChip } from "./assetLabel";
 import { FACILITY_NODE, layOut } from "./layout";
 
 interface AssetData extends Record<string, unknown> {
   asset: GraphAsset;
   overlay: boolean;
-  onOpen: (asset: GraphAsset) => void;
+  onOpen: OpenAsset;
 }
+
+/** A node's slot, for centring it; the node's own width and a typical height. */
+const NODE_WIDTH = 240;
+const NODE_HEIGHT = 80;
 
 interface FacilityData extends Record<string, unknown> {
   name: string;
@@ -33,10 +38,31 @@ type AssetNode = Node<AssetData, "asset">;
 type FacilityNode = Node<FacilityData, "facility">;
 
 /** One Asset; the button is the node's only stop for the keyboard and opens its details. */
-function AssetNodeView({ data }: NodeProps<AssetNode>) {
+function AssetNodeView({ data, positionAbsoluteX, positionAbsoluteY }: NodeProps<AssetNode>) {
   const { t } = useTranslation();
   const { asset, overlay } = data;
   const category = overlay ? asset.risks.highest?.category : undefined;
+  const flow = useReactFlow();
+  const reducedMotion = useReducedMotion() ?? false;
+  const entry = `graph:${asset.id}`;
+
+  // Tab may reach a node that panning or zooming moved out of view; the graph follows it.
+  const reveal = (button: HTMLElement) => {
+    const pane = button.closest(".react-flow")?.getBoundingClientRect();
+    const own = button.getBoundingClientRect();
+    if (
+      pane &&
+      (own.left < pane.left ||
+        own.right > pane.right ||
+        own.top < pane.top ||
+        own.bottom > pane.bottom)
+    ) {
+      void flow.setCenter(positionAbsoluteX + NODE_WIDTH / 2, positionAbsoluteY + NODE_HEIGHT / 2, {
+        zoom: flow.getZoom(),
+        duration: reducedMotion ? 0 : 200,
+      });
+    }
+  };
 
   return (
     <>
@@ -47,9 +73,13 @@ function AssetNodeView({ data }: NodeProps<AssetNode>) {
         className="grc-graph-node nopan nodrag"
         data-kind={asset.kind}
         data-risk={category ?? (overlay && asset.risks.count > 0 ? "pending" : undefined)}
+        data-entry={entry}
         aria-label={assetLabel(t, asset, overlay)}
+        onFocus={(event) => {
+          reveal(event.currentTarget);
+        }}
         onClick={() => {
-          data.onOpen(asset);
+          data.onOpen(asset, entry);
         }}
       >
         <span className="grc-graph-node-name">{asset.name}</span>
@@ -92,7 +122,7 @@ export function DependencyGraphView({
 }: {
   graph: DependencyGraph;
   overlay: boolean;
-  onOpen: (asset: GraphAsset) => void;
+  onOpen: OpenAsset;
 }) {
   const { t } = useTranslation();
   const reducedMotion = useReducedMotion() ?? false;
@@ -103,8 +133,13 @@ export function DependencyGraphView({
     const nodes: (AssetNode | FacilityNode)[] = placed.map((item) => {
       const asset = byId.get(item.id);
       // The graph library's own focus and selection would add a second stop per node and
-      // English instructions; the button inside is the stop.
-      const shared = { id: item.id, position: item.position, focusable: false };
+      // English instructions; the button inside is the stop, and it names itself.
+      const shared = {
+        id: item.id,
+        position: item.position,
+        focusable: false,
+        domAttributes: { "aria-roledescription": undefined },
+      };
       return asset
         ? // Without handlers of its own the library lets clicks through the node; the
           // button inside must receive them.
@@ -116,7 +151,13 @@ export function DependencyGraphView({
           }
         : { ...shared, type: "facility", data: { name: graph.scope.name } };
     });
-    const arrow = { type: MarkerType.ArrowClosed, width: 16, height: 16 };
+    // Drawn by the library with an inline color, which only a value of the Theme's beats.
+    const arrow = {
+      type: MarkerType.ArrowClosed,
+      width: 16,
+      height: 16,
+      color: "var(--grc-text-secondary)",
+    };
     const edges: Edge[] = [
       ...graph.roots.map((id) => ({
         id: `${FACILITY_NODE}-${id}`,
@@ -126,7 +167,14 @@ export function DependencyGraphView({
       ...graph.assets.flatMap((asset) =>
         asset.depends_on.map((id) => ({ id: `${asset.id}-${id}`, source: asset.id, target: id })),
       ),
-    ].map((edge) => ({ ...edge, markerEnd: arrow, focusable: false }));
+      // The nodes' names and the list view say what the arrows show; read one by one with
+      // internal ids, they would only be noise.
+    ].map((edge) => ({
+      ...edge,
+      markerEnd: arrow,
+      focusable: false,
+      domAttributes: { "aria-hidden": true, "aria-roledescription": undefined },
+    }));
     return { nodes, edges };
   }, [graph, overlay, onOpen]);
 
@@ -149,6 +197,10 @@ export function DependencyGraphView({
           "controls.zoomIn.ariaLabel": t("dependencies.controls.zoomIn"),
           "controls.zoomOut.ariaLabel": t("dependencies.controls.zoomOut"),
           "controls.fitView.ariaLabel": t("dependencies.controls.fitView"),
+          // Instructions for moving and selecting nodes, which can't be done here.
+          "node.a11yDescription.default": "",
+          "node.a11yDescription.keyboardDisabled": "",
+          "edge.a11yDescription.default": "",
         }}
       >
         <Controls showInteractive={false} fitViewOptions={{ duration: reducedMotion ? 0 : 200 }} />

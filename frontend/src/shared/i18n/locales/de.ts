@@ -537,9 +537,9 @@ export const de = {
     risks_other: "{{count}} Risiken",
     noRisks: "keine Risiken",
     repeated: "oben aufgeführt",
-    highest: "höchstes Restrisiko: {{category}}",
-    pending: "Restrisiko wird berechnet",
-    pendingShort: "ausstehend",
+    chip: "Restrisiko: {{category}} · {{risks}}",
+    chipPending: "Restrisiko ausstehend · {{risks}}",
+    noAssets: "Für diese Anlage sind noch keine Assets erfasst.",
     controls: {
       label: "Ansicht des Graphen",
       zoomIn: "Vergrößern",

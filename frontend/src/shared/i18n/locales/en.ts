@@ -518,14 +518,14 @@ export const en: Translation = {
     view: { label: "View", graph: "Graph", list: "List" },
     overlay: "Show risks",
     overlayHint:
-      "Counted are this facility's risks that name the asset; the color shows the highest residual risk.",
+      "Each count covers this facility's risks that name the asset; the color shows the highest residual risk.",
     risks_one: "{{count}} risk",
     risks_other: "{{count}} risks",
     noRisks: "no risks",
     repeated: "listed above",
-    highest: "highest residual risk: {{category}}",
-    pending: "residual risk being calculated",
-    pendingShort: "pending",
+    chip: "Residual risk: {{category}} · {{risks}}",
+    chipPending: "Residual risk pending · {{risks}}",
+    noAssets: "No assets recorded for this facility yet.",
     controls: {
       label: "Graph view",
       zoomIn: "Zoom in",

@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+import { tenantData } from "@/mocks/db";
 import { WIDE_SCREEN_QUERY } from "@/shared/lib/breakpoints";
 import { matchMediaQueries } from "@/test/media";
 import { layOutForGraphs } from "@/test/reactFlow";
@@ -67,9 +68,71 @@ describe("the dependency graph", () => {
     await waitFor(() => {
       expect(wells).toHaveTextContent("2 Risiken");
     });
+    // The name says what the node shows, in the same order.
     expect(wells).toHaveAccessibleName(
-      /2 Risiken, höchstes Restrisiko: (Niedrig|Mittel|Hoch|Kritisch)/,
+      "Brunnenfeld Nord, Technische Anlage, Restrisiko: Hoch · 2 Risiken",
     );
+  });
+
+  it("returns focus to the node that opened the details", async () => {
+    await openDependencies();
+    const pumps = await within(await graph()).findByRole("button", { name: /^Pumpwerk Nord/ });
+    await userEvent.click(pumps);
+    await screen.findByRole("dialog");
+
+    await userEvent.click(screen.getByRole("button", { name: "Schließen" }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(pumps).toHaveFocus();
+    });
+  });
+
+  it("closes the details with the back gesture", async () => {
+    const { router } = await openDependencies();
+    await userEvent.click(
+      await within(await graph()).findByRole("button", { name: /^Pumpwerk Nord/ }),
+    );
+    await screen.findByRole("dialog");
+
+    await router.navigate(-1);
+
+    await waitFor(() => {
+      expect(new URLSearchParams(router.state.location.search).has("asset")).toBe(false);
+    });
+  });
+
+  it("closes a linked Asset into the page, not back out of it", async () => {
+    const { router } = await openDependencies("?asset=as-n-pumps");
+    await screen.findByRole("dialog");
+
+    await userEvent.click(screen.getByRole("button", { name: "Schließen" }));
+
+    await waitFor(() => {
+      expect(new URLSearchParams(router.state.location.search).has("asset")).toBe(false);
+    });
+    expect(router.state.location.pathname).toBe(PAGE);
+  });
+
+  it("says so when the Asset in the URL isn't part of the graph", async () => {
+    await openDependencies("?asset=as-s-pumps");
+
+    expect(
+      await within(await screen.findByRole("dialog")).findByText(
+        "Dieses Asset gibt es in diesem Geltungsbereich nicht.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps the graph library's English helper texts away from screen readers", async () => {
+    await openDependencies();
+    await within(await graph()).findByRole("button", { name: /^Pumpwerk Nord/ });
+
+    expect(screen.queryByText(/Press enter or space/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: /^Edge from/ })).not.toBeInTheDocument();
+    expect(document.querySelector("[aria-roledescription]")).toBeNull();
   });
 
   it("switches to another Critical Facility, kept in the URL", async () => {
@@ -130,6 +193,18 @@ describe("the dependencies on phones", () => {
 
     expect(
       await within(await screen.findByRole("dialog")).findByText("Pumpwerk Nord"),
+    ).toBeInTheDocument();
+  });
+});
+
+describe("a Critical Facility without Assets", () => {
+  it("says where Assets come from", async () => {
+    const data = tenantData("muster-stadtwerke")!;
+    data.assets = data.assets.filter((asset) => asset.scope_id !== "sc-nord");
+    await openDependencies();
+
+    expect(
+      await screen.findByText(/Für diese Anlage sind noch keine Assets erfasst/),
     ).toBeInTheDocument();
   });
 });

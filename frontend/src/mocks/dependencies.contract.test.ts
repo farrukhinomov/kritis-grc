@@ -43,7 +43,8 @@ describe("the dependency graph", () => {
 
     const wells = result.assets.find((asset) => asset.id === "as-n-wells")!;
     expect(wells.risks.count).toBe(2);
-    expect(["low", "medium", "high", "critical"]).toContain(wells.risks.highest?.category);
+    // Of its two Risks, the higher Residual Rating.
+    expect(wells.risks.highest).toEqual({ likelihood: 2, impact: 4, score: 8, category: "high" });
     // Both plants rely on the chlorine supplier, but only a Risk of Nord names it.
     const chlorine = result.assets.find((asset) => asset.id === "as-chlorine")!;
     expect(chlorine.risks.count).toBe(1);
@@ -71,6 +72,17 @@ describe("the dependency graph", () => {
     const result = await graph("sc-nord");
 
     expect(result.assets.filter((asset) => asset.id === "as-grid")).toHaveLength(1);
+  });
+
+  it("starts from the facility's own Assets even where they need each other in a cycle", async () => {
+    const assets = tenantData(DEMO)!.assets;
+    // Plant and reservoir rely on each other, so neither is "needed by nothing".
+    assets.find((asset) => asset.id === "as-n-reservoir")!.depends_on.push("as-n-plant");
+    assets.find((asset) => asset.id === "as-n-plant")!.depends_on.push("as-n-reservoir");
+
+    const result = await graph("sc-nord");
+
+    expect(result.roots).toEqual(["as-n-plant"]);
   });
 
   it("exists only for a Critical Facility of the Tenant", async () => {
