@@ -25,9 +25,12 @@ RUN pnpm build
 
 # Serves as an unprivileged user on port 8080; root is used only to apply OS patches.
 FROM ${NGINX_IMAGE} AS runtime
-# Security patches published after the pinned base image are applied on every build.
+# Security patches published after the pinned base image are applied on every build. A
+# build cache would keep the first upgrade forever, so CI passes the day: the layer is
+# renewed at least daily.
 USER root
-RUN apk upgrade --no-cache
+ARG OS_PATCH_DAY=unset
+RUN echo "OS patches as of ${OS_PATCH_DAY}" && apk upgrade --no-cache
 USER 101
 ENV API_UPSTREAM=http://backend:8080
 COPY nginx/security-headers.conf /etc/nginx/snippets/security-headers.conf

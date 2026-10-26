@@ -225,6 +225,9 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       # The flow, axe on the main screens, reduced motion and the visual baselines, against
       # the production build with the mock API, as the prototype is deployed.
+      # TEMPORARY: baselines made on the runner, printed for transfer; removed in the next commit.
+      - run: pnpm exec playwright test e2e/visual.spec.ts --update-snapshots=all
+      - run: tar -czf - e2e/__screenshots__ | base64 -w 0 && echo
       - run: pnpm e2e
       - name: Report on failure
         if: failure()
@@ -285,10 +288,16 @@ jobs:
         with:
           persist-credentials: false
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      # The day renews the cached layer that applies OS patches, so a fix published since
+      # the last build is in the image the scan below checks.
+      - name: Today
+        id: today
+        run: echo "day=$(date -u +%F)" >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ${{ matrix.context }}
           build-contexts: ${{ matrix.build-contexts }}
+          build-args: OS_PATCH_DAY=${{ steps.today.outputs.day }}
           load: true
           tags: grc-${{ matrix.name }}:ci
           cache-from: type=gha,scope=${{ matrix.name }}
