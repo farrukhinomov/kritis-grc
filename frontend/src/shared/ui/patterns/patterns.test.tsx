@@ -108,6 +108,29 @@ describe("ColumnDrillDown", () => {
     expect(group.queryByRole("button", { name: "Zurück" })).not.toBeInTheDocument();
   });
 
+  it("holds the place of a level that isn't open, and swaps content in its place", () => {
+    matchMediaQueries(WIDE_SCREEN_QUERY);
+    const open: DrillColumn = { key: "a", slot: "second", title: "Zweite", content: "Inhalt A" };
+    const held: DrillColumn = { ...open, key: "none", placeholder: true, content: "Wählen Sie" };
+    const { rerender } = render(
+      <ColumnDrillDown label="Cockpit" columns={[COLUMNS[0]!, held]} onBack={vi.fn()} />,
+    );
+    const column = screen.getByRole("heading", { name: "Zweite" }).closest("section");
+
+    rerender(<ColumnDrillDown label="Cockpit" columns={[COLUMNS[0]!, open]} onBack={vi.fn()} />);
+
+    expect(screen.getByRole("heading", { name: "Zweite" }).closest("section")).toBe(column);
+    expect(screen.getByText("Inhalt A")).toBeInTheDocument();
+    expect(screen.queryByText("Wählen Sie")).not.toBeInTheDocument();
+  });
+
+  it("shows no held places on phones, one level at a time", () => {
+    const held: DrillColumn = { key: "none", placeholder: true, title: "Leer", content: "Hinweis" };
+    render(<ColumnDrillDown label="Cockpit" columns={[COLUMNS[0]!, held]} onBack={vi.fn()} />);
+
+    expect(screen.queryByText("Hinweis")).not.toBeInTheDocument();
+  });
+
   it("stacks the levels on phones and goes back one level at a time", async () => {
     function Harness() {
       const [columns, setColumns] = useState(COLUMNS);

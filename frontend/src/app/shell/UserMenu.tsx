@@ -48,11 +48,10 @@ export function UserMenu({ role, includeLanguage, showName }: UserMenuProps) {
       key: "identity",
       type: "group",
       label: (
-        <>
+        <span className="grc-user-menu-identity">
           <strong>{user.display_name}</strong>
-          <br />
-          {t(`shell.roles.${role}`)}
-        </>
+          <span>{t(`shell.roles.${role}`)}</span>
+        </span>
       ),
     },
     { type: "divider" },
@@ -113,7 +112,12 @@ export function UserMenu({ role, includeLanguage, showName }: UserMenuProps) {
   };
 
   return (
-    <Dropdown trigger={["click"]} placement="bottomRight" menu={{ items, onClick }}>
+    <Dropdown
+      trigger={["click"]}
+      placement="bottomRight"
+      rootClassName="grc-user-menu"
+      menu={{ items, onClick }}
+    >
       <Button
         type="text"
         aria-label={showName ? undefined : t("shell.userMenu")}

@@ -162,6 +162,10 @@ export const en: Translation = {
       requirements: "Requirements",
       implementation: "Implementation",
     },
+    hints: {
+      requirements: "Choose a paragraph to see its requirements.",
+      implementation: "Choose a requirement to see its implementation.",
+    },
     summary:
       "{{requirements}} requirements · {{implemented}} implemented · {{partial}} partially · {{open}} open",
     implementedOf: "{{implemented}} of {{total}} implemented",

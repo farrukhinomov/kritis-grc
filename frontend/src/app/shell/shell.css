@@ -94,9 +94,20 @@
 }
 
 /* Hover keeps the regular text color: the active text color is only tested on the
-   active background, and in High Contrast it is black. */
+   active background, and in High Contrast it is black. Without this the UI library's
+   own link color applies on hover, a dark green or blue that can't be read on the
+   sidebar in any Theme. */
+.grc-shell-nav-link:hover,
+.grc-shell-nav-link:focus-visible {
+  color: var(--grc-sidebar-text);
+}
+
 .grc-shell-nav-link:not([aria-current="page"]):hover {
   background: var(--grc-sidebar-hover-bg);
+}
+
+.grc-shell-nav-link[aria-current="page"]:hover {
+  color: var(--grc-sidebar-text-active);
 }
 
 .grc-shell-nav-link[aria-current="page"] {
@@ -385,4 +396,64 @@
   padding: 0 4px;
   font-size: 10px;
   line-height: 16px;
+}
+
+/* The same on the phone's tab bar and sheet, where a tap leaves the hover state behind. */
+.grc-shell-tab:hover {
+  color: var(--grc-text-secondary);
+}
+
+.grc-shell-tab[aria-current="page"]:hover,
+.grc-shell-tab[data-active="true"]:hover {
+  color: var(--grc-link);
+}
+
+.grc-shell-sheet-link:hover {
+  color: var(--grc-text);
+}
+
+.grc-shell-sheet-link[aria-current="page"]:hover {
+  color: var(--grc-on-primary);
+}
+
+/* ---------- User menu ---------- */
+
+/* antd insets the items of a group by 8 px but not the group's title, which left the
+   name, the group heading and the icons on three different edges. Everything starts at
+   12 px from the menu's edge. */
+.ant-dropdown.grc-user-menu .ant-dropdown-menu {
+  min-width: 232px;
+  padding: 6px;
+}
+
+.ant-dropdown.grc-user-menu .ant-dropdown-menu .ant-dropdown-menu-item-group-list {
+  margin: 0;
+}
+
+.ant-dropdown.grc-user-menu .ant-dropdown-menu .ant-dropdown-menu-item-group-title {
+  padding: 8px 12px 4px;
+}
+
+.ant-dropdown.grc-user-menu .ant-dropdown-menu .ant-dropdown-menu-item {
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 6px 12px;
+}
+
+.grc-user-menu-identity {
+  display: grid;
+  gap: 2px;
+  color: var(--grc-text);
+}
+
+.grc-user-menu-identity > span {
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+}
+
+@media (pointer: coarse) {
+  .ant-dropdown.grc-user-menu .ant-dropdown-menu .ant-dropdown-menu-item {
+    min-height: 44px;
+  }
 }

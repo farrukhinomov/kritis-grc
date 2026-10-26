@@ -97,10 +97,20 @@
 
 .grc-drill {
   display: grid;
-  grid-auto-columns: minmax(280px, 1fr);
-  grid-auto-flow: column;
+  grid-template-columns: repeat(var(--grc-drill-columns, 3), minmax(260px, 1fr));
   gap: 16px;
   overflow-x: auto;
+}
+
+/* A slot held open for the next level, so the columns never change width as one opens. */
+.grc-drill-column[data-placeholder="true"] {
+  border-style: dashed;
+  background: transparent;
+}
+
+.grc-drill-hint {
+  margin: 0;
+  color: var(--grc-text-secondary);
 }
 
 .grc-drill-column,

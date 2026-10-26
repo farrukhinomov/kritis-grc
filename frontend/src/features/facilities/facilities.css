@@ -20,6 +20,20 @@
   background: var(--grc-surface);
 }
 
+/* Side by side, a card's label column left a value too narrow for a word like
+   "Trinkwasserversorgung", which then stuck out of the card. Stacked, every value has the
+   card's full width, and anything longer still wraps. */
+.grc-facility-card .grc-facts {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  width: 100%;
+}
+
+.grc-facility-card .grc-facts dd {
+  margin-bottom: 10px;
+  overflow-wrap: anywhere;
+}
+
 .grc-facility-card[data-selected="true"] {
   border-color: var(--grc-primary);
 }

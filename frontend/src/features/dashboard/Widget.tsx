@@ -9,6 +9,12 @@ interface WidgetProps {
   title: string;
   /** Spans two columns on wide screens, for content that needs the width. */
   wide?: boolean;
+  /**
+   * Spans two rows on wide screens. A tall card beside a short one would otherwise stretch
+   * its neighbor, leaving it half empty; spanning lets the neighbor keep its own height
+   * and the cards below fill the rest.
+   */
+  tall?: boolean;
   children: ReactNode;
 }
 
@@ -16,13 +22,16 @@ interface WidgetProps {
  * One dashboard card. It owns its error boundary, so a widget that fails to render
  * leaves the other five working.
  */
-export function Widget({ title, wide = false, children }: WidgetProps) {
+export function Widget({ title, wide = false, tall = false, children }: WidgetProps) {
   const headingId = useId();
   const client = useQueryClient();
   const tenant = useCurrentMembership().tenant.slug;
 
   return (
-    <section aria-labelledby={headingId} className={`grc-widget${wide ? " grc-widget-wide" : ""}`}>
+    <section
+      aria-labelledby={headingId}
+      className={`grc-widget${wide ? " grc-widget-wide" : ""}${tall ? " grc-widget-tall" : ""}`}
+    >
       <h2 id={headingId} className="grc-widget-title">
         {title}
       </h2>
