@@ -388,3 +388,20 @@ Each milestone gets one entry with four parts:
 
 ### Rejected
 - **"Show a label next to every marker."** Deadlines a month apart are a few pixels apart at this scale, so the labels would overlap. The marker's accessible name and its list entry carry the text.
+
+---
+
+## P-13 Asset dependency graph (2026-10-26)
+
+### Accepted
+- **React Flow (`@xyflow/react`, MIT)** draws the graph; the styles are the Theme's tokens. It only displays: nothing is dragged, connected or deleted, and its own node focus and English helper texts are switched off. Each node holds a real button that opens the Asset's details, so every node is one stop for the keyboard.
+- **One aggregate per Critical Facility.** `/dependency-graph` returns the facility's Assets and everything they depend on, across Scopes, with the facility's own Risks per Asset. A shared supplier is threatened differently at each facility, so another facility's Risks don't count here.
+- **Top-down layers by the longest path.** Every Asset sits below everything that relies on it, so all arrows point down. A chain of seven layers fits a screen's height at a readable size; left to right it was too small to read.
+- **The same content as a list.** Phones get it as nested lists; wide screens can switch to it. A shared Asset appears in full once and is only named where it appears again, which keeps the phone page at about half its length.
+- **The overlay's chip is short ("Hoch · 2 Risiken")**, and the node's accessible name says it in full.
+- **Found while testing:**
+  - The graph library makes a node without its own handlers let clicks through, so the buttons in the nodes couldn't be clicked. Asset nodes now take pointer events.
+  - Pressing a node's button started panning the graph. The buttons are now excluded from panning.
+
+### Rejected
+- **"Use antd's Tree for the phone view."** It renders a flat, virtualised list without levels, so a screen reader can't hear the hierarchy. Nested lists say it on their own.

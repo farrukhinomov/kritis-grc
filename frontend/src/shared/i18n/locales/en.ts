@@ -509,6 +509,30 @@ export const en: Translation = {
     noRisks: "No risk names this asset.",
     unknownAsset: "This asset doesn't exist in this scope.",
   },
+  dependencies: {
+    description:
+      "What your critical facilities depend on: assets, their dependencies and the suppliers at the end of the chain.",
+    empty: "No critical facility yet. The applicability check creates one.",
+    graph: "Dependency graph: {{name}}",
+    tree: "Dependencies of {{name}}",
+    view: { label: "View", graph: "Graph", list: "List" },
+    overlay: "Show risks",
+    overlayHint:
+      "Counted are this facility's risks that name the asset; the color shows the highest residual risk.",
+    risks_one: "{{count}} risk",
+    risks_other: "{{count}} risks",
+    noRisks: "no risks",
+    repeated: "listed above",
+    highest: "highest residual risk: {{category}}",
+    pending: "residual risk being calculated",
+    pendingShort: "pending",
+    controls: {
+      label: "Graph view",
+      zoomIn: "Zoom in",
+      zoomOut: "Zoom out",
+      fitView: "Show the whole graph",
+    },
+  },
   deadlines: {
     description:
       "Every legal deadline of your critical facilities, calculated from registration and risk assessment.",

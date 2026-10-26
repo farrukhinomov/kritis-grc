@@ -1,4 +1,5 @@
 import "@/shared/ui/RiskChip/riskChip.css";
+import "./assetDetail.css";
 
 import { useQuery } from "@tanstack/react-query";
 import { useId } from "react";
