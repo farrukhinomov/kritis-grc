@@ -225,9 +225,6 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       # The flow, axe on the main screens, reduced motion and the visual baselines, against
       # the production build with the mock API, as the prototype is deployed.
-      # TEMPORARY: baselines made on the runner, printed for transfer; removed in the next commit.
-      - run: pnpm exec playwright test e2e/visual.spec.ts --update-snapshots=all
-      - run: tar -czf - e2e/__screenshots__ | base64 -w 0 && echo
       - run: pnpm e2e
       - name: Report on failure
         if: failure()

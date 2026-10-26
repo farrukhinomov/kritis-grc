@@ -488,5 +488,9 @@ Each was confirmed with a mutation or a throwaway test.
   - To measure on the deployed site: PageSpeed Insights on `grc.inomov.online`.
 - **The deployment.** Importing the project into Vercel and setting `VITE_API_MOCKING=enabled` are manual steps in the Vercel account (see `infra/README.md`). The README marks the live link as pending.
 
+### Found in CI
+- **The baselines made here didn't match the runner:** 6,500 to 45,000 pixels differed per screen, from text anti-aliasing alone, despite the same Chromium and the bundled font. The baselines now come from the runner, and the visual checks are left out locally.
+- **The frontend image failed its scan on a curl fix published since the last build.** The build cache kept serving the first `apk upgrade` layer, so new OS patches never reached the image. CI now passes the day as a build argument, which renews that layer daily.
+
 ### Rejected
-- **"Generate the baselines in the Playwright Docker image."** There is no Docker daemon here. The same Chromium build and the bundled font give the same rendering; the CI run will show whether that holds, and its report contains every difference.
+- **"Make the baselines on this machine."** Text renders differently from the runner, and every comparison failed. The runner is the one place every check runs, so it makes the baselines.
