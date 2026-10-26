@@ -2,13 +2,13 @@
 
 A multi-tenant governance, risk and compliance SaaS for operators of critical facilities in Germany. It covers the KRITIS-Dachgesetz (physical resilience) and maps it to NIS2 as implemented in the BSIG, so one piece of work counts toward both.
 
-> **Status:** the clickable prototype on demo data is complete; the backend milestone M0 is in progress (see [docs/scope.md](docs/scope.md)). The prototype will be live at **grc.inomov.online**, marked "Prototyp – Demodaten"; the deployment is pending.
+> **Status:** the clickable prototype on demo data is complete; the backend milestone M0 is in progress (see [docs/scope.md](docs/scope.md)). The prototype is live at **[grc.inomov.online](https://grc.inomov.online)**, marked "Prototyp – Demodaten".
 
 ![The dashboard of the Demo Tenant](frontend/e2e/__screenshots__/desktop/dashboard-saar-green-light.png)
 
 ## A short tour of the prototype
 
-Everything runs in the browser on fictional data; nothing is sent anywhere. Sign in with "Als GRC-Manager ansehen", or as the Auditor, who reads everything and changes nothing.
+Everything runs in the browser on fictional data; nothing is sent anywhere. [grc.inomov.online](https://grc.inomov.online) opens straight in the demo organization as the GRC Manager, in light mode, so there is nothing to sign in to. To see the Auditor, who reads everything and changes nothing, sign out and choose "Als Auditor ansehen".
 
 1. **Übersicht:** compliance per Framework and facility, the next legal deadlines, the residual risk matrix and your open Implementations.
 2. **Compliance:** from paragraph to Requirement to Implementation. Set a status, attach Evidence, or refer to the BSIG Implementation that already covers it.
