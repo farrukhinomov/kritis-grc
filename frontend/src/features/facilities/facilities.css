@@ -51,22 +51,6 @@
   gap: 4px;
 }
 
-.grc-asset-detail {
-  display: grid;
-  gap: 20px;
-}
-
-.grc-asset-detail p {
-  margin: 0;
-}
-
-.grc-asset-risk {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
 /* A long Scope name may wrap; the button keeps its height and padding while it does. */
 .grc-facility-show.ant-btn {
   max-width: 100%;

@@ -11,11 +11,10 @@ import type { Asset, Scope } from "@/shared/api/types";
 import { combine } from "@/shared/lib/combineQueries";
 import { formatDate } from "@/shared/lib/format";
 import { useCurrentMembership } from "@/shared/session/sessionContext";
+import { AssetDetail } from "@/shared/ui/assets/AssetDetail";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 import { ResponsiveTable } from "@/shared/ui/patterns/ResponsiveTable";
-
-import { AssetDetail } from "./AssetDetail";
 
 /**
  * The Tenant's Scopes and, for the chosen one, its Assets. The chosen Scope and an open

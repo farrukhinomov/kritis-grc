@@ -168,6 +168,24 @@ export interface Asset {
   description: string;
 }
 
+/** An Asset in a facility's dependency graph, with the facility's Risks that name it. */
+export interface GraphAsset extends Asset {
+  scope_name: string;
+  risks: {
+    count: number;
+    /** The highest Residual Rating; null without Risks or while it can't be calculated. */
+    highest: Rating | null;
+  };
+}
+
+export interface DependencyGraph {
+  scope: Pick<Scope, "id" | "name">;
+  /** The Assets the facility relies on directly: those none of its other Assets needs. */
+  roots: string[];
+  /** The facility's Assets and, across Scopes, every Asset they depend on. */
+  assets: GraphAsset[];
+}
+
 // ---------- Compliance ----------
 
 export interface FrameworkVersion {

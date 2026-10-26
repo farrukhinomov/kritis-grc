@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 
 import { setMockSession } from "@/mocks/accounts";
 import { setSimulation } from "@/mocks/simulation";
+import { dependencyGraphQuery } from "@/shared/api/organization";
 import { risksQuery } from "@/shared/api/risk";
 import { WIDE_SCREEN_QUERY } from "@/shared/lib/breakpoints";
 import { matchMediaQueries } from "@/test/media";
@@ -50,6 +51,8 @@ describe("changing the status", () => {
   it("refreshes the risks, whose Residual Rating follows the status", async () => {
     const { client, drawer } = await openDrawer();
     await client.query(risksQuery("muster-stadtwerke"));
+    const graph = dependencyGraphQuery("muster-stadtwerke", "sc-nord");
+    await client.query(graph);
 
     await userEvent.click(statusRadio("Umgesetzt"));
     await drawer.findByText("Gespeichert.");
@@ -57,6 +60,8 @@ describe("changing the status", () => {
     expect(client.getQueryState(risksQuery("muster-stadtwerke").queryKey)?.isInvalidated).toBe(
       true,
     );
+    // The dependency graph shows the highest Residual Rating per Asset.
+    expect(client.getQueryState(graph.queryKey)?.isInvalidated).toBe(true);
   });
 
   it("explains a conflict and visibly returns to the saved status", async () => {

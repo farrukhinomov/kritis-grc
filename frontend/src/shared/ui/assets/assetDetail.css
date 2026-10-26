@@ -1,0 +1,16 @@
+/* One Asset in a drawer, opened from the facilities and from the dependency graph. */
+.grc-asset-detail {
+  display: grid;
+  gap: 20px;
+}
+
+.grc-asset-detail p {
+  margin: 0;
+}
+
+.grc-asset-risk {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+}

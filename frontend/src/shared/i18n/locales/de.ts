@@ -523,6 +523,30 @@ export const de = {
     noRisks: "Kein Risiko nennt dieses Asset.",
     unknownAsset: "Dieses Asset gibt es in diesem Geltungsbereich nicht.",
   },
+  dependencies: {
+    description:
+      "Wovon Ihre kritischen Anlagen abhängen: Assets, ihre Abhängigkeiten und die Lieferanten am Ende der Kette.",
+    empty: "Noch keine kritische Anlage erfasst. Mit der Betroffenheitsprüfung legen Sie eine an.",
+    graph: "Abhängigkeitsgraph: {{name}}",
+    tree: "Abhängigkeiten von {{name}}",
+    view: { label: "Ansicht", graph: "Graph", list: "Liste" },
+    overlay: "Risiken einblenden",
+    overlayHint:
+      "Gezählt werden die Risiken dieser Anlage, die das Asset nennen; die Farbe zeigt das höchste Restrisiko.",
+    risks_one: "{{count}} Risiko",
+    risks_other: "{{count}} Risiken",
+    noRisks: "keine Risiken",
+    repeated: "oben aufgeführt",
+    chip: "Restrisiko: {{category}} · {{risks}}",
+    chipPending: "Restrisiko ausstehend · {{risks}}",
+    noAssets: "Für diese Anlage sind noch keine Assets erfasst.",
+    controls: {
+      label: "Ansicht des Graphen",
+      zoomIn: "Vergrößern",
+      zoomOut: "Verkleinern",
+      fitView: "Ganzen Graphen zeigen",
+    },
+  },
   deadlines: {
     description:
       "Alle gesetzlichen Fristen Ihrer kritischen Anlagen, berechnet aus Registrierung und Risikobewertung.",

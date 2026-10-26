@@ -9,6 +9,7 @@ import type {
   CriticalFacilityDetails,
   CriticalServiceDefinition,
   Deadlines,
+  DependencyGraph,
   Member,
   Page,
   PageParams,
@@ -67,6 +68,14 @@ export const deadlinesQuery = (tenant: string) =>
   queryOptions({
     queryKey: resourceKey(tenant, "deadlines"),
     queryFn: ({ signal }) => apiGet<Deadlines>(tenantPath(tenant, ["deadlines"]), signal),
+  });
+
+/** An aggregate of the server's: a Critical Facility's Assets, their dependencies and Risks. */
+export const dependencyGraphQuery = (tenant: string, scope: string) =>
+  queryOptions({
+    queryKey: resourceKey(tenant, "dependency-graph", { scope }),
+    queryFn: ({ signal }) =>
+      apiGet<DependencyGraph>(tenantPath(tenant, ["dependency-graph"], { scope }), signal),
   });
 
 export const criticalServicesQuery = (tenant: string) =>

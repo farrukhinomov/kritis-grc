@@ -388,3 +388,32 @@ Each milestone gets one entry with four parts:
 
 ### Rejected
 - **"Show a label next to every marker."** Deadlines a month apart are a few pixels apart at this scale, so the labels would overlap. The marker's accessible name and its list entry carry the text.
+
+---
+
+## P-13 Asset dependency graph (2026-10-26)
+
+### Accepted
+- **React Flow (`@xyflow/react`, MIT)** draws the graph; the styles are the Theme's tokens. It only displays: nothing is dragged, connected or deleted, and its own node focus and English helper texts are switched off. Each node holds a real button that opens the Asset's details, so every node is one stop for the keyboard.
+- **One aggregate per Critical Facility.** `/dependency-graph` returns the facility's Assets and everything they depend on, across Scopes, with the facility's own Risks per Asset. A shared supplier is threatened differently at each facility, so another facility's Risks don't count here.
+- **Top-down layers by the longest path.** Every Asset sits below everything that relies on it, so all arrows point down. A chain of seven layers fits a screen's height at a readable size; left to right it was too small to read.
+- **The same content as a list.** Phones get it as nested lists; wide screens can switch to it. A shared Asset appears in full once and is only named where it appears again, which keeps the phone page at about half its length.
+- **The overlay's chip is short ("Hoch · 2 Risiken")**, and the node's accessible name says it in full.
+- **Found while testing:**
+  - The graph library makes a node without its own handlers let clicks through, so the buttons in the nodes couldn't be clicked. Asset nodes now take pointer events.
+  - Pressing a node's button started panning the graph. The buttons are now excluded from panning.
+- **Review findings that were real defects**, each with a test that fails without its fix (mutation-checked where it is behavior):
+  - Closing the details left focus on the page body. It returns to the exact button that opened them; in the list one Asset can have several.
+  - Changing an Implementation's status didn't refresh the graph, whose overlay shows Residual Ratings. It does now.
+  - An Asset with one low and one still-pending Risk read as low. While any of its Risks is pending, the highest rating is unknown and says so.
+  - Own Assets that only need each other in a cycle left the graph empty. The first of each such group by name starts it.
+  - A facility without Assets showed a lone node and no explanation, and an unknown Asset in the URL opened nothing. Both now say what is the case.
+  - The graph library still exposed English instructions and every arrow as an image named by internal ids, plus a role description without a role. Arrows are hidden from screen readers (the list says the same), and the instructions are empty.
+  - Tab could reach nodes panned out of view. The graph now follows the focus, without animation under reduced motion.
+  - Arrowheads kept the library's own gray in every Theme; node and entry borders used the decorative border instead of the one that meets 3:1; the zoom buttons were 36 px on touch screens; hovering hid the risk color; phones downloaded the graph library without ever showing it; and the accessible names didn't follow the visible text. All fixed.
+
+### Not built
+- **Scope-limited Memberships.** The graph crosses Scopes to reach shared suppliers. What a member limited to one Scope may see of organization-level Assets is for the backend to decide; the mock has no such Memberships.
+
+### Rejected
+- **"Use antd's Tree for the phone view."** It renders a flat, virtualised list without levels, so a screen reader can't hear the hierarchy. Nested lists say it on their own.

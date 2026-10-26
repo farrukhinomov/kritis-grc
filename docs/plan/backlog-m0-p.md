@@ -269,7 +269,7 @@ As a GRC Manager, I want to see how my measures change the risk picture.
 ### P-13 Asset dependency graph
 **Labels:** `module:frontend`, `module:assets`, `type:feature`, `prio:should` · **Estimate:** 3 h · **Depends on:** P-02
 
-- [ ] Built with React Flow (`@xyflow/react`, MIT), styled with the semantic tokens. Critical Facility → Assets → suppliers as an interactive graph, with a risk overlay and a details panel. On phones, a simplified list with a tree view.
+- [x] Built with React Flow (`@xyflow/react`, MIT), styled with the semantic tokens. Critical Facility → Assets → suppliers as an interactive graph, with a risk overlay and a details panel. On phones, a simplified list with a tree view.
 
 ### P-14 Coverage heatmap
 **Labels:** `module:frontend`, `module:compliance`, `type:feature`, `prio:should` · **Estimate:** 2 h · **Depends on:** P-02

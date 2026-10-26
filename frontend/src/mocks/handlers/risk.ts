@@ -14,7 +14,7 @@ import { getSimulation } from "../simulation";
  * statuses, as the risk engine does after each change. When the risk engine is
  * unreachable it is null, and the UI shows "calculation pending".
  */
-function present(risk: StoredRisk, data: TenantData): Risk {
+export function present(risk: StoredRisk, data: TenantData): Risk {
   const statusOf = (id: string) =>
     data.implementations.find((implementation) => implementation.id === id)?.status ?? "open";
   const hazard = data.hazards.find((item) => item.id === risk.hazard_id);

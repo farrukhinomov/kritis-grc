@@ -1,0 +1,195 @@
+.grc-dependencies {
+  display: grid;
+  gap: 16px;
+}
+
+.grc-dependencies-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: center;
+}
+
+.grc-dependencies-overlay {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 44px;
+}
+
+.grc-dependencies > .grc-meta {
+  margin: 0;
+}
+
+.grc-graph {
+  height: min(640px, 70vh);
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 14px;
+  background: var(--grc-surface-sunken);
+  overflow: hidden;
+}
+
+/* The graph library's parts, in the Theme's tokens. */
+.grc-graph .react-flow__edge-path {
+  stroke: var(--grc-text-secondary);
+  stroke-width: 1.5;
+}
+
+.grc-graph .react-flow__handle {
+  width: 6px;
+  height: 6px;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  background: var(--grc-border-subtle);
+}
+
+.grc-graph .react-flow__controls {
+  box-shadow: none;
+}
+
+.grc-graph .react-flow__controls-button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--grc-control-border);
+  background: var(--grc-surface);
+  color: var(--grc-text);
+}
+
+/* Touch screens get the graph too; their fingers need 44 px targets. */
+@media (pointer: coarse) {
+  .grc-graph .react-flow__controls-button {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.grc-graph .react-flow__controls-button svg {
+  fill: currentcolor;
+}
+
+.grc-graph .react-flow__controls-button:focus-visible {
+  outline: 3px solid var(--grc-focus-ring);
+}
+
+.grc-graph-node {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+  width: 240px;
+  padding: 10px 12px;
+  border: 1px solid var(--grc-control-border);
+  border-radius: 10px;
+  background: var(--grc-surface);
+  color: var(--grc-text);
+  font: inherit;
+  text-align: start;
+}
+
+button.grc-graph-node {
+  cursor: pointer;
+}
+
+/* The border carries the risk overlay, so hovering marks the node with its background. */
+button.grc-graph-node:hover {
+  background: var(--grc-surface-sunken);
+}
+
+button.grc-graph-node:focus-visible {
+  outline: 3px solid var(--grc-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Suppliers sit outside the organization; a dashed frame says so without color. */
+.grc-graph-node[data-kind="supplier"] {
+  border-style: dashed;
+}
+
+.grc-graph-node[data-risk] {
+  border-width: 2px;
+}
+
+.grc-graph-node[data-risk="low"] {
+  border-color: var(--grc-risk-low-solid);
+}
+
+.grc-graph-node[data-risk="medium"] {
+  border-color: var(--grc-risk-medium-solid);
+}
+
+.grc-graph-node[data-risk="high"] {
+  border-color: var(--grc-risk-high-solid);
+}
+
+.grc-graph-node[data-risk="critical"] {
+  border-color: var(--grc-risk-critical-solid);
+}
+
+.grc-graph-facility {
+  border-color: var(--grc-primary);
+  background: var(--grc-primary);
+  color: var(--grc-on-primary);
+}
+
+.grc-graph-facility .grc-meta {
+  color: inherit;
+}
+
+.grc-graph-node-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.grc-graph-node .grc-risk-chip,
+.grc-dependency-entry .grc-risk-chip {
+  margin-top: 4px;
+}
+
+.grc-risk-pending {
+  background: var(--grc-surface-sunken);
+  color: var(--grc-text-secondary);
+}
+
+.grc-dependency-tree-root {
+  margin: 0 0 8px;
+}
+
+.grc-dependency-level {
+  display: grid;
+  gap: 6px;
+}
+
+/* Each level indents and draws its line, so the nesting reads at a glance. */
+.grc-dependency-level .grc-dependency-level {
+  margin-block-start: 6px;
+  margin-inline-start: 14px;
+  padding-inline-start: 12px;
+  border-inline-start: 2px solid var(--grc-border-subtle);
+}
+
+.grc-dependency-entry {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--grc-control-border);
+  border-radius: 10px;
+  background: var(--grc-surface);
+  color: var(--grc-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.grc-dependency-entry:focus-visible {
+  outline: 3px solid var(--grc-focus-ring);
+  outline-offset: 2px;
+}
+
+/* A reference to an Asset shown in full above: lighter, so the full entries lead. */
+.grc-dependency-entry[data-repeated="true"] {
+  border-style: dashed;
+  background: transparent;
+}
