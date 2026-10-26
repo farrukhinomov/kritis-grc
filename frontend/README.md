@@ -25,6 +25,10 @@ With mocking disabled, `/api` is proxied to Django at `http://localhost:8000`, t
 | Lint (zero warnings)                  | `pnpm lint`                            |
 | Format / check                        | `pnpm format` / `pnpm format:check`    |
 | Production build                      | `pnpm build`                           |
+| End-to-end, axe, motion, visual       | `pnpm e2e`                             |
+| Update the visual baselines           | `pnpm e2e:update`                      |
+
+`pnpm e2e` builds the prototype with the mock API and runs Playwright against it in Chromium, at 1440 px and 390 px. The 30 visual baselines in `e2e/__screenshots__/` show what fits the first screen of each page, and at most 100 pixels may differ, each by more than a strict per-pixel threshold. The baselines are made on the CI runner (Ubuntu 24.04, the pinned Chromium). Other machines render text a little differently, so locally run `pnpm e2e --grep-invert visual`, which covers the flow, axe and reduced motion. After an intended visual change, take the new images from the "Frontend end-to-end" job's report (`playwright-report`, the `-actual.png` attachments), and review every one before committing it.
 
 ## Layout
 

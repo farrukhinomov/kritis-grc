@@ -19,7 +19,7 @@ export function TopRisksWidget() {
   return (
     <QueryContent
       query={query}
-      rows={5}
+      rows={15}
       isEmpty={([risks]) => risks.items.length === 0}
       empty={t("dashboard.risks.empty")}
     >

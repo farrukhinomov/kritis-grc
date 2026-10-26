@@ -9,7 +9,15 @@ import tseslint from "typescript-eslint";
 import { RAW_COLOR_SELECTORS } from "./eslint/raw-colors.js";
 
 export default tseslint.config(
-  { ignores: ["dist", "coverage", "public/mockServiceWorker.js"] },
+  {
+    ignores: [
+      "dist",
+      "coverage",
+      "playwright-report",
+      "test-results",
+      "public/mockServiceWorker.js",
+    ],
+  },
   {
     files: ["**/*.{ts,tsx}"],
     extends: [

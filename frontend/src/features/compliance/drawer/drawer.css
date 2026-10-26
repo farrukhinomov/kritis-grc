@@ -12,6 +12,11 @@
   gap: 8px;
 }
 
+/* antd spaces inline radios apart; stacked in a grid, the gap does that, so all are equally wide. */
+.grc-status-option.ant-radio-wrapper {
+  margin-inline-end: 0;
+}
+
 .grc-status-option {
   padding: 8px 12px;
   border: 1px solid var(--grc-border-subtle);

@@ -22,7 +22,7 @@ export function DeadlinesWidget() {
   return (
     <QueryContent
       query={query}
-      rows={4}
+      rows={17}
       isEmpty={([deadlines]) => deadlines.items.length === 0}
       empty={t("dashboard.deadlines.empty")}
     >

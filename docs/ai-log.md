@@ -440,3 +440,57 @@ Each milestone gets one entry with four parts:
 
 ### Not built
 - **Sticky column headers.** The BSIG labels scroll out of view on a long page. Sticking them inside a container that scrolls sideways needs that container to scroll vertically too, which would give the page a second scroll area. With sixteen rows that isn't worth it.
+
+---
+
+## P-16 Quality pass and prototype release (2026-10-26)
+
+### Accepted
+- **Playwright on the production build with the mock API**, in Chromium at 1440 px and 390 px, on a fixed day and in Berlin time:
+  - The v1 flow of a GRC Manager, and the Auditor's read-only access.
+  - axe (WCAG 2.2 A and AA) on the five main screens.
+  - A reduced-motion check.
+  - 30 visual baselines.
+  - The screenshots use the bundled Inter font and the same Chromium version locally and in CI.
+- **A CI job "Frontend end-to-end"**, which uploads the Playwright report on failure.
+- **Reduced motion is checked as movement.** The test counts animations of transform, position and size. The motion library deliberately keeps fades under reduced motion, which moves nothing.
+- **`vercel.json` for the prototype** with the same security headers as the nginx image, long caching for hashed assets and the SPA fallback.
+
+### Found by the new checks
+- **The dashboard's layout shift.** Lighthouse measured a CLS of 0.102: the widgets' skeletons were half as tall as their content, so everything below jumped when the data arrived. Skeletons now match the content, and CLS is 0.001.
+- **The status options in the drawer.** The last one was 8 px wider than the others, because the UI library spaces inline radios apart. The baseline screenshots showed it.
+- **A vitest setting that would have dropped tests.** My first exclusion of `e2e/` limited vitest to `src/`, which would have skipped the lint rule's own tests. It now keeps the defaults and excludes only `e2e/`.
+
+### Review findings that were real defects
+Each was confirmed with a mutation or a throwaway test.
+- **The visual tolerance was too loose.** 1 % of the screen let the old 8 px error in the status options pass unnoticed, which is the very defect the baselines had found. Counting pixels alone wasn't enough: the faint borders fell under the default per-pixel threshold. With a threshold of 0.05 and at most 100 differing pixels, the old error shows as 240 pixels and fails (mutation-checked).
+- **Three checks were hollow:**
+  - The Activity Log check matched the seed's own status changes.
+  - The Auditor's empty inbox was counted before the page had loaded.
+  - The slide-in check also counted the cockpit's columns, so it would have passed with a drawer that no longer slid.
+  
+  Each now checks its own evidence: the entry of this change, the Auditor's message first, and only animations inside the drawer.
+- **axe scanned the drawer mid-slide,** where it leaves contrast unchecked; "no skeleton" could also hold before any skeleton existed. Scans and screenshots now run at rest and wait for content only the loaded page shows.
+- **Vercel would have answered a missing asset with the page itself,** cached for a year under the assets' rule. Assets and `/api` are now outside the SPA fallback.
+- **Smaller fixes:**
+  - The E2E server is always this checkout's build, on its own port.
+  - The CI job has a time limit.
+  - Test types no longer break production builds, and the E2E files stay out of the image's build context.
+  - The README names the setting the Simulation panel needs.
+  - The Vercel steps pin pnpm.
+
+### Not met yet
+- **Lighthouse performance ≥ 90 on the dashboard.**
+  - Measured here: accessibility 100 and best practices 100. Performance scored 84–91 over five runs (median 88), served compressed like production.
+  - Largest Contentful Paint is 1.4–1.6 s, and total blocking time 150–250 ms. The blocking time is what costs the points; this container's CPU is noisy, and blocking time is measured in CPU time.
+  - Part of the main-thread time is the mock itself: MSW parses the cookies again for every handler it tests, on every request, about 80 ms in all. A real API removes that.
+  - The longest task, about 200 ms, is the UI library generating its styles on the first render. Static CSS (antd's zero-runtime mode) would remove it. That is a change to the theming, too large for this pass, so it is proposed as its own item.
+  - To measure on the deployed site: PageSpeed Insights on `grc.inomov.online`.
+- **The deployment.** Importing the project into Vercel and setting `VITE_API_MOCKING=enabled` are manual steps in the Vercel account (see `infra/README.md`). The README marks the live link as pending.
+
+### Found in CI
+- **The baselines made here didn't match the runner:** 6,500 to 45,000 pixels differed per screen, from text anti-aliasing alone, despite the same Chromium and the bundled font. The baselines now come from the runner, and the visual checks are left out locally.
+- **The frontend image failed its scan on a curl fix published since the last build.** The build cache kept serving the first `apk upgrade` layer, so new OS patches never reached the image. CI now passes the day as a build argument, which renews that layer daily.
+
+### Rejected
+- **"Make the baselines on this machine."** Text renders differently from the runner, and every comparison failed. The runner is the one place every check runs, so it makes the baselines.

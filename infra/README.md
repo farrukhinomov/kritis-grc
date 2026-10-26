@@ -63,10 +63,11 @@ printf '%s' "<value>" | gcloud secrets versions add <secret-name> --data-file=-
 ## Manual setup: Vercel
 
 1. Import the repository, root directory `frontend/`, framework preset *Vite*. Keep *Include files outside the root directory in the Build Step* on: the prototype build reads the demo fixtures from `seed/`.
-2. **Turn the Git integration's automatic deployments off.** GitHub Actions deploys after the backend is live (M0-08).
+2. **Turn the Git integration's automatic deployments off.** GitHub Actions deploys after the backend is live (M0-08). Until then the prototype is deployed by hand from `main`.
 3. Add the domain `grc.inomov.online`; the DNS record already comes from OpenTofu.
-4. The `/api/*` rewrite, caching opt-out and security headers live in `frontend/vercel.json` (M0-08).
-5. The Hobby plan is non-commercial only, which fits the job-demo phase. A commercial launch moves to Vercel Pro, or to Cloudflare Pages with a Worker proxying `/api`.
+4. **For the prototype, set the environment variables `VITE_API_MOCKING=enabled` and `ENABLE_EXPERIMENTAL_COREPACK=1`** (Production). The second makes Vercel use the pnpm version pinned in `frontend/package.json`, not one guessed from the lockfile. With the first, the build contains the mock API, and every page shows the "Prototyp – Demodaten" badge; remove it once the real API is live.
+5. `frontend/vercel.json` holds the build, the SPA fallback, caching and the security headers (the same as the nginx image). The `/api/*` rewrite and its caching opt-out are added with M0-08.
+6. The Hobby plan is non-commercial only, which fits the job-demo phase. A commercial launch moves to Vercel Pro, or to Cloudflare Pages with a Worker proxying `/api`.
 
 ## Checks
 

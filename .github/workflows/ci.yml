@@ -197,6 +197,43 @@ jobs:
       - name: Production dependency licenses
         run: pnpm licenses list --prod --json | node ../scripts/check-node-licenses.mjs
 
+  e2e:
+    name: Frontend end-to-end
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      # The browser build that matches the pinned Playwright version, with its system libraries.
+      - run: pnpm exec playwright install --with-deps chromium
+      # The flow, axe on the main screens, reduced motion and the visual baselines, against
+      # the production build with the mock API, as the prototype is deployed.
+      - run: pnpm e2e
+      - name: Report on failure
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report
+          path: frontend/playwright-report
+          retention-days: 7
+
   infra:
     name: Infrastructure code
     needs: changes
@@ -248,10 +285,16 @@ jobs:
         with:
           persist-credentials: false
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      # The day renews the cached layer that applies OS patches, so a fix published since
+      # the last build is in the image the scan below checks.
+      - name: Today
+        id: today
+        run: echo "day=$(date -u +%F)" >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ${{ matrix.context }}
           build-contexts: ${{ matrix.build-contexts }}
+          build-args: OS_PATCH_DAY=${{ steps.today.outputs.day }}
           load: true
           tags: grc-${{ matrix.name }}:ci
           cache-from: type=gha,scope=${{ matrix.name }}
@@ -334,7 +377,7 @@ jobs:
   ci-passed:
     name: CI passed
     if: always()
-    needs: [changes, tooling, backend, risk-engine, frontend, infra, images, dependencies, secrets, stack]
+    needs: [changes, tooling, backend, risk-engine, frontend, e2e, infra, images, dependencies, secrets, stack]
     runs-on: ubuntu-24.04
     permissions: {}
     steps:
