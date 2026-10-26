@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 4173;
+// Not vite's default preview port, so another preview is never mistaken for this build.
+const PORT = 4317;
 const ci = Boolean(process.env.CI);
 
 /**
@@ -17,8 +18,15 @@ export default defineConfig({
   reporter: ci ? [["github"], ["html", { open: "never" }]] : "list",
   snapshotPathTemplate: "{testDir}/__screenshots__/{projectName}/{arg}{ext}",
   expect: {
-    // Anti-aliasing differs by a few pixels between machines; a changed layout differs by far more.
-    toHaveScreenshot: { maxDiffPixelRatio: 0.01, animations: "disabled", caret: "hide" },
+    // Faint borders differ from their background by little, so the per-pixel threshold is
+    // strict enough to see one move; a box 8 px narrower then shows as ~240 pixels, while
+    // anti-aliasing stays under the 100 pixels allowed.
+    toHaveScreenshot: {
+      maxDiffPixels: 100,
+      threshold: 0.05,
+      animations: "disabled",
+      caret: "hide",
+    },
   },
   use: {
     baseURL: `http://localhost:${String(PORT)}`,
@@ -44,7 +52,8 @@ export default defineConfig({
   webServer: {
     command: `pnpm build && pnpm preview --port ${String(PORT)} --strictPort`,
     url: `http://localhost:${String(PORT)}`,
-    reuseExistingServer: !ci,
+    // Always this checkout's build: a server left running could serve an older one.
+    reuseExistingServer: false,
     env: { VITE_API_MOCKING: "enabled" },
     timeout: 180_000,
   },

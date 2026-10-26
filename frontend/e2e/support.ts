@@ -10,15 +10,26 @@ export const DRAWER_PATH = `${TENANT}/compliance?scope=sc-nord&paragraph=%C2%A7%
 
 /** The five main screens of the prototype, by name and path. */
 export const MAIN_SCREENS = [
-  { name: "dashboard", path: `${TENANT}/dashboard`, heading: "Übersicht" },
-  { name: "compliance", path: `${TENANT}/compliance`, heading: "Compliance" },
+  {
+    name: "dashboard",
+    path: `${TENANT}/dashboard`,
+    heading: "Übersicht",
+    content: "Wasserwerk Nord",
+  },
+  { name: "compliance", path: `${TENANT}/compliance`, heading: "Compliance", content: "§ 13" },
   {
     name: "implementation",
     path: DRAWER_PATH,
     heading: "Compliance",
+    content: "Nicht anwendbar",
   },
-  { name: "risks", path: `${TENANT}/risks`, heading: "Risiken" },
-  { name: "suggestions", path: `${TENANT}/suggestions`, heading: "Mapping-Vorschläge" },
+  { name: "risks", path: `${TENANT}/risks`, heading: "Risiken", content: "Restrisiko" },
+  {
+    name: "suggestions",
+    path: `${TENANT}/suggestions`,
+    heading: "Mapping-Vorschläge",
+    content: "Annehmen",
+  },
 ] as const;
 
 export type ColorMode = "light" | "dark";
@@ -42,7 +53,8 @@ export async function signIn(
 
 /**
  * Moves within the app without reloading it. The mock API keeps its data in the page, so a
- * reload would undo what a test changed, such as the Theme.
+ * reload would undo what a test changed, such as the Theme. Every move arrives as a link
+ * from outside would: the app's own back-navigation within a drill-down isn't exercised.
  */
 export async function go(page: Page, path: string) {
   await page.evaluate((target) => {
@@ -51,9 +63,14 @@ export async function go(page: Page, path: string) {
   }, path);
 }
 
-/** Waits until a screen has its data and its font, so a screenshot shows the final state. */
-export async function settled(page: Page, heading: string) {
+/**
+ * Waits until a screen has its data, its font and its open drawer, so a screenshot or a
+ * scan sees the final state. `content` is something only the loaded screen shows; without
+ * it, "no skeleton" could hold before any skeleton was rendered.
+ */
+export async function settled(page: Page, heading: string, content: string) {
   await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
+  await expect(page.getByText(content).first()).toBeVisible();
   await expect(page.locator(".ant-skeleton")).toHaveCount(0);
   await page.evaluate(() => document.fonts.ready);
 }

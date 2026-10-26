@@ -17,7 +17,7 @@ Everything runs in the browser on fictional data; nothing is sent anywhere. Sign
 5. **Fristen, Abhängigkeiten, Abdeckung:** the legal deadlines on a timeline, what each facility depends on up to its suppliers, and where one Implementation counts for KRITIS-DachG and BSIG at once.
 6. **Betroffenheit:** whether the KRITIS-Dachgesetz applies to a facility, explained with its legal basis.
 
-`Ctrl K` (`⌘ K` on a Mac) searches everything. Run locally with `pnpm dev`, a "Simulation" panel also slows the mock API down, makes it fail, or takes the risk engine offline, so the loading, error and "calculation pending" states can be seen too.
+`Ctrl K` (`⌘ K` on a Mac) searches everything. Run locally with `pnpm dev` and `VITE_API_MOCKING=enabled` in `frontend/.env.local` (as in `.env.example`), a "Simulation" panel also slows the mock API down, makes it fail, or takes the risk engine offline, so the loading, error and "calculation pending" states can be seen too.
 
 ## Where to start
 

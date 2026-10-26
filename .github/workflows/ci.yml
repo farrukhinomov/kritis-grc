@@ -202,6 +202,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     permissions:
       contents: read
     defaults:

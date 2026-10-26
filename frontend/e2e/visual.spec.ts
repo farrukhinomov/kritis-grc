@@ -26,7 +26,7 @@ for (const look of LOOKS) {
         await chooseHighContrast(page);
       }
       await go(page, screen.path);
-      await settled(page, screen.heading);
+      await settled(page, screen.heading, screen.content);
 
       await expect(page).toHaveScreenshot(`${screen.name}-${look.name}.png`);
     });

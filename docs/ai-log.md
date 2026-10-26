@@ -451,7 +451,7 @@ Each milestone gets one entry with four parts:
   - axe (WCAG 2.2 A and AA) on the five main screens.
   - A reduced-motion check.
   - 30 visual baselines.
-  - The screenshots use the bundled Inter font and the same Chromium version locally and in CI, and are compared within 1 % of their pixels.
+  - The screenshots use the bundled Inter font and the same Chromium version locally and in CI.
 - **A CI job "Frontend end-to-end"**, which uploads the Playwright report on failure.
 - **Reduced motion is checked as movement.** The test counts animations of transform, position and size. The motion library deliberately keeps fades under reduced motion, which moves nothing.
 - **`vercel.json` for the prototype** with the same security headers as the nginx image, long caching for hashed assets and the SPA fallback.
@@ -460,6 +460,24 @@ Each milestone gets one entry with four parts:
 - **The dashboard's layout shift.** Lighthouse measured a CLS of 0.102: the widgets' skeletons were half as tall as their content, so everything below jumped when the data arrived. Skeletons now match the content, and CLS is 0.001.
 - **The status options in the drawer.** The last one was 8 px wider than the others, because the UI library spaces inline radios apart. The baseline screenshots showed it.
 - **A vitest setting that would have dropped tests.** My first exclusion of `e2e/` limited vitest to `src/`, which would have skipped the lint rule's own tests. It now keeps the defaults and excludes only `e2e/`.
+
+### Review findings that were real defects
+Each was confirmed with a mutation or a throwaway test.
+- **The visual tolerance was too loose.** 1 % of the screen let the old 8 px error in the status options pass unnoticed, which is the very defect the baselines had found. Counting pixels alone wasn't enough: the faint borders fell under the default per-pixel threshold. With a threshold of 0.05 and at most 100 differing pixels, the old error shows as 240 pixels and fails (mutation-checked).
+- **Three checks were hollow:**
+  - The Activity Log check matched the seed's own status changes.
+  - The Auditor's empty inbox was counted before the page had loaded.
+  - The slide-in check also counted the cockpit's columns, so it would have passed with a drawer that no longer slid.
+  
+  Each now checks its own evidence: the entry of this change, the Auditor's message first, and only animations inside the drawer.
+- **axe scanned the drawer mid-slide,** where it leaves contrast unchecked; "no skeleton" could also hold before any skeleton existed. Scans and screenshots now run at rest and wait for content only the loaded page shows.
+- **Vercel would have answered a missing asset with the page itself,** cached for a year under the assets' rule. Assets and `/api` are now outside the SPA fallback.
+- **Smaller fixes:**
+  - The E2E server is always this checkout's build, on its own port.
+  - The CI job has a time limit.
+  - Test types no longer break production builds, and the E2E files stay out of the image's build context.
+  - The README names the setting the Simulation panel needs.
+  - The Vercel steps pin pnpm.
 
 ### Not met yet
 - **Lighthouse performance ≥ 90 on the dashboard.**

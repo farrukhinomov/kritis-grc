@@ -5,3 +5,6 @@ coverage
 .env.*.local
 Dockerfile
 .dockerignore
+e2e
+playwright-report
+test-results

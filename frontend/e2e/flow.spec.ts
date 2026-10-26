@@ -52,7 +52,13 @@ test("a GRC Manager works through the v1 flow", async ({ page, isMobile }) => {
     await go(page, `${TENANT}/activity`);
     const log = page.getByRole("list", { name: "Aktivitätsprotokoll" });
     await expect(log.getByText(/Risikobewertung Wasserwerk Nord 2026/).first()).toBeVisible();
-    await expect(log.getByText(/Status: .* → Umgesetzt/).first()).toBeVisible();
+    // The entry of this change, not one of the seed's earlier status changes.
+    await expect(
+      log
+        .getByRole("listitem")
+        .filter({ hasText: "§ 13 Abs. 3 Nr. 5 · Wasserwerk Nord" })
+        .filter({ hasText: "Offen → Umgesetzt" }),
+    ).not.toHaveCount(0);
   });
 
   await test.step("the command palette finds a Requirement by its citation", async () => {
@@ -89,5 +95,8 @@ test("an Auditor reads everything and changes nothing", async ({ page }) => {
   }
 
   await go(page, `${TENANT}/approvals`);
+  // The page's own answer first, so an empty count can't come from a page still loading.
+  await expect(page.getByText("Als Auditor geben Sie nichts frei.")).toBeVisible();
   await expect(page.getByRole("article")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Freigeben" })).toHaveCount(0);
 });
