@@ -10,7 +10,12 @@ export type ColorModePreference = (typeof COLOR_MODE_PREFERENCES)[number];
 export const COLOR_MODE_STORAGE_KEY = "grc.colorMode";
 export const DARK_SCHEME_QUERY = "(prefers-color-scheme: dark)";
 
-const DEFAULT_PREFERENCE: ColorModePreference = "system";
+/**
+ * Light until someone chooses otherwise, even on a dark system: the product's palette is
+ * designed light first, and a first visit should look the same for everyone. "System" is a
+ * choice the user makes in the menu.
+ */
+const DEFAULT_PREFERENCE: ColorModePreference = "light";
 
 export function resolveColorMode(
   preference: ColorModePreference,

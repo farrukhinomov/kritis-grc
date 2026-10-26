@@ -7,11 +7,12 @@
   try {
     preference = localStorage.getItem("grc.colorMode");
   } catch (error) {
-    // Storage blocked: fall back to the system setting.
+    // Storage blocked: the default applies.
   }
+  // Light unless the user chose dark, or chose to follow the system and it is dark.
   var dark =
     preference === "dark" ||
-    (preference !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    (preference === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   var mode = dark ? "dark" : "light";
   document.documentElement.dataset.colorMode = mode;
   document.documentElement.style.colorScheme = mode;

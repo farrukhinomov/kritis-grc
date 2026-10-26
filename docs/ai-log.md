@@ -509,3 +509,16 @@ Each was confirmed with a mutation or a throwaway test.
 ### Lesson
 - **Read the platform's own build log before trusting a setup checklist.** The answer was one warning line above the failing command.
 - **Never upload a working checkout.** The tool respects the ignore rules, but a private folder sits one missing rule away from a public site. Deploy an export of the tracked files.
+
+---
+
+## Open the prototype in the demo, light by default (2026-10-26)
+
+### Found
+- **Tests depended on a developer's own `.env.local`.** The new entry test for "a build without the mock API" failed here, because a local file switched the flag on during tests, while CI has no such file. The test configuration now pins the flag, and a case that needs the prototype switches it itself.
+- **The full test suite is not reliable on a busy developer machine.** On the untouched base commit, 60 of 870 tests failed locally under coverage, all by running into the 5 second limit while many workers competed for the CPU; CI passes. With `--maxWorkers=3` all 882 pass here. The failures were not a code defect and weren't "fixed" by raising time limits.
+
+### Decided
+- **The entry signs in as the GRC Manager, and keeps an existing session.** A visitor who chose Auditor in this tab and then opens the main address would otherwise be switched back without asking.
+- **Light is the default, even on a dark system.** The palette is designed light first, and a recruiter should see the same screens everyone else sees. Following the system stays a choice in the user menu.
+- **Only the entry changed; deep links without a session still lead to the login page.** The login page offers both demo roles with one click and returns to the link afterwards.

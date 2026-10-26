@@ -40,8 +40,11 @@ describe("the pre-paint color mode script", () => {
     { stored: "dark", systemDark: false, expected: "dark" },
     { stored: "light", systemDark: true, expected: "light" },
     { stored: "system", systemDark: true, expected: "dark" },
+    { stored: "system", systemDark: false, expected: "light" },
     { stored: null, systemDark: false, expected: "light" },
-    { stored: null, systemDark: true, expected: "dark" },
+    // Nothing chosen yet: light, even on a dark system.
+    { stored: null, systemDark: true, expected: "light" },
+    { stored: "sepia", systemDark: true, expected: "light" },
   ])("applies $expected for stored=$stored and system dark=$systemDark", (scenario) => {
     const root = runScript(scenario.stored, scenario.systemDark);
 
@@ -58,7 +61,7 @@ describe("the pre-paint color mode script", () => {
     expect(prePaint).toBeLessThan(html.indexOf('type="module"'));
   });
 
-  it("falls back to the system setting when storage is blocked", () => {
-    expect(runScript(null, true, true).dataset.colorMode).toBe("dark");
+  it("falls back to light when storage is blocked", () => {
+    expect(runScript(null, true, true).dataset.colorMode).toBe("light");
   });
 });

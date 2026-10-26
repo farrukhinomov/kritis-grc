@@ -40,6 +40,9 @@ export default defineConfig({
     },
   },
   test: {
+    // Tests run as the real product, whatever a developer's own .env.local says; a case
+    // that needs the prototype switches the flag itself.
+    env: { VITE_API_MOCKING: "disabled" },
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],

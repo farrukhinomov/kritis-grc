@@ -2,7 +2,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import deDE from "antd/locale/de_DE";
 
-import { COLOR_MODE_STORAGE_KEY } from "./colorMode";
+import { matchMediaQueries } from "@/test/media";
+
+import { COLOR_MODE_STORAGE_KEY, DARK_SCHEME_QUERY } from "./colorMode";
 import { semanticTokens, type ThemeName } from "./semantic";
 import { useColorMode, useSemanticTokens, useTenantTheme } from "./themeContext";
 import { ThemeProvider } from "./ThemeProvider";
@@ -42,10 +44,18 @@ afterEach(() => {
 });
 
 describe("ThemeProvider", () => {
-  it("starts in system mode, which is light when the system prefers light", () => {
+  it("starts in light mode", () => {
     renderWithTheme(<ModeProbe />);
 
-    expect(screen.getByLabelText("mode")).toHaveTextContent("system/light");
+    expect(screen.getByLabelText("mode")).toHaveTextContent("light/light");
+    expect(root.dataset.colorMode).toBe("light");
+  });
+
+  it("stays light on a dark system until the user chooses otherwise", () => {
+    matchMediaQueries(DARK_SCHEME_QUERY);
+
+    renderWithTheme(<ModeProbe />);
+
     expect(root.dataset.colorMode).toBe("light");
   });
 
