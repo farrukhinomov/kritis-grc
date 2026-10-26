@@ -8,6 +8,7 @@ import { AnimatedIcon } from "@/shared/ui/AnimatedIcon/AnimatedIcon";
 import { ResponsiveDrawer } from "@/shared/ui/patterns/ResponsiveDrawer";
 
 import { PRIMARY_NAV_ITEMS, SECONDARY_NAV_ITEMS, screenOf } from "./navigation";
+import { NavCount } from "./NavCount";
 
 const ICON_SIZE = 22;
 
@@ -33,6 +34,7 @@ export function BottomTabBar() {
                 {isActive && <TabIndicator />}
                 <AnimatedIcon preset={item.icon} size={ICON_SIZE} />
                 {t(`nav.${item.key}`)}
+                <NavCount item={item} />
               </>
             )}
           </NavLink>

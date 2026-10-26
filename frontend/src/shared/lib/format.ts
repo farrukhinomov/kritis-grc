@@ -49,3 +49,8 @@ export function formatDateTime(isoDateTime: string, language: string): string {
     new Date(isoDateTime),
   );
 }
+
+/** The calendar day of a moment, in the user's own time zone. */
+export function formatLocalDate(isoDateTime: string, language: string): string {
+  return new Intl.DateTimeFormat(language, { dateStyle: "medium" }).format(new Date(isoDateTime));
+}

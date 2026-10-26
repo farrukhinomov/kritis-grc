@@ -24,6 +24,9 @@ const SCREENS: Partial<Record<NavEntry["key"], typeof placeholder>> = {
   applicability: async () => ({
     Component: (await import("@/features/applicability/ApplicabilityPage")).ApplicabilityPage,
   }),
+  approvals: async () => ({
+    Component: (await import("@/features/approvals/ApprovalsPage")).ApprovalsPage,
+  }),
   facilities: async () => ({
     Component: (await import("@/features/facilities/FacilitiesPage")).FacilitiesPage,
   }),

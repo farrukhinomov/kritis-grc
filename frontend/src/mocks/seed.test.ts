@@ -25,6 +25,7 @@ describe("the seed fixtures", () => {
       SEED.evidence,
       SEED.hazards,
       SEED.risks,
+      SEED.riskAssessments,
       SEED.activity,
       SEED.members,
     ];
@@ -138,6 +139,24 @@ describe("the seed fixtures", () => {
     expect(facilities.map((scope) => scope.name)).toEqual(["Wasserwerk Nord", "Wasserwerk Süd"]);
     for (const facility of facilities) {
       expect(facility.critical_facility?.registration.status).toBe("planned");
+    }
+  });
+
+  it("assess each Critical Facility's own Risks, approved only by someone else", () => {
+    const riskScope = new Map(SEED.risks.map((risk) => [risk.id, risk.scope_id]));
+    for (const assessment of SEED.riskAssessments) {
+      expect(scopeKind.get(assessment.scope_id)).toBe("critical_facility");
+      expect(memberIds.has(assessment.submitted_by_id)).toBe(true);
+      expect(assessment.risk_ids.every((id) => riskScope.get(id) === assessment.scope_id)).toBe(
+        true,
+      );
+      expect(["submitted", "approved", "rejected"]).toContain(assessment.status);
+      if (assessment.status === "submitted") {
+        expect(assessment.decided_by_id).toBeNull();
+      } else {
+        expect(assessment.decided_by_id).not.toBe(assessment.submitted_by_id);
+        expect(memberIds.has(assessment.decided_by_id ?? "")).toBe(true);
+      }
     }
   });
 

@@ -71,7 +71,7 @@ function HistoryEntry({ entry }: { entry: ActivityEntry }) {
         <ul className="grc-history-changes">
           {changes.map((change) => (
             <li key={change.field}>
-              <ChangeText change={change} />
+              <ChangeText change={change} objectType={entry.object_type} />
             </li>
           ))}
         </ul>

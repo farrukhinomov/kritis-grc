@@ -1,0 +1,76 @@
+.grc-approvals-alert {
+  margin-bottom: 16px;
+}
+
+.grc-approvals {
+  gap: 12px;
+  max-width: 840px;
+}
+
+.grc-approval-frame {
+  border-radius: 14px;
+}
+
+.grc-approval-frame:focus-visible {
+  outline: 3px solid var(--grc-primary);
+  outline-offset: 2px;
+}
+
+/* On wide screens the card draws its own frame; on phones the swipe card does. */
+@media (min-width: 768px) {
+  .grc-approval-frame {
+    border: 1px solid var(--grc-border-subtle);
+    background: var(--grc-surface);
+  }
+
+  .grc-approval {
+    padding: 16px;
+  }
+}
+
+.grc-approval {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+
+.grc-approval-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.grc-approval > .grc-meta {
+  margin: 0;
+}
+
+.grc-approval-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.grc-approvals-reason {
+  display: grid;
+  gap: 6px;
+}
+
+.grc-approvals-error {
+  color: var(--grc-status-danger-text);
+  font-size: 13px;
+}
+
+/* Collapsing on exit must not let the card spill over its neighbour. */
+.grc-approval-item {
+  overflow: hidden;
+}
+
+@media (pointer: coarse), (max-width: 767.98px) {
+  .grc-approval-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}

@@ -7,6 +7,7 @@ import implementations from "@seed/implementations.json";
 import mappingSuggestions from "@seed/mapping-suggestions.json";
 import mappings from "@seed/mappings.json";
 import requirements from "@seed/requirements.json";
+import riskAssessments from "@seed/risk-assessments.json";
 import risks from "@seed/risks.json";
 import scopes from "@seed/scopes.json";
 import tenant from "@seed/tenant.json";
@@ -22,6 +23,7 @@ import type {
   Implementation,
   Mapping,
   MappingSuggestion,
+  RiskAssessment,
   Member,
   Requirement,
   Risk,
@@ -77,6 +79,12 @@ export type StoredSuggestion = Omit<
   decided_at?: string;
 };
 
+/** Names and the next due date are joined in on read. */
+export type StoredRiskAssessment = Omit<
+  RiskAssessment,
+  "scope_name" | "submitted_by_name" | "decided_by_name" | "next_due"
+>;
+
 export interface SeedData {
   tenant: Tenant;
   members: Member[];
@@ -90,6 +98,7 @@ export interface SeedData {
   evidence: Evidence[];
   hazards: Hazard[];
   risks: StoredRisk[];
+  riskAssessments: StoredRiskAssessment[];
   activity: StoredActivity[];
 }
 
@@ -108,5 +117,6 @@ export const SEED = {
   evidence,
   hazards,
   risks,
+  riskAssessments,
   activity,
 } as unknown as SeedData;

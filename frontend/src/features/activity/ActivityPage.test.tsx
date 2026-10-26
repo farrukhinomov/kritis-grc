@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 
 import { problem } from "@/mocks/http";
+import { approveRiskAssessment } from "@/shared/api/approvals";
 import { server } from "@/mocks/server";
 import { scrollIntoViewEverywhere } from "@/test/intersection";
 import { WIDE_SCREEN_QUERY } from "@/shared/lib/breakpoints";
@@ -140,6 +141,15 @@ describe("the Activity Log", () => {
 
     expect(requests).toEqual(["first", "next"]);
     expect(screen.getByRole("button", { name: "Ältere Einträge laden" })).toBeInTheDocument();
+  });
+
+  it("says a Risk Assessment's decision in words", async () => {
+    await approveRiskAssessment("muster-stadtwerke", "ra-n-2026");
+    await openActivity("?type=risk_assessment");
+
+    const entries = [...(await log()).children];
+    expect(entries[0]).toHaveTextContent(/Risikobewertung/);
+    expect(entries[0]).toHaveTextContent("Status: eingereicht → freigegeben");
   });
 
   it("explains a filter without entries", async () => {

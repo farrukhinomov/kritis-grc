@@ -345,3 +345,27 @@ Each milestone gets one entry with four parts:
 ### Changed
 - **A long Scope name stretched its card and the page.** The button now reads "Assets anzeigen" and carries the Scope in its accessible name, which starts with the visible text.
 - **The Activity Log showed stored values** ("open → partial", "inherent_impact"). It uses the shared formatter.
+
+---
+
+## P-11 Approvals inbox (2026-10-25)
+
+### Accepted
+- **Risk Assessments enter the seed.** The glossary defines them as dated, approved reviews of a Critical Facility's Risks; one is submitted and waiting, one approved. The seed test checks that approvals come from someone other than the author.
+- **Four eyes on Risk Assessments.** Whoever submitted an assessment can't approve or reject it; the server refuses with `own_submission`, and the inbox doesn't offer it to them.
+- **A rejection needs a reason.** It goes back to the author, who has to know what to rework.
+- **One inbox across modules.** `/approvals` gathers Mapping Suggestions and Risk Assessments, oldest first, and its total feeds the navigation's badge, so the count and the list can't disagree.
+- **The badge says its number in words.** The digit is hidden from screen readers; the link reads "Freigaben, 5 offen".
+- **An approved Risk Assessment is due again four years after its date**, calculated on read, as the law asks for one at least every four years.
+- **Review findings that were real defects**, each with a test that fails without its fix (mutation-checked):
+  - Decisions on the suggestions page didn't reach the inbox or the badge; deciding a listed Suggestion again then read as "decided by someone else". The suggestions page refreshes the approvals too.
+  - A decided item stayed until the inbox reloaded, with its buttons enabled again. Like the suggestions page, the inbox now takes it out of the cache in one step once the server agrees.
+  - The dialog gave focus back to the decided card's button, which left with the card. Focus moves to the next item, and only after a success.
+  - Risk Assessment entries in the Activity Log had no type and an untranslated status. Statuses are now translated per kind of object, since "approved" means "angenommen" for a Suggestion and "freigegeben" for an assessment.
+  - Submission dates were the UTC day; they are the user's own day now.
+  - The hidden count text took room in the sidebar and pushed the badge out of the collapsed rail; on the active item the badge disappeared into the pill. Both fixed in the shell's styles.
+  - The Auditor text promised a list that never comes, the card links were under 44 px on phones, a rejection without reason answered 422 where 404, 409 or 403 apply first, and the Suggestion's card said "Freigeben" while its dialog said "annehmen". All fixed.
+
+### Rejected
+- **"Keep the dialog's content while it closes."** As found in P-08, the dialog component freezes its panel while closing, so the content doesn't change.
+

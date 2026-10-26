@@ -42,6 +42,7 @@ function empty(slug: string, name: string, theme: SeedData["tenant"]["theme"]): 
     evidence: [],
     hazards: SEED.hazards,
     risks: [],
+    riskAssessments: [],
     activity: [],
   };
 }

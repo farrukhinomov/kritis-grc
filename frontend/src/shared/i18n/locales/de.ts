@@ -12,6 +12,8 @@ export const de = {
     openApp: "Zur Anwendung",
   },
   nav: {
+    pending_one: ", {{count}} offen",
+    pending_other: ", {{count}} offen",
     main: "Hauptnavigation",
     more: "Mehr",
     collapse: "Navigation einklappen",
@@ -533,6 +535,7 @@ export const de = {
       risk: "Risiko",
       mapping: "Mapping",
       mapping_suggestion: "Mapping-Vorschlag",
+      risk_assessment: "Risikobewertung",
       scope: "Geltungsbereich",
       tenant: "Mandant",
     },
@@ -597,6 +600,57 @@ export const de = {
       memberships: "Verwaltung der Mitglieder in der Oberfläche",
       sso: "Single Sign-on (OIDC, SAML)",
       quantitative: "Quantitative Risikobewertung",
+    },
+  },
+  approvals: {
+    description: "Alles, was auf Ihre Freigabe wartet, das Älteste zuerst.",
+    list: "Offene Freigaben",
+    empty: "Nichts wartet auf Ihre Freigabe.",
+    auditor: "Als Auditor geben Sie nichts frei.",
+    kinds: { mapping_suggestion: "Mapping-Vorschlag", risk_assessment: "Risikobewertung" },
+    submittedBy: "eingereicht von {{name}} am {{date}}",
+    proposedOn: "von der KI vorgeschlagen am {{date}}",
+    open: { mapping_suggestion: "Vorschlag ansehen", risk_assessment: "Risiken ansehen" },
+    approveAction: { mapping_suggestion: "Annehmen", risk_assessment: "Freigeben" },
+    reject: "Ablehnen",
+    reason: "Begründung",
+    status: { submitted: "eingereicht", approved: "freigegeben", rejected: "abgelehnt" },
+    reasonMissing: "Bitte geben Sie eine Begründung an.",
+    confirm: {
+      cancel: "Abbrechen",
+      risk_assessment: {
+        approve: {
+          title: "Risikobewertung freigeben?",
+          ok: "Freigeben",
+          body: "„{{title}}“ gilt danach als freigegeben. Die nächste Bewertung ist spätestens vier Jahre nach dem Bewertungsdatum fällig.",
+        },
+        reject: {
+          title: "Risikobewertung ablehnen?",
+          ok: "Ablehnen",
+          body: "„{{title}}“ geht mit Ihrer Begründung an die Person zurück, die sie eingereicht hat.",
+        },
+      },
+      mapping_suggestion: {
+        approve: {
+          title: "Mapping-Vorschlag annehmen?",
+          ok: "Annehmen",
+          body: "Das Mapping zu „{{title}}“ gilt danach für Ihren Mandanten.",
+        },
+        reject: {
+          title: "Mapping-Vorschlag ablehnen?",
+          ok: "Ablehnen",
+          body: "Das Mapping zu „{{title}}“ wird nicht übernommen.",
+        },
+      },
+    },
+    announce: {
+      approve: "„{{title}}“ freigegeben.",
+      reject: "„{{title}}“ abgelehnt.",
+    },
+    errors: {
+      conflict:
+        "Das wurde bereits entschieden, vermutlich von einer anderen Person. Die Liste zeigt jetzt den aktuellen Stand.",
+      failed: "Die Entscheidung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
     },
   },
   patterns: {
