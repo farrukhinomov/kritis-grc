@@ -6,12 +6,11 @@ import { can } from "@/shared/session/permissions";
 
 import { currentSession } from "../accounts";
 import { logActivity, type TenantData } from "../db";
+import { RISK_ASSESSMENT_VALID_MONTHS } from "../deadlines";
 import { isRecord, jsonBody, listResponse, notFound, problem, tenantRoute } from "../http";
 import type { StoredRiskAssessment } from "../seed";
 
 const STATUSES: readonly RiskAssessmentStatus[] = ["submitted", "approved", "rejected"];
-/** The law asks for a new Risk Assessment at least every four years. */
-const VALID_MONTHS = 48;
 
 const memberName = (data: TenantData, id: string | null) =>
   data.members.find((member) => member.id === id)?.display_name ?? null;
@@ -23,7 +22,9 @@ function present(data: TenantData, assessment: StoredRiskAssessment): RiskAssess
     submitted_by_name: memberName(data, assessment.submitted_by_id) ?? "",
     decided_by_name: memberName(data, assessment.decided_by_id),
     next_due:
-      assessment.status === "approved" ? addMonths(assessment.assessed_on, VALID_MONTHS) : null,
+      assessment.status === "approved"
+        ? addMonths(assessment.assessed_on, RISK_ASSESSMENT_VALID_MONTHS)
+        : null,
   };
 }
 

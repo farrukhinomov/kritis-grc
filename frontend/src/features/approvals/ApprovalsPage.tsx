@@ -91,6 +91,7 @@ export function ApprovalsPage() {
         "mapping-suggestions",
         "mappings",
         "risk-assessments",
+        "deadlines",
         "activity",
       ]) {
         void client.invalidateQueries({ queryKey: resourceKey(tenant, resource) });

@@ -39,6 +39,9 @@ const SCREENS: Partial<Record<NavEntry["key"], typeof placeholder>> = {
   roadmap: async () => ({
     Component: (await import("@/features/roadmap/RoadmapPage")).RoadmapPage,
   }),
+  deadlines: async () => ({
+    Component: (await import("@/features/deadlines/DeadlinesPage")).DeadlinesPage,
+  }),
   suggestions: async () => ({
     Component: (await import("@/features/suggestions/SuggestionsPage")).SuggestionsPage,
   }),

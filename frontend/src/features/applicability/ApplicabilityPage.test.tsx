@@ -7,7 +7,7 @@ import { problem } from "@/mocks/http";
 import { server } from "@/mocks/server";
 import { activityQuery } from "@/shared/api/activity";
 import * as organizationApi from "@/shared/api/organization";
-import { scopesQuery } from "@/shared/api/organization";
+import { deadlinesQuery, scopesQuery } from "@/shared/api/organization";
 import { addMonths, localToday } from "@/shared/lib/dates";
 import { WIDE_SCREEN_QUERY } from "@/shared/lib/breakpoints";
 import { matchMediaQueries } from "@/test/media";
@@ -110,7 +110,9 @@ describe("the Applicability Check", () => {
     const { client } = await openCheck();
     const scopes = scopesQuery(TENANT);
     const activity = activityQuery(TENANT);
+    const timeline = deadlinesQuery(TENANT);
     await client.query(scopes);
+    await client.query(timeline);
     await client.infiniteQuery(activity);
     await answer("620000");
 
@@ -133,6 +135,7 @@ describe("the Applicability Check", () => {
       expect(client.getQueryState(scopes.queryKey)?.isInvalidated).toBe(true);
     });
     expect(client.getQueryState(activity.queryKey)?.isInvalidated).toBe(true);
+    expect(client.getQueryState(timeline.queryKey)?.isInvalidated).toBe(true);
     // A second facility from the same answers would be a duplicate; only a new check starts one.
     expect(screen.queryByRole("button", { name: "Angaben ändern" })).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Weitere Anlage prüfen" }));

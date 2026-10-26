@@ -9,6 +9,7 @@ import { rejectRiskAssessment } from "@/shared/api/approvals";
 import { WIDE_SCREEN_QUERY } from "@/shared/lib/breakpoints";
 import { matchMediaQueries } from "@/test/media";
 import { renderRoute } from "@/test/render";
+import { deadlinesQuery } from "@/shared/api/organization";
 
 const DEMO = "muster-stadtwerke";
 const PAGE = `/t/${DEMO}/approvals`;
@@ -58,7 +59,9 @@ describe("the approvals inbox", () => {
   });
 
   it("approves a Risk Assessment after a confirmation, and the count follows", async () => {
-    await openInbox();
+    const { client } = await openInbox();
+    const timeline = deadlinesQuery(DEMO);
+    await client.query(timeline);
 
     await userEvent.click(
       within(await item(ASSESSMENT)).getByRole("button", { name: "Freigeben" }),
@@ -76,6 +79,8 @@ describe("the approvals inbox", () => {
     await waitFor(() => {
       expect(navLink()).toHaveAccessibleName("Freigaben, 4 offen");
     });
+    // An approved assessment sets the date of the next one on the timeline.
+    expect(client.getQueryState(timeline.queryKey)?.isInvalidated).toBe(true);
   });
 
   it("rejects a Risk Assessment only with a reason", async () => {

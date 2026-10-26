@@ -54,6 +54,10 @@ describe("the dashboard", () => {
     const deadlines = widget("Fristen");
     expect(await deadlines.findAllByText("prognostiziert")).toHaveLength(4);
     expect(deadlines.getAllByText(/^§ 12 KRITIS-DachG/)).not.toHaveLength(0);
+    expect(deadlines.getByRole("link", { name: "Alle Fristen" })).toHaveAttribute(
+      "href",
+      "/t/muster-stadtwerke/deadlines",
+    );
   });
 
   it("places every rated risk in the matrix and names each cell's category", async () => {

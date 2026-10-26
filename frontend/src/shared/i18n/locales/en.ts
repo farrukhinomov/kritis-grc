@@ -105,6 +105,7 @@ export const en: Translation = {
     },
     deadlines: {
       title: "Deadlines",
+      all: "All deadlines",
       inDays_zero: "due today",
       inDays_one: "in {{count}} day",
       inDays_other: "in {{count}} days",
@@ -507,6 +508,28 @@ export const en: Translation = {
     risks: "Risks affecting this asset",
     noRisks: "No risk names this asset.",
     unknownAsset: "This asset doesn't exist in this scope.",
+  },
+  deadlines: {
+    description:
+      "Every legal deadline of your critical facilities, calculated from registration and risk assessment.",
+    empty: "No critical facility with a registration yet. The applicability check creates one.",
+    timeline: "Timeline",
+    list: "All deadlines by date",
+    today: "Today",
+    binding: "binding",
+    citation: "{{citation}} KRITIS-DachG",
+    obligations: {
+      risk_analysis: "Risk analysis and assessment",
+      resilience_measures: "Resilience measures and resilience plan",
+      incident_reporting: "Incident reporting",
+      management_duties: "Management duties",
+      risk_assessment_renewal: "Renewed risk assessment, at least every four years",
+    },
+    basis: {
+      planned_registration: "Calculated from the planned registration",
+      confirmed_registration: "Calculated from the confirmed registration",
+      approved_risk_assessment: "Calculated from the approved risk assessment",
+    },
   },
   activityLog: {
     description: "Every change, who made it and when. Entries can't be changed or deleted.",

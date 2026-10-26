@@ -369,3 +369,16 @@ Each milestone gets one entry with four parts:
 ### Rejected
 - **"Keep the dialog's content while it closes."** As found in P-08, the dialog component freezes its panel while closing, so the content doesn't change.
 
+
+---
+
+## P-12 Deadlines timeline (2026-10-26)
+
+### Accepted
+- **One aggregate for every deadline.** `/deadlines` lists the four duties that start with each facility's Registration and the renewal of its latest approved Risk Assessment. The dashboard widget reads it too, so the two screens can't disagree.
+- **A renewal binds only as much as the facility's duties do.** Each deadline follows the facility's Registration: projected while it's planned, binding once it's confirmed.
+- **The timeline is an overview, and the list is the content.** On wide screens, markers sit in lanes per facility on a scale of whole years with a line for today. Each marker is a link to its list entry, so no information exists only in a tooltip. On phones, and for screen readers, the list is the whole page.
+- **Deadlines of one facility that fall on one day share a marker** that names all their citations, since at this scale they would sit on top of each other.
+
+### Rejected
+- **"Show a label next to every marker."** Deadlines a month apart are a few pixels apart at this scale, so the labels would overlap. The marker's accessible name and its list entry carry the text.
