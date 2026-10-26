@@ -62,11 +62,12 @@ printf '%s' "<value>" | gcloud secrets versions add <secret-name> --data-file=-
 
 ## Manual setup: Vercel
 
-1. Import the repository, root directory `frontend/`, framework preset *Vite*. Keep *Include files outside the root directory in the Build Step* on: the prototype build reads the demo fixtures from `seed/`.
-2. **Turn the Git integration's automatic deployments off.** GitHub Actions deploys after the backend is live (M0-08). Until then the prototype is deployed by hand from `main`.
-3. Add the domain `grc.inomov.online`; the DNS record already comes from OpenTofu.
-4. **For the prototype, set the environment variables `VITE_API_MOCKING=enabled` and `ENABLE_EXPERIMENTAL_COREPACK=1`** (Production). The second makes Vercel use the pnpm version pinned in `frontend/package.json`, not one guessed from the lockfile. With the first, the build contains the mock API, and every page shows the "Prototyp – Demodaten" badge; remove it once the real API is live.
-5. `frontend/vercel.json` holds the build, the SPA fallback, caching and the security headers (the same as the nginx image). The `/api/*` rewrite and its caching opt-out are added with M0-08.
+1. Import the repository, root directory `frontend/`, framework preset *Vite*, Node.js 24.x. Keep *Include files outside the root directory in the Build Step* on: the prototype build reads the demo fixtures from `seed/`.
+2. **For the prototype, set the environment variables `VITE_API_MOCKING=enabled` and `ENABLE_EXPERIMENTAL_COREPACK=1`** (Production and Preview). With the first, the build contains the mock API, and every page shows the "Prototyp – Demodaten" badge; remove it once the real API is live.
+3. `frontend/vercel.json` holds the build, the SPA fallback, caching and the security headers (the same as the nginx image). The `/api/*` rewrite and its caching opt-out are added with M0-08.
+   - Install and build run through `corepack pnpm`, so the pnpm version pinned in `frontend/package.json` is used. Vercel's own pnpm is older and rejects the lockfile ("expected a single document"). Corepack's automatic switch-on looks for `packageManager` in the repository root, where there is no `package.json`, so it can't be relied on here.
+4. **Domain.** Add `grc.inomov.online` to the project (`vercel domains add grc.inomov.online kritis-grc`). `inomov.online` is served by Cloudflare DNS, so the record is created there: a CNAME `grc` to the target `vercel domains verify grc.inomov.online` prints, **DNS only** (not proxied), because Vercel issues the certificate itself. OpenTofu manages the same record once it is applied; import an existing record before the first apply instead of creating a second one.
+5. Git deployments stay on: every merge to `main` updates the prototype. Deploying from a local folder uploads everything the ignore rules let through, so export the tracked files first (`git archive HEAD`) instead of deploying from a working checkout.
 6. The Hobby plan is non-commercial only, which fits the job-demo phase. A commercial launch moves to Vercel Pro, or to Cloudflare Pages with a Worker proxying `/api`.
 
 ## Checks

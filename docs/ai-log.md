@@ -494,3 +494,18 @@ Each was confirmed with a mutation or a throwaway test.
 
 ### Rejected
 - **"Make the baselines on this machine."** Text renders differently from the runner, and every comparison failed. The runner is the one place every check runs, so it makes the baselines.
+
+---
+
+## Prototype deployment (2026-10-26)
+
+### Found
+- **The first Vercel build failed in 3 seconds** with `ERR_PNPM_BROKEN_LOCKFILE`. The build used Vercel's own, older pnpm, which can't read the lockfile format pnpm 12 writes. The documented fix, `ENABLE_EXPERIMENTAL_COREPACK=1` plus a `packageManager` field, was in place and did nothing: Vercel looks for the field in the repository root, and the project sits in `frontend/`. The warning in the build log said so; the README's setup steps hadn't.
+- **A missing asset is cached for a year.** `/assets/…` answers 404 for a file that doesn't exist, and the header rule for hashed assets (`immutable`, one year) applies to that 404 too. A browser that asks during a deploy, before a new chunk is live, would keep the 404. Not fixed yet; the rule needs to apply to successful responses only.
+
+### Changed
+- **Install and build run through `corepack pnpm`** in `vercel.json`, so the pinned pnpm is used however Vercel's detection behaves. Verified by a production deployment of exactly this change, exported from the tracked files only.
+
+### Lesson
+- **Read the platform's own build log before trusting a setup checklist.** The answer was one warning line above the failing command.
+- **Never upload a working checkout.** The tool respects the ignore rules, but a private folder sits one missing rule away from a public site. Deploy an export of the tracked files.

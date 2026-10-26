@@ -43,3 +43,6 @@ Thumbs.db
 *.tfplan
 *.tfvars
 !*.tfvars.example
+
+# Local link to a Vercel project
+.vercel
