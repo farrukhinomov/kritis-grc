@@ -318,6 +318,33 @@ export interface Mapping {
   approved_at: string | null;
 }
 
+/** A Requirement as the coverage matrix names it: its place in the statute and its title. */
+export type CoverageRequirement = Pick<
+  Requirement,
+  "id" | "citation" | "paragraph" | "title_de" | "title_en"
+> & { framework_key: Framework["key"]; framework_name: string };
+
+/** One pair of Requirements with every Mapping between them that applies to the Tenant. */
+export interface CoverageCell {
+  target_requirement_id: string;
+  source_requirement_id: string;
+  /** The strongest of its Mappings. */
+  coverage: Coverage;
+  mappings: Pick<Mapping, "id" | "kind" | "coverage" | "justification_de" | "gap_note_de">[];
+  /** Facilities whose Implementation already refers to the source's as Evidence. */
+  reused_in: { scope_id: string; scope_name: string }[];
+}
+
+export interface CoverageMatrix {
+  /** The KRITIS-DachG Requirements, in the statute's order. */
+  rows: CoverageRequirement[];
+  /** The BSIG Requirements, in the statute's order. */
+  columns: CoverageRequirement[];
+  /** Only the pairs with a Mapping. */
+  cells: CoverageCell[];
+  totals: { cells: number; full: number; partial: number; reused: number };
+}
+
 export type SuggestionStatus = "pending" | "approved" | "rejected";
 
 /** A Requirement as another object names it: enough to read, without the statute text. */

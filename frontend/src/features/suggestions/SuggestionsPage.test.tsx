@@ -6,7 +6,7 @@ import { setMockSession } from "@/mocks/accounts";
 import { problem } from "@/mocks/http";
 import { server } from "@/mocks/server";
 import { apiGet } from "@/shared/api/client";
-import { mappingsQuery, rejectSuggestion } from "@/shared/api/compliance";
+import { coverageMatrixQuery, mappingsQuery, rejectSuggestion } from "@/shared/api/compliance";
 import type { MappingSuggestion, Page } from "@/shared/api/types";
 import { WIDE_SCREEN_QUERY } from "@/shared/lib/breakpoints";
 import { matchMediaQueries } from "@/test/media";
@@ -71,6 +71,8 @@ describe("the Mapping Suggestion review on a wide screen", () => {
     // Mappings the cockpit has cached must not outlive the decision.
     const mappings = mappingsQuery("muster-stadtwerke", { target_requirement: "req-k-13-3-2" });
     await client.query(mappings);
+    const matrix = coverageMatrixQuery("muster-stadtwerke");
+    await client.query(matrix);
     const suggestion = within(await card(pending(), ACCESS));
 
     await userEvent.click(suggestion.getByRole("button", { name: "Annehmen" }));
@@ -83,6 +85,8 @@ describe("the Mapping Suggestion review on a wide screen", () => {
     await waitFor(() => {
       expect(client.getQueryState(mappings.queryKey)?.isInvalidated).toBe(true);
     });
+    // The new Tenant Mapping adds a cell to the coverage matrix.
+    expect(client.getQueryState(matrix.queryKey)?.isInvalidated).toBe(true);
   });
 
   it("moves the card as soon as the server confirms, so it can glide, before the lists reload", async () => {

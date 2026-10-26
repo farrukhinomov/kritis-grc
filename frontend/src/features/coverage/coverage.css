@@ -1,0 +1,261 @@
+.grc-coverage {
+  display: grid;
+  gap: 16px;
+}
+
+.grc-coverage-totals {
+  margin: 0;
+  font-size: 15px;
+}
+
+.grc-coverage-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  color: var(--grc-text-secondary);
+  font-size: 13px;
+}
+
+.grc-coverage-legend li {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/*
+ * A cell's mark: a full square for full coverage, a half-filled one for partial, so the
+ * two differ in shape as well as in color. A dot in the corner marks a pair whose
+ * Implementation already counts for both; the outline stays free for the focus ring.
+ */
+.grc-coverage-mark {
+  --grc-coverage-diagonal: 135deg;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--grc-primary);
+  border-radius: 5px;
+  background: var(--grc-primary);
+}
+
+.grc-coverage-mark[data-coverage="partial"] {
+  background: linear-gradient(
+    var(--grc-coverage-diagonal),
+    var(--grc-primary) 0 50%,
+    var(--grc-surface) 50% 100%
+  );
+}
+
+/* Mirrored with the writing direction, so the filled half always leads. */
+.grc-coverage-mark:dir(rtl) {
+  --grc-coverage-diagonal: 225deg;
+}
+
+.grc-coverage-mark[data-reused="true"]::after {
+  position: absolute;
+  inset-block-start: -7px;
+  inset-inline-end: -7px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--grc-surface);
+  border-radius: 50%;
+  background: var(--grc-status-success-solid);
+  content: "";
+}
+
+/*
+ * With forced colors the backgrounds are dropped, and full and partial would look alike.
+ * The marks then draw themselves in system colors, so the shapes survive.
+ */
+@media (forced-colors: active) {
+  .grc-coverage-mark {
+    border-color: CanvasText;
+    background: CanvasText;
+    forced-color-adjust: none;
+  }
+
+  .grc-coverage-mark[data-coverage="partial"] {
+    background: linear-gradient(var(--grc-coverage-diagonal), CanvasText 0 50%, Canvas 50% 100%);
+  }
+
+  .grc-coverage-mark[data-reused="true"]::after {
+    border-color: Canvas;
+    background: Highlight;
+  }
+}
+
+/* The whole cell is the target, 44 px square; the mark sits in its middle. */
+.grc-coverage-cell-button {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.grc-coverage-cell-button:hover {
+  background: var(--grc-surface-sunken);
+}
+
+.grc-coverage-cell-button:focus-visible {
+  outline: 3px solid var(--grc-focus-ring);
+  outline-offset: -3px;
+}
+
+/* Positioned, so the hidden caption and labels stay inside it instead of widening the page. */
+.grc-coverage-scroll {
+  position: relative;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 14px;
+  background: var(--grc-surface);
+}
+
+/* Separate borders, so a sticky row header keeps its own border while the table scrolls. */
+.grc-coverage-grid {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.grc-coverage-corner {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  padding: 8px 12px;
+  background: var(--grc-surface);
+  color: var(--grc-text-secondary);
+  font-size: 12px;
+  vertical-align: bottom;
+}
+
+.grc-coverage-column {
+  height: 96px;
+  padding: 8px 0;
+  color: var(--grc-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+/* Column labels run upwards, so fourteen of them fit beside the row headers. */
+.grc-coverage-column > span[aria-hidden] {
+  display: inline-block;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.grc-coverage-row {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  min-width: 260px;
+  max-width: 340px;
+  padding: 6px 12px;
+  border-block-end: 1px solid var(--grc-border-subtle);
+  border-inline-end: 1px solid var(--grc-border-subtle);
+  background: var(--grc-surface);
+  font-weight: 400;
+  text-align: start;
+}
+
+.grc-coverage-row .grc-meta {
+  font-size: 12px;
+}
+
+.grc-coverage-group > tr:first-child > * {
+  border-block-start: 2px solid var(--grc-border-subtle);
+}
+
+/* 44 px cells, so every mark is a comfortable target. */
+.grc-coverage-cell {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+  border-block-end: 1px solid var(--grc-border-subtle);
+  border-inline-end: 1px solid var(--grc-border-subtle);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.grc-coverage-cell .grc-coverage-mark {
+  width: 28px;
+  height: 28px;
+}
+
+.grc-coverage-list {
+  display: grid;
+  gap: 12px;
+}
+
+.grc-coverage-entry {
+  padding: 12px;
+  border: 1px solid var(--grc-border-subtle);
+  border-radius: 12px;
+  background: var(--grc-surface);
+}
+
+.grc-coverage-entry-title {
+  margin: 0 0 8px;
+}
+
+.grc-coverage-pair {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--grc-surface-sunken);
+  color: var(--grc-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.grc-coverage-pair:focus-visible {
+  outline: 3px solid var(--grc-focus-ring);
+  outline-offset: 2px;
+}
+
+.grc-coverage-detail {
+  display: grid;
+  gap: 20px;
+}
+
+.grc-coverage-detail p {
+  margin: 0 0 6px;
+}
+
+.grc-coverage-mappings {
+  display: grid;
+  gap: 16px;
+}
+
+.grc-coverage-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.grc-coverage-tag[data-coverage="full"] {
+  border-color: var(--grc-status-success-solid);
+  background: var(--grc-status-success-bg);
+  color: var(--grc-status-success-text);
+}
+
+.grc-coverage-tag[data-coverage="partial"] {
+  border-color: var(--grc-status-warning-solid);
+  background: var(--grc-status-warning-bg);
+  color: var(--grc-status-warning-text);
+}

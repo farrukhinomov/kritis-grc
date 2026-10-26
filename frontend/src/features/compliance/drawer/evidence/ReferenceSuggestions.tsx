@@ -12,6 +12,7 @@ import {
 import { scopeQuery } from "@/shared/api/organization";
 import type { Evidence, Framework, Implementation, Mapping, Requirement } from "@/shared/api/types";
 import { combine } from "@/shared/lib/combineQueries";
+import { LAW_ABBREVIATIONS } from "@/shared/lib/laws";
 import { QueryContent } from "@/shared/ui/patterns/QueryContent";
 import { StatusBadge } from "@/shared/ui/StatusBadge/StatusBadge";
 
@@ -19,11 +20,6 @@ import { SaveError } from "./SaveError";
 import { useIdempotencyKey } from "@/shared/lib/useIdempotencyKey";
 
 import { type EvidenceTarget, useAddEvidence } from "./useAddEvidence";
-
-const LAW_ABBREVIATIONS: Record<Framework["key"], string> = {
-  kritis_dachg: "KRITIS-DachG",
-  bsig: "BSIG",
-};
 
 interface ReferenceSuggestionsProps {
   target: EvidenceTarget;

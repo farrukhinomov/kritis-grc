@@ -2,6 +2,7 @@ import { activityHandlers } from "./handlers/activity";
 import { approvalHandlers } from "./handlers/approvals";
 import { authHandlers } from "./handlers/auth";
 import { complianceHandlers } from "./handlers/compliance";
+import { coverageHandlers } from "./handlers/coverage";
 import { dependencyHandlers } from "./handlers/dependencies";
 import { organizationHandlers } from "./handlers/organization";
 import { riskHandlers } from "./handlers/risk";
@@ -19,6 +20,7 @@ export const handlers = [
   ...organizationHandlers,
   ...dependencyHandlers,
   ...complianceHandlers,
+  ...coverageHandlers,
   ...riskHandlers,
   ...activityHandlers,
   ...searchHandlers,

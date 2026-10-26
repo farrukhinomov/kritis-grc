@@ -82,6 +82,7 @@ export function useDecideSuggestion(tenant: string, { onDecided, onFailed }: Dec
       void client.invalidateQueries({ queryKey: suggestions });
       // An approval adds a Tenant Mapping, which the cockpit's references read.
       void client.invalidateQueries({ queryKey: resourceKey(tenant, "mappings") });
+      void client.invalidateQueries({ queryKey: resourceKey(tenant, "coverage-matrix") });
       void client.invalidateQueries({ queryKey: resourceKey(tenant, "activity") });
       // The navigation's count and the approvals inbox list the same Suggestions.
       void client.invalidateQueries({ queryKey: resourceKey(tenant, "approvals") });

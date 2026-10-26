@@ -22,11 +22,11 @@ const place = (requirement: string, scope = "sc-nord") =>
   `/t/muster-stadtwerke/compliance?scope=${scope}&paragraph=§ 13&requirement=${requirement}&panel=evidence`;
 
 async function openEvidence(requirement: string) {
-  renderRoute(place(requirement));
+  const { client } = renderRoute(place(requirement));
   const element = await screen.findByRole("dialog");
   const drawer = within(element);
   await drawer.findByRole("tab", { name: "Nachweise", selected: true });
-  return Object.assign(drawer, { element });
+  return Object.assign(drawer, { element, client });
 }
 
 /** antd's Segmented keeps its native radios under the labels, out of pointer reach. */
@@ -129,6 +129,8 @@ describe("the Evidence of an Implementation", () => {
 describe("Reference Evidence", () => {
   it("suggests the NIS2 Implementation a full Mapping covers, added in one click", async () => {
     const drawer = await openEvidence("req-k-13-3-5");
+    const matrix = complianceApi.coverageMatrixQuery("muster-stadtwerke");
+    await drawer.client.query(matrix);
     await chooseKind(drawer.element, "Verweis");
 
     const suggestion = within(
@@ -148,6 +150,8 @@ describe("Reference Evidence", () => {
       ),
     ).toBeInTheDocument();
     expect(await suggestion.findByText("Bereits als Nachweis verwiesen.")).toBeInTheDocument();
+    // Now one Implementation counts for both, which the coverage matrix shows.
+    expect(drawer.client.getQueryState(matrix.queryKey)?.isInvalidated).toBe(true);
   });
 
   it("explains when no full Mapping exists", async () => {
