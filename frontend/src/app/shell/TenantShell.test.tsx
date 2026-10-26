@@ -123,7 +123,7 @@ describe("the shell on a wide screen", () => {
     await openPage("/t/muster-stadtwerke/dashboard", "Übersicht");
 
     await userEvent.click(screen.getByRole("button", { name: /Alex Kramer/ }));
-    expect(await screen.findByRole("menuitemradio", { name: "Wie System" })).toHaveAttribute(
+    expect(await screen.findByRole("menuitemradio", { name: "Hell" })).toHaveAttribute(
       "aria-checked",
       "true",
     );

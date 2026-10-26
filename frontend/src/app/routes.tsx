@@ -1,5 +1,7 @@
 import { Navigate, type RouteObject } from "react-router";
 
+import { isDemoBuild } from "@/shared/lib/demo";
+
 import { PublicLayout } from "./PublicLayout";
 import { RootLayout } from "./RootLayout";
 import { RouteError } from "./RouteError";
@@ -8,6 +10,9 @@ import { SessionGate } from "./SessionGate";
 import { NAV_ITEMS, type NavEntry } from "./shell/navigation";
 
 const placeholder = async () => ({ Component: (await import("./pages")).PlaceholderPage });
+const status = async () => ({
+  Component: (await import("@/features/status/StatusPage")).StatusPage,
+});
 const notFound = async () => ({ Component: (await import("./pages")).NotFound });
 
 /** Screens that exist so far; the others keep the placeholder until their issue builds them. */
@@ -66,10 +71,14 @@ export const routes: RouteObject[] = [
           {
             index: true,
             ...titled("status.title"),
-            lazy: async () => ({
-              Component: (await import("@/features/status/StatusPage")).StatusPage,
-            }),
+            // The prototype's visitors go straight into the demo; the real product starts
+            // on the system status until it has a landing page of its own.
+            lazy: async () =>
+              isDemoBuild()
+                ? { Component: (await import("@/features/auth/DemoEntry")).DemoEntry }
+                : status(),
           },
+          { path: "status", ...titled("status.title"), lazy: status },
           {
             path: "login",
             ...titled("auth.title"),

@@ -23,8 +23,8 @@ describe("resolveColorMode", () => {
 });
 
 describe("color mode preference storage", () => {
-  it("defaults to system when nothing is stored", () => {
-    expect(readColorModePreference()).toBe("system");
+  it("defaults to light when nothing is stored, whatever the system prefers", () => {
+    expect(readColorModePreference()).toBe("light");
   });
 
   it("round-trips a stored choice", () => {
@@ -37,7 +37,7 @@ describe("color mode preference storage", () => {
   it("ignores unknown stored values", () => {
     localStorage.setItem(COLOR_MODE_STORAGE_KEY, "sepia");
 
-    expect(readColorModePreference()).toBe("system");
+    expect(readColorModePreference()).toBe("light");
   });
 
   it("survives storage that is unavailable", () => {
@@ -48,7 +48,7 @@ describe("color mode preference storage", () => {
       throw new DOMException("blocked", "SecurityError");
     });
 
-    expect(readColorModePreference()).toBe("system");
+    expect(readColorModePreference()).toBe("light");
     expect(() => {
       storeColorModePreference("dark");
     }).not.toThrow();
