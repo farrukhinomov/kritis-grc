@@ -163,6 +163,10 @@ export const de = {
       requirements: "Anforderungen",
       implementation: "Umsetzung",
     },
+    hints: {
+      requirements: "Wählen Sie einen Paragraphen, um seine Anforderungen zu sehen.",
+      implementation: "Wählen Sie eine Anforderung, um ihre Umsetzung zu sehen.",
+    },
     summary:
       "{{requirements}} Anforderungen · {{implemented}} umgesetzt · {{partial}} teilweise · {{open}} offen",
     implementedOf: "{{implemented}} von {{total}} umgesetzt",

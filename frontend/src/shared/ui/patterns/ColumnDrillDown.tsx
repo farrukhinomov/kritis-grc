@@ -3,6 +3,7 @@ import "./patterns.css";
 import { Button, Typography } from "antd";
 import { AnimatePresence, m } from "motion/react";
 import {
+  type CSSProperties,
   type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
@@ -18,7 +19,16 @@ import { duration, ease } from "@/shared/theme/motion";
 import { AnimatedIcon } from "@/shared/ui/AnimatedIcon/AnimatedIcon";
 
 export interface DrillColumn {
+  /** Identifies the content: a new key swaps the column's content, with a short fade. */
   key: string;
+  /**
+   * Identifies the column's place. A column that keeps its slot stays in the page while its
+   * content changes, so choosing another paragraph doesn't remove one column and add
+   * another beside it, which briefly made three and pushed a scrollbar into view.
+   */
+  slot?: string;
+  /** Only held open on wide screens, to keep the other columns' width from jumping. */
+  placeholder?: boolean;
   title: string;
   content: ReactNode;
 }
@@ -33,6 +43,7 @@ interface ColumnDrillDownProps {
 
 const SLIDE_DISTANCE = 48;
 const transition = { duration: duration.base, ease: ease.standard };
+const fade = { duration: duration.fast, ease: ease.enter };
 
 /**
  * Hierarchies (paragraph → Requirement → Implementation) as side-by-side columns on wide
@@ -44,26 +55,41 @@ export function ColumnDrillDown({ label, columns, onBack }: ColumnDrillDownProps
   const baseId = useId();
 
   return wide ? (
-    <div className="grc-drill" role="group" aria-label={label}>
-      <AnimatePresence initial={false}>
-        {columns.map((column, index) => (
-          <m.section
+    <div
+      className="grc-drill"
+      role="group"
+      aria-label={label}
+      style={{ "--grc-drill-columns": columns.length } as CSSProperties}
+    >
+      {columns.map((column, index) => (
+        <section
+          key={column.slot ?? column.key}
+          className="grc-drill-column"
+          data-placeholder={column.placeholder ?? false}
+          aria-labelledby={`${baseId}-${String(index)}`}
+        >
+          <ColumnTitle id={`${baseId}-${String(index)}`} title={column.title} />
+          {/* No exit animation: the old content would stay in the flow beside the new,
+              doubling the column's height for a moment, which scrolled the page and
+              added a scrollbar that narrowed every column. */}
+          <m.div
             key={column.key}
-            className="grc-drill-column"
-            aria-labelledby={`${baseId}-${String(index)}`}
-            initial={{ opacity: 0, x: SLIDE_DISTANCE }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: SLIDE_DISTANCE }}
-            transition={transition}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={fade}
           >
-            <ColumnTitle id={`${baseId}-${String(index)}`} title={column.title} />
             {column.content}
-          </m.section>
-        ))}
-      </AnimatePresence>
+          </m.div>
+        </section>
+      ))}
     </div>
   ) : (
-    <StackedColumns label={label} columns={columns} onBack={onBack} />
+    // One level at a time: the held-open slots only exist to keep the wide layout steady.
+    <StackedColumns
+      label={label}
+      columns={columns.filter((column) => !column.placeholder)}
+      onBack={onBack}
+    />
   );
 }
 

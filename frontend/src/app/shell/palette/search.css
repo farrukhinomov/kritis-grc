@@ -35,6 +35,9 @@
   max-height: min(60vh, 480px);
   padding: 8px;
   overflow-y: auto;
+  /* The browser's own scrollbar, with arrow buttons, doesn't belong in a calm list. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--grc-control-border) transparent;
 }
 
 .grc-palette-group {
@@ -45,10 +48,14 @@
 }
 
 .grc-palette-option {
+  /* 44 px in all, padding included: without border-box the row was 60 px, with its text
+     at the top of the extra room. */
+  box-sizing: border-box;
   display: grid;
+  align-content: center;
   gap: 2px;
   min-height: 44px;
-  padding: 8px;
+  padding: 6px 8px;
   border-radius: 8px;
   cursor: pointer;
 }

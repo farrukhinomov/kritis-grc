@@ -19,6 +19,10 @@
   .grc-widget-wide {
     grid-column: span 2;
   }
+
+  .grc-widget-tall {
+    grid-row: span 2;
+  }
 }
 
 .grc-widget {
@@ -190,6 +194,13 @@ time.grc-widget-muted {
 
 .grc-risk-matrix thead th {
   text-align: center;
+}
+
+/* In a fixed table layout the first row sets the column widths, and its empty corner
+   cell would otherwise take a full column's share. */
+.grc-risk-matrix-corner {
+  width: 28px;
+  padding: 0;
 }
 
 .grc-risk-matrix tbody th {

@@ -185,6 +185,7 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
   const columns: DrillColumn[] = [
     {
       key: "paragraphs",
+      slot: "paragraphs",
       title: t("compliance.columns.paragraphs"),
       content: (
         <QueryContent
@@ -221,6 +222,7 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
   if (paragraph) {
     columns.push({
       key: `requirements ${paragraph.paragraph}`,
+      slot: "requirements",
       title: t("compliance.columns.requirements"),
       content: (
         <QueryContent
@@ -253,9 +255,30 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
     });
   }
 
+  if (!paragraph) {
+    columns.push(
+      heldOpen(
+        "requirements",
+        t("compliance.columns.requirements"),
+        t("compliance.hints.requirements"),
+      ),
+    );
+  }
+
+  if (!requirement) {
+    columns.push(
+      heldOpen(
+        "implementation",
+        t("compliance.columns.implementation"),
+        t("compliance.hints.implementation"),
+      ),
+    );
+  }
+
   if (requirement) {
     columns.push({
       key: `implementation ${requirement.id}`,
+      slot: "implementation",
       title: t("compliance.columns.implementation"),
       content: (
         <ImplementationDetail
@@ -307,6 +330,17 @@ function Cockpit({ tenant, frameworks, summary }: CockpitProps) {
       />
     </>
   );
+}
+
+/** The place of a level that isn't open yet, saying what opens it. */
+function heldOpen(slot: string, title: string, hint: string): DrillColumn {
+  return {
+    key: `${slot} none`,
+    slot,
+    placeholder: true,
+    title,
+    content: <p className="grc-drill-hint">{hint}</p>,
+  };
 }
 
 /** Totals for the whole column, so the counts per row have a frame of reference. */

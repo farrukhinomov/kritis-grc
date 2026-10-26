@@ -28,7 +28,7 @@ export function DashboardPage() {
         <Widget title={t("dashboard.compliance.title")} wide>
           <ComplianceWidget />
         </Widget>
-        <Widget title={t("dashboard.deadlines.title")}>
+        <Widget title={t("dashboard.deadlines.title")} tall>
           <DeadlinesWidget />
         </Widget>
         <Widget title={t("dashboard.matrix.title")}>

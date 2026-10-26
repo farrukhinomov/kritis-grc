@@ -49,6 +49,13 @@
   font-weight: 500;
 }
 
+/* In a fixed table layout the first row sets the column widths, and its empty corner
+   cell would otherwise take a full column's share. */
+.grc-explorer-corner {
+  width: 28px;
+  padding: 0;
+}
+
 .grc-explorer-matrix tbody th {
   width: 24px;
   text-align: end;

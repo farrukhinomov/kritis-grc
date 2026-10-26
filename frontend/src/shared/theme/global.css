@@ -14,6 +14,12 @@
   outline-offset: 2px !important;
 }
 
+/* Room for the scrollbar is always kept: a page that grows past the window for a moment
+   (a column opening, a list loading) would otherwise shrink every column by its width. */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
 }
