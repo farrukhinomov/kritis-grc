@@ -31,7 +31,7 @@ export function MyImplementationsWidget() {
   return (
     <QueryContent
       query={query}
-      rows={5}
+      rows={15}
       isEmpty={([implementations]) => implementations.items.length === 0}
       empty={t("dashboard.mine.empty")}
     >

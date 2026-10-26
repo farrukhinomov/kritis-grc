@@ -284,8 +284,8 @@ As a GRC Manager, I want to see how my measures change the risk picture.
 ### P-16 Quality pass and prototype release
 **Labels:** `module:frontend`, `type:test`, `prio:must` · **Estimate:** 3 h · **Depends on:** P-03 to P-15
 
-- [ ] Playwright runs the v1 flow end to end on mocks. axe passes on the five main screens. A reduced-motion check runs.
-- [ ] 30 visual baselines: 5 main screens × (Saar Green light, Saar Green dark, High Contrast light) × (desktop, 390 px).
+- [x] Playwright runs the v1 flow end to end on mocks. axe passes on the five main screens. A reduced-motion check runs.
+- [x] 30 visual baselines: 5 main screens × (Saar Green light, Saar Green dark, High Contrast light) × (desktop, 390 px).
 - [ ] Lighthouse on the dashboard: performance and accessibility ≥ 90 on desktop.
 - [ ] Deployed to `grc.inomov.online` with the "Prototyp – Demodaten" badge. The README links the live prototype and gives a short tour.
 

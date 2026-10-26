@@ -18,7 +18,7 @@ export function ActivityWidget() {
   return (
     <QueryContent
       query={query}
-      rows={5}
+      rows={10}
       isEmpty={([activity]) => (activity.pages[0]?.items.length ?? 0) === 0}
       empty={t("dashboard.activity.empty")}
     >

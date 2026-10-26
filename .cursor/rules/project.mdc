@@ -45,6 +45,7 @@ Frontend (run in `frontend/`, details in [its README](../../frontend/README.md))
 pnpm test:coverage
 pnpm lint && pnpm typecheck && pnpm format:check
 pnpm build
+pnpm e2e                             # Playwright on the built prototype: flow, axe, motion, visual
 ```
 
 Whole system (repository root, needs `.env` from `.env.example`):

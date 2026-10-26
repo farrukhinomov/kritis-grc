@@ -18,7 +18,7 @@ export function RiskMatrixWidget() {
   return (
     <QueryContent
       query={query}
-      rows={5}
+      rows={15}
       isEmpty={([matrix]) => matrix.total === 0}
       empty={t("dashboard.risks.empty")}
     >

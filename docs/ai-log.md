@@ -440,3 +440,35 @@ Each milestone gets one entry with four parts:
 
 ### Not built
 - **Sticky column headers.** The BSIG labels scroll out of view on a long page. Sticking them inside a container that scrolls sideways needs that container to scroll vertically too, which would give the page a second scroll area. With sixteen rows that isn't worth it.
+
+---
+
+## P-16 Quality pass and prototype release (2026-10-26)
+
+### Accepted
+- **Playwright on the production build with the mock API**, in Chromium at 1440 px and 390 px, on a fixed day and in Berlin time:
+  - The v1 flow of a GRC Manager, and the Auditor's read-only access.
+  - axe (WCAG 2.2 A and AA) on the five main screens.
+  - A reduced-motion check.
+  - 30 visual baselines.
+  - The screenshots use the bundled Inter font and the same Chromium version locally and in CI, and are compared within 1 % of their pixels.
+- **A CI job "Frontend end-to-end"**, which uploads the Playwright report on failure.
+- **Reduced motion is checked as movement.** The test counts animations of transform, position and size. The motion library deliberately keeps fades under reduced motion, which moves nothing.
+- **`vercel.json` for the prototype** with the same security headers as the nginx image, long caching for hashed assets and the SPA fallback.
+
+### Found by the new checks
+- **The dashboard's layout shift.** Lighthouse measured a CLS of 0.102: the widgets' skeletons were half as tall as their content, so everything below jumped when the data arrived. Skeletons now match the content, and CLS is 0.001.
+- **The status options in the drawer.** The last one was 8 px wider than the others, because the UI library spaces inline radios apart. The baseline screenshots showed it.
+- **A vitest setting that would have dropped tests.** My first exclusion of `e2e/` limited vitest to `src/`, which would have skipped the lint rule's own tests. It now keeps the defaults and excludes only `e2e/`.
+
+### Not met yet
+- **Lighthouse performance ≥ 90 on the dashboard.**
+  - Measured here: accessibility 100 and best practices 100. Performance scored 84–91 over five runs (median 88), served compressed like production.
+  - Largest Contentful Paint is 1.4–1.6 s, and total blocking time 150–250 ms. The blocking time is what costs the points; this container's CPU is noisy, and blocking time is measured in CPU time.
+  - Part of the main-thread time is the mock itself: MSW parses the cookies again for every handler it tests, on every request, about 80 ms in all. A real API removes that.
+  - The longest task, about 200 ms, is the UI library generating its styles on the first render. Static CSS (antd's zero-runtime mode) would remove it. That is a change to the theming, too large for this pass, so it is proposed as its own item.
+  - To measure on the deployed site: PageSpeed Insights on `grc.inomov.online`.
+- **The deployment.** Importing the project into Vercel and setting `VITE_API_MOCKING=enabled` are manual steps in the Vercel account (see `infra/README.md`). The README marks the live link as pending.
+
+### Rejected
+- **"Generate the baselines in the Playwright Docker image."** There is no Docker daemon here. The same Chromium build and the bundled font give the same rendering; the CI run will show whether that holds, and its report contains every difference.

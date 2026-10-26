@@ -163,6 +163,9 @@ Every check below is required before merging into `main`.
 - Failure-mode tests (risk engine down → "calculation pending") and outbox retry tests.
 - The authorization matrix (every endpoint × every actor) and the RLS raw-SQL check.
 - Playwright E2E for 3–4 core flows, including the two-user cache test, axe checks on the main screens, a reduced-motion check, and **30 visual baselines**: 5 main screens × (Saar Green light, Saar Green dark, High Contrast light) × (desktop, 390 px).
+  - They run against the production build with the mock API, on a fixed day and in Berlin time, so dates and "in N days" never drift. The two-user cache test needs the real API behind the edge and comes with M0-09.
+  - Reduced motion means nothing moves: no transform, position or size animation. Fades and color changes may stay.
+  - A visual baseline changes only with an intended visual change, and every changed image is looked at before it is committed.
 - Security and licensing:
   - Scanners: osv-scanner (lockfiles), Trivy (images), gitleaks (full git history), CodeQL with `security-extended` (while the repo is public), Dependabot with a 7-day cooldown. High/critical fixable findings block merges.
   - Scanners run as digest-pinned containers, not through third-party actions. Actions are pinned to commit SHAs, workflows have `permissions: {}` by default, and checkout never persists credentials. `actionlint` and `zizmor` check the workflows themselves.

@@ -14,7 +14,9 @@ import { TopRisksWidget } from "./widgets/TopRisksWidget";
 
 /**
  * Where a GRC Manager stands at a glance. The source order is the priority order: on a
- * phone the widgets simply stack, so the most important one is always on top.
+ * phone the widgets simply stack, so the most important one is always on top. Each
+ * widget's skeleton is about as tall as its content, so nothing below jumps when the
+ * data arrives.
  */
 export function DashboardPage() {
   const { t } = useTranslation();

@@ -25,6 +25,10 @@ With mocking disabled, `/api` is proxied to Django at `http://localhost:8000`, t
 | Lint (zero warnings)                  | `pnpm lint`                            |
 | Format / check                        | `pnpm format` / `pnpm format:check`    |
 | Production build                      | `pnpm build`                           |
+| End-to-end, axe, motion, visual       | `pnpm e2e`                             |
+| Update the visual baselines           | `pnpm e2e:update`                      |
+
+`pnpm e2e` builds the prototype with the mock API and runs Playwright against it in Chromium, at 1440 px and 390 px. The 30 visual baselines in `e2e/__screenshots__/` are compared within 1 % of their pixels. After an intended visual change, run `pnpm e2e:update` and review every changed image before committing it.
 
 ## Layout
 
