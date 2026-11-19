@@ -252,9 +252,14 @@ jobs:
           docker run --rm -v "$PWD/infra/tofu:/work" -w /work "$TOFU_IMAGE" fmt -check -recursive
           docker run --rm -v "$PWD/infra/tofu:/work" -w /work "$TOFU_IMAGE" init -backend=false -input=false -lockfile=readonly
           docker run --rm -v "$PWD/infra/tofu:/work" -w /work "$TOFU_IMAGE" validate
+      # tflint downloads its ruleset plugins from GitHub releases. Anonymous requests share
+      # a small per-IP rate limit across all hosted runners and fail at random; the job's
+      # read-only token gets a limit of its own.
       - name: Lint
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          docker run --rm -v "$PWD/infra/tofu:/work" -w /work --entrypoint sh "$TFLINT_IMAGE" \
+          docker run --rm -e GITHUB_TOKEN -v "$PWD/infra/tofu:/work" -w /work --entrypoint sh "$TFLINT_IMAGE" \
             -c "tflint --init && tflint --recursive"
       - name: Scan for insecure configuration
         run: |
