@@ -226,7 +226,8 @@ describe("the Mapping Suggestion review on a wide screen", () => {
     );
     await openReview();
     const list = within(await pending());
-    await userEvent.click(await list.findByTitle("2"));
+    // The page number's link, not its list item: newer antd handles the click on the link.
+    await userEvent.click(within(await list.findByTitle("2")).getByText("2"));
     await waitFor(() => {
       expect(list.getAllByRole("article")).toHaveLength(1);
     });
