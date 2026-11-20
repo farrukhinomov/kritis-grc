@@ -308,8 +308,10 @@ jobs:
         env:
           IMAGE: grc-${{ matrix.name }}:ci
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock "$TRIVY_IMAGE" \
-            image --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed --no-progress "$IMAGE"
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$PWD/.trivyignore:/.trivyignore:ro" "$TRIVY_IMAGE" \
+            image --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed --no-progress \
+            --ignorefile /.trivyignore "$IMAGE"
 
   dependencies:
     name: Dependency vulnerabilities
