@@ -40,7 +40,7 @@ This applies to all source code, tests, migrations, Dockerfiles and CI/CD workfl
 - Optimistic concurrency: every editable resource has a `version`, exposed as `ETag`. Writes send `If-Match`, and a stale version returns `412 Precondition Failed`.
 - Idempotency: create endpoints accept `Idempotency-Key`. Keys are stored per (Tenant, user, key) together with the original response, replayed on retry, and expire after 24 h.
 - Health: `/health/live` (process up) and `/health/ready` (database reachable), wired to the platform's probes. They are answered by middleware ahead of host validation, the HTTPS redirect and the per-request transaction, so probes by IP work and a database outage returns a clean 503.
-- Containers: multi-stage build, base images pinned by digest, a non-root user that can't write to the code, gunicorn with `gthread` workers, and a `HEALTHCHECK`.
+- Containers: multi-stage build, base images pinned by digest with Debian security updates applied in the runtime stage, a non-root user that can't write to the code, gunicorn with `gthread` workers, and a `HEALTHCHECK`.
 
 ## Risk engine (FastAPI)
 
@@ -170,6 +170,7 @@ Every check below is required before merging into `main`.
   - A visual baseline shows the first screen of a page, which is what a reviewer sees first; content further down is covered by the flow and the unit tests. It changes only with an intended visual change, and every changed image is looked at before it is committed.
 - Security and licensing:
   - Scanners: osv-scanner (lockfiles), Trivy (images), gitleaks (full git history), CodeQL with `security-extended` (while the repo is public), Dependabot with a 7-day cooldown. High/critical fixable findings block merges.
+  - A finding is ignored only in `.trivyignore`, only when it cannot be exploited in our configuration and no fixed version is installable, with that reason next to it and an expiry of at most 7 days.
   - Scanners run as digest-pinned containers, not through third-party actions. Actions are pinned to commit SHAs, workflows have `permissions: {}` by default, and checkout never persists credentials. `actionlint` and `zizmor` check the workflows themselves.
   - A license check enforces ADR 0016 against `.github/license-policy.json` for runtime dependencies only.
   - Runtime images ship without pip and get OS security patches at build time.

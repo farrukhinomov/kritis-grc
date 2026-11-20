@@ -1,0 +1,4 @@
+# typescript-eslint still asks for minimatch 10, whose ReDoS fix (GHSA-g3hv-75wg-m249)
+# only shipped in 11. The API it uses is unchanged, so 11 is forced until it upgrades.
+overrides:
+  minimatch@10: ^11.0.1
