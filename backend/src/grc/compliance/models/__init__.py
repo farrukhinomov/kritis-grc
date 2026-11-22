@@ -13,6 +13,7 @@ from typing import ClassVar
 from django.conf import settings
 from django.db import models
 
+from grc.core.history import tracked
 from grc.core.models import TenantOwnedModel
 
 CATALOGUE_ID_LENGTH = 64
@@ -90,6 +91,7 @@ class PlatformMapping(models.Model):
         return f"{self.target_requirement_id} <- {self.source_requirement_id}"
 
 
+@tracked()
 class TenantMapping(TenantOwnedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     target_requirement = models.ForeignKey(Requirement, on_delete=models.PROTECT, related_name="+")
@@ -113,6 +115,8 @@ class ImplementationStatus(models.TextChoices):
     NOT_APPLICABLE = "not_applicable", "not applicable"
 
 
+# The version and timestamp move with every change; they are not changes themselves.
+@tracked(exclude=["version", "updated_at"])
 class Implementation(TenantOwnedModel):
     """One Requirement applied to one Scope. Evidence attaches here, never to Requirements."""
 
@@ -164,6 +168,8 @@ class Upload(TenantOwnedModel):
         return self.name
 
 
+# The storage key is plumbing, not something a reader of the log needs.
+@tracked(exclude=["file_key"])
 class Evidence(TenantOwnedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     implementation = models.ForeignKey(

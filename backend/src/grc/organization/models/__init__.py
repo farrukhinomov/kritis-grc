@@ -11,6 +11,7 @@ from typing import Any, ClassVar
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 
+from grc.core.history import tracked
 from grc.core.models import TenantOwnedModel
 
 
@@ -88,6 +89,7 @@ class RegistrationStatus(models.TextChoices):
     CONFIRMED = "confirmed", "confirmed"
 
 
+@tracked()
 class Scope(TenantOwnedModel):
     """A part of a Tenant. A Critical Facility is a Scope with its legal particulars."""
 

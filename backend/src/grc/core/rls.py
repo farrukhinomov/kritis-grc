@@ -35,3 +35,27 @@ def tenant_rls(table: str, condition: str | None = None) -> migrations.RunSQL:
         f'ALTER TABLE "{table}" DISABLE ROW LEVEL SECURITY;'
     )
     return migrations.RunSQL(forward, reverse)
+
+
+_IMMUTABLE_FUNCTION = """
+CREATE OR REPLACE FUNCTION grc_activity_is_immutable() RETURNS trigger AS $$
+BEGIN
+  -- Only the Demo Tenant reset may purge, and only within its own transaction.
+  IF TG_OP = 'DELETE' AND current_setting('app.allow_activity_purge', true) = 'on' THEN
+    RETURN OLD;
+  END IF;
+  RAISE EXCEPTION 'The Activity Log is immutable' USING ERRCODE = 'insufficient_privilege';
+END $$ LANGUAGE plpgsql;
+"""
+
+
+def immutable_events(table: str) -> migrations.RunSQL:
+    """Rejects every UPDATE of an event table, and every DELETE outside a purge."""
+    if not _IDENTIFIER.match(table):
+        raise ValueError(f"Not a plain table name: {table!r}")
+    forward = (
+        _IMMUTABLE_FUNCTION
+        + f'CREATE TRIGGER activity_immutable BEFORE UPDATE OR DELETE ON "{table}" '
+        "FOR EACH ROW EXECUTE FUNCTION grc_activity_is_immutable();"
+    )
+    return migrations.RunSQL(forward, f'DROP TRIGGER IF EXISTS activity_immutable ON "{table}";')
