@@ -2,9 +2,10 @@
 
 from typing import Any
 
+from drf_spectacular.utils import inline_serializer
 from rest_framework import serializers
 
-from grc.compliance.models import Coverage, FrameworkKey
+from grc.compliance.models import Coverage, FrameworkKey, ImplementationStatus
 
 
 class FrameworkVersionOut(serializers.Serializer[Any]):
@@ -50,3 +51,46 @@ class MappingOut(serializers.Serializer[Any]):
     gap_note_de = serializers.CharField(allow_null=True)
     approved_by_id = serializers.CharField(allow_null=True)
     approved_at = serializers.DateTimeField(allow_null=True)
+
+
+class ImplementationOut(serializers.Serializer[Any]):
+    id = serializers.CharField()
+    requirement_id = serializers.CharField()
+    scope_id = serializers.CharField()
+    status = serializers.ChoiceField(choices=ImplementationStatus.choices)
+    owner_id = serializers.CharField(allow_null=True)
+    owner_name = serializers.CharField(allow_null=True)
+    due_date = serializers.DateField(allow_null=True)
+    note_de = serializers.CharField(allow_null=True)
+    version = serializers.IntegerField()
+    updated_at = serializers.DateTimeField()
+
+
+# A serializer can't declare a field called "partial" (it is the serializer's own flag),
+# so the counts are described inline.
+StatusCountsOut = inline_serializer(
+    "StatusCounts", {status: serializers.IntegerField() for status in ImplementationStatus.values}
+)
+
+
+class ComplianceSummaryRowOut(serializers.Serializer[Any]):
+    scope_id = serializers.CharField()
+    scope_name = serializers.CharField()
+    scope_kind = serializers.CharField()
+    framework_id = serializers.CharField()
+    framework_name = serializers.CharField()
+    counts = StatusCountsOut
+
+
+class ComplianceSummaryOut(serializers.Serializer[Any]):
+    rows = ComplianceSummaryRowOut(many=True)
+
+
+class ParagraphSummaryRowOut(serializers.Serializer[Any]):
+    paragraph = serializers.CharField()
+    requirement_count = serializers.IntegerField()
+    counts = StatusCountsOut
+
+
+class ParagraphSummaryOut(serializers.Serializer[Any]):
+    rows = ParagraphSummaryRowOut(many=True)
