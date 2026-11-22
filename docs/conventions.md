@@ -34,6 +34,11 @@ This applies to all source code, tests, migrations, Dockerfiles and CI/CD workfl
 - Configuration comes only from environment variables, validated at startup with **pydantic-settings**. A missing secret stops the process.
 - Runs synchronously under gunicorn with threads. Static files (admin, Scalar) are served by WhiteNoise.
 - Business logic never lives in views or serializers. Services receive the acting user and Membership ([ADR 0020](adr/0020-authorization-in-the-service-layer.md)).
+- Tenant isolation:
+  - Tenant-owned models inherit `grc.core.models.TenantOwnedModel`. Its default manager filters by the active Tenant and raises without one; saving refuses a row of another Tenant. Every table with `tenant_id` gets `grc.core.rls.tenant_rls()` in a migration.
+  - Code acts for a Tenant only inside `tenant_context()` (or `tenant_transaction()` for jobs and handlers), which sets the ORM filter and `app.tenant_id` together. `ATOMIC_REQUESTS` wraps the view but not middleware, so requests activate the Tenant at the start of the view, never in middleware.
+  - A test walks every model: each is tenant-owned with manager and forced policy, or declared platform-wide (User, Tenant). Memberships are the one exception: their policy also admits the user's own rows (`app.user_id`), because login lists them before a Tenant is chosen.
+  - Users log in by email (`organization.User`); there is no username.
 - `ATOMIC_REQUESTS = True`. Under the pooler: `DISABLE_SERVER_SIDE_CURSORS = True`, `CONN_MAX_AGE = 0` and psycopg `prepare_threshold = None` ([ADR 0004](adr/0004-supavisor-transaction-pooling.md)). Production requires TLS to the database (`sslmode=require`).
 - `APP_ENV` is required, with no default. Production also requires `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`.
 - Logs never contain query strings or the serialized request object.
