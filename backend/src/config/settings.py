@@ -130,6 +130,19 @@ HEADLESS_ONLY = True
 HEADLESS_FRONTEND_URLS: dict[str, str] = {}
 DEMO_LOGIN_ENABLED = env.demo_login_enabled
 SEED_DIR = env.seed_dir
+GRC_STORAGE = "grc.core.storage.S3Storage"
+STORAGE = {
+    "endpoint_url": env.storage_endpoint_url,
+    "public_endpoint_url": env.storage_public_endpoint_url,
+    "bucket": env.storage_bucket,
+    "region": env.storage_region,
+    "access_key_id": (
+        env.storage_access_key_id.get_secret_value() if env.storage_access_key_id else None
+    ),
+    "secret_access_key": (
+        env.storage_secret_access_key.get_secret_value() if env.storage_secret_access_key else None
+    ),
+}
 # Finds the caller's Membership for /api/v1/tenants/{tenant_slug}/… requests.
 GRC_ACTOR_RESOLVER = "grc.organization.selectors.resolve_actor"
 
@@ -183,6 +196,9 @@ SPECTACULAR_SETTINGS = {
     "ENUM_NAME_OVERRIDES": {
         "ImplementationStatus": "grc.compliance.models.ImplementationStatus",
         "RegistrationStatus": "grc.organization.models.RegistrationStatus",
+        "EvidenceKind": "grc.compliance.models.EvidenceKind",
+        "ScopeKind": "grc.organization.models.ScopeKind",
+        "MappingKind": [("platform", "platform"), ("tenant", "tenant")],
     },
 }
 

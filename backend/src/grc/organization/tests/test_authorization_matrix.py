@@ -95,6 +95,22 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
         {"status": "implemented"},
         _row(UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, NOT_FOUND, NOT_FOUND),
     ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/implementations/{implementation_id}/evidence"): (
+        None,
+        _row(UNAUTHENTICATED, NOT_FOUND, NOT_FOUND, NOT_FOUND, NOT_FOUND),
+    ),
+    ("POST", "/api/v1/tenants/{tenant_slug}/implementations/{implementation_id}/evidence"): (
+        {"kind": "link", "title": "Policy", "url": "https://example.org"},
+        _row(UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, NOT_FOUND, NOT_FOUND),
+    ),
+    (
+        "DELETE",
+        "/api/v1/tenants/{tenant_slug}/implementations/{implementation_id}/evidence/{evidence_id}",
+    ): (None, _row(UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, NOT_FOUND, NOT_FOUND)),
+    ("POST", "/api/v1/tenants/{tenant_slug}/uploads"): (
+        {"name": "a.pdf", "size_bytes": 10, "content_type": "application/pdf"},
+        _row(UNAUTHENTICATED, FORBIDDEN, CREATED, CREATED, NOT_FOUND),
+    ),
     ("GET", "/api/v1/tenants/{tenant_slug}/compliance-summary"): (None, READ),
     # Without its required filters: answered after the membership check.
     ("GET", "/api/v1/tenants/{tenant_slug}/compliance-paragraphs"): (
@@ -163,6 +179,7 @@ def test_operation_answers_each_actor_as_expected(
         .replace("{requirement_id}", "req-x")
         .replace("{scope_id}", str(OTHER_SCOPE))
         .replace("{implementation_id}", str(OTHER_SCOPE))
+        .replace("{evidence_id}", str(OTHER_SCOPE))
     )
 
     actual = {}

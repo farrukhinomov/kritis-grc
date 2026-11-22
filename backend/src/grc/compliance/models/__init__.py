@@ -140,3 +140,49 @@ class Implementation(TenantOwnedModel):
 
     def __str__(self) -> str:
         return f"{self.requirement_id} in {self.scope_id}"
+
+
+class EvidenceKind(models.TextChoices):
+    FILE = "file", "file"
+    LINK = "link", "link"
+    REFERENCE = "reference", "reference"
+
+
+class Upload(TenantOwnedModel):
+    """A file a member announced and may PUT to storage once, before it is Evidence."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+")
+    name = models.CharField(max_length=255)
+    size_bytes = models.PositiveBigIntegerField()
+    content_type = models.CharField(max_length=128)
+    key = models.CharField(max_length=300, unique=True)
+    expires_at = models.DateTimeField()
+    used = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Evidence(TenantOwnedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    implementation = models.ForeignKey(
+        Implementation, on_delete=models.CASCADE, related_name="evidence"
+    )
+    kind = models.CharField(max_length=16, choices=EvidenceKind.choices)
+    title = models.CharField(max_length=200)
+    file_name = models.CharField(max_length=255, blank=True)
+    file_size_bytes = models.PositiveBigIntegerField(null=True)
+    file_content_type = models.CharField(max_length=128, blank=True)
+    file_key = models.CharField(max_length=300, blank=True)
+    url = models.URLField(max_length=2000, blank=True)
+    referenced_implementation = models.ForeignKey(
+        Implementation, on_delete=models.CASCADE, null=True, related_name="+"
+    )
+    added_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="+"
+    )
+    added_at = models.DateTimeField()
+
+    def __str__(self) -> str:
+        return self.title

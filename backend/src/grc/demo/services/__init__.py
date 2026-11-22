@@ -12,6 +12,7 @@ from typing import Any
 from django.db import transaction
 
 from grc.compliance import services as compliance
+from grc.compliance.services.evidence import load_evidence
 from grc.compliance.services.implementations import load_implementations
 from grc.core.ids import fixture_uuid
 from grc.core.tenancy import tenant_context
@@ -42,9 +43,10 @@ def load_demo(seed_dir: Path) -> None:
             organization.load_scopes(scopes, scope_ids)
             compliance.load_tenant_mappings(own, _ids(tenant.slug, own), users)
             implementations = read("implementations")
-            load_implementations(
-                implementations, _ids(tenant.slug, implementations), scope_ids, users
-            )
+            implementation_ids = _ids(tenant.slug, implementations)
+            load_implementations(implementations, implementation_ids, scope_ids, users)
+            evidence = read("evidence")
+            load_evidence(evidence, _ids(tenant.slug, evidence), implementation_ids, users)
 
 
 def _ids(tenant_slug: str, rows: list[dict[str, Any]]) -> dict[str, Any]:

@@ -8,7 +8,13 @@ from uuid import UUID
 from django.db.models import F, QuerySet
 from rest_framework import status
 
-from grc.compliance.models import Implementation, ImplementationStatus, Requirement
+from grc.compliance.models import (
+    Evidence,
+    EvidenceKind,
+    Implementation,
+    ImplementationStatus,
+    Requirement,
+)
 from grc.core.actor import Actor
 from grc.core.problems import Problem
 
@@ -135,3 +141,33 @@ def _uuid_or_none(value: str) -> UUID | None:
         return UUID(value)
     except ValueError:
         return None
+
+
+def evidence_of(actor: Actor, implementation_id: UUID) -> QuerySet[Evidence] | None:
+    """The Evidence of a visible Implementation, oldest first; None if it isn't visible."""
+    if not implementations(actor).filter(id=implementation_id).exists():
+        return None
+    return Evidence.objects.filter(implementation_id=implementation_id).order_by("added_at", "id")
+
+
+def present_evidence(evidence: Evidence) -> dict[str, Any]:
+    is_file = evidence.kind == EvidenceKind.FILE
+    return {
+        "id": str(evidence.id),
+        "implementation_id": str(evidence.implementation_id),
+        "kind": evidence.kind,
+        "title": evidence.title,
+        "file": {
+            "name": evidence.file_name,
+            "size_bytes": evidence.file_size_bytes,
+            "content_type": evidence.file_content_type,
+        }
+        if is_file
+        else None,
+        "url": evidence.url or None,
+        "referenced_implementation_id": str(evidence.referenced_implementation_id)
+        if evidence.referenced_implementation_id
+        else None,
+        "added_by_id": str(evidence.added_by_id) if evidence.added_by_id else None,
+        "added_at": evidence.added_at.isoformat().replace("+00:00", "Z"),
+    }

@@ -5,7 +5,7 @@ from typing import Any
 from drf_spectacular.utils import inline_serializer
 from rest_framework import serializers
 
-from grc.compliance.models import Coverage, FrameworkKey, ImplementationStatus
+from grc.compliance.models import Coverage, EvidenceKind, FrameworkKey, ImplementationStatus
 
 
 class FrameworkVersionOut(serializers.Serializer[Any]):
@@ -94,3 +94,27 @@ class ParagraphSummaryRowOut(serializers.Serializer[Any]):
 
 class ParagraphSummaryOut(serializers.Serializer[Any]):
     rows = ParagraphSummaryRowOut(many=True)
+
+
+class EvidenceFileOut(serializers.Serializer[Any]):
+    name = serializers.CharField()
+    size_bytes = serializers.IntegerField()
+    content_type = serializers.CharField()
+
+
+class EvidenceOut(serializers.Serializer[Any]):
+    id = serializers.CharField()
+    implementation_id = serializers.CharField()
+    kind = serializers.ChoiceField(choices=EvidenceKind.choices)
+    title = serializers.CharField()
+    file = EvidenceFileOut(allow_null=True)
+    url = serializers.URLField(allow_null=True)
+    referenced_implementation_id = serializers.CharField(allow_null=True)
+    added_by_id = serializers.CharField(allow_null=True)
+    added_at = serializers.DateTimeField()
+
+
+class UploadSlotOut(serializers.Serializer[Any]):
+    upload_id = serializers.CharField()
+    upload_url = serializers.URLField()
+    expires_at = serializers.DateTimeField()
