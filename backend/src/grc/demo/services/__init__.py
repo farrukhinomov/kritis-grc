@@ -35,7 +35,11 @@ def load_demo(seed_dir: Path) -> None:
             read("tenant"), read("users"), is_demo=True, demo_accounts=DEMO_ACCOUNTS
         )
         own = [m for m in mappings if m["kind"] == "tenant"]
+        scopes = read("scopes")
         with tenant_context(tenant.id):
-            compliance.load_tenant_mappings(
-                own, {m["id"]: fixture_uuid(tenant.slug, m["id"]) for m in own}, users
-            )
+            organization.load_scopes(scopes, _ids(tenant.slug, scopes))
+            compliance.load_tenant_mappings(own, _ids(tenant.slug, own), users)
+
+
+def _ids(tenant_slug: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
+    return {row["id"]: fixture_uuid(tenant_slug, row["id"]) for row in rows}

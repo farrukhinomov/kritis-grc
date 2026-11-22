@@ -78,9 +78,51 @@ class Tenant(models.Model):
         return self.name
 
 
+class ScopeKind(models.TextChoices):
+    ORGANIZATION = "organization", "Organization"
+    CRITICAL_FACILITY = "critical_facility", "Critical Facility"
+
+
+class RegistrationStatus(models.TextChoices):
+    PLANNED = "planned", "planned"
+    CONFIRMED = "confirmed", "confirmed"
+
+
 class Scope(TenantOwnedModel):
+    """A part of a Tenant. A Critical Facility is a Scope with its legal particulars."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200)
+    kind = models.CharField(
+        max_length=32, choices=ScopeKind.choices, default=ScopeKind.ORGANIZATION
+    )
+    # Only for Critical Facilities; empty for every other kind of Scope.
+    sector = models.CharField(max_length=32, blank=True)
+    critical_service = models.CharField(max_length=64, blank=True)
+    people_supplied = models.PositiveIntegerField(null=True)
+    threshold = models.PositiveIntegerField(null=True)
+    location = models.CharField(max_length=200, blank=True)
+    registration_status = models.CharField(
+        max_length=16, choices=RegistrationStatus.choices, blank=True
+    )
+    registration_date = models.DateField(null=True)
+
+    class Meta:
+        constraints: ClassVar = [
+            # A Critical Facility without its Registration would have no deadlines at all.
+            models.CheckConstraint(
+                condition=~models.Q(kind="critical_facility")
+                | (
+                    ~models.Q(sector="")
+                    & ~models.Q(critical_service="")
+                    & models.Q(people_supplied__isnull=False)
+                    & models.Q(threshold__isnull=False)
+                    & ~models.Q(registration_status="")
+                    & models.Q(registration_date__isnull=False)
+                ),
+                name="critical_facility_is_complete",
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.name
@@ -116,4 +158,20 @@ class MembershipScope(TenantOwnedModel):
     class Meta:
         constraints: ClassVar = [
             models.UniqueConstraint(fields=["membership", "scope"], name="unique_membership_scope"),
+        ]
+
+
+class IdempotencyRecord(TenantOwnedModel):
+    """The first answer to a create request, replayed when the client retries it."""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
+    key = models.CharField(max_length=200)
+    fingerprint = models.CharField(max_length=64)
+    status = models.PositiveSmallIntegerField()
+    body = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints: ClassVar = [
+            models.UniqueConstraint(fields=["tenant", "user", "key"], name="one_answer_per_key"),
         ]

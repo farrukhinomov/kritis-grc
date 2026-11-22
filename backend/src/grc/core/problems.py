@@ -16,7 +16,7 @@ from rest_framework.views import exception_handler
 PROBLEM_CONTENT_TYPE = "application/problem+json"
 
 # DRF and Django name a few equivalent field problems differently; the UI knows one.
-_FIELD_CODES = {"blank": "required", "null": "required"}
+_FIELD_CODES = {"blank": "required", "null": "required", "max_length": "too_long"}
 
 
 class Problem(exceptions.APIException):
@@ -26,6 +26,16 @@ class Problem(exceptions.APIException):
         super().__init__(detail=detail, code=code)
         self.status_code = status_code
         self.problem_code = code
+
+
+class FieldProblem(exceptions.APIException):
+    """Field errors found by a service rather than by the request's serializer."""
+
+    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    def __init__(self, errors: list[dict[str, str]]) -> None:
+        super().__init__(detail="The request has invalid fields.", code="validation_error")
+        self.errors = errors
 
 
 def problem_response(
@@ -60,6 +70,10 @@ def handle_exception(exc: Exception, context: dict[str, Any]) -> Response | None
         )
     if isinstance(exc, Http404 | exceptions.NotFound):
         return problem_response(status.HTTP_404_NOT_FOUND, "not_found", "Not found.")
+    if isinstance(exc, FieldProblem):
+        return problem_response(
+            exc.status_code, "validation_error", "The request has invalid fields.", exc.errors
+        )
     if isinstance(exc, Problem):
         return problem_response(exc.status_code, exc.problem_code, str(exc.detail))
     response = exception_handler(exc, context)

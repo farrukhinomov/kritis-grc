@@ -6,7 +6,10 @@ door: it exists only while switched on, only for the Demo Tenant's shared accoun
 has its own rate limit because it needs no secret.
 """
 
+from datetime import date
 from typing import Any
+from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from allauth.account.adapter import get_adapter
 from allauth.core import ratelimit
@@ -14,13 +17,24 @@ from django.conf import settings
 from django.contrib.auth import login, logout
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest
+from django.utils import timezone
 from rest_framework import status
 
 from grc.core.actor import Actor, Permission
-from grc.core.problems import Problem
+from grc.core.problems import FieldProblem, Problem
 from grc.core.tenancy import tenant_context
-from grc.organization.models import Membership, Role, Tenant, Theme, User
+from grc.organization.models import (
+    Membership,
+    RegistrationStatus,
+    Role,
+    Scope,
+    ScopeKind,
+    Tenant,
+    Theme,
+    User,
+)
 from grc.organization.selectors import Session, demo_account, session_of, tenant_of
+from grc.organization.selectors.legal import service_for
 
 AUTH_BACKEND = "allauth.account.auth_backends.AuthenticationBackend"
 
@@ -110,6 +124,75 @@ def load_tenant(
                 tenant=row, user=user, defaults={"role": person["role"]}
             )
     return row, ids
+
+
+def create_critical_facility(
+    actor: Actor,
+    *,
+    name: str,
+    location: str,
+    sector: str,
+    critical_service: str,
+    people_supplied: int,
+    registration_date: date,
+) -> Scope:
+    """A new Critical Facility, as the Applicability Check found it.
+
+    Only a facility at or above the legal threshold is created, and only with a planned
+    Registration: confirming it is the authority's act, and a facility below the
+    threshold would carry deadlines it doesn't have. The threshold is the law's, so it
+    is set here and never taken from the caller.
+    """
+    actor.require(Permission.CHANGE)
+    service = service_for(sector, critical_service)
+    errors: list[dict[str, str]] = []
+    if service is None:
+        errors.append({"field": "critical_facility.critical_service", "code": "invalid_choice"})
+    elif people_supplied < service.threshold:
+        errors.append({"field": "critical_facility.people_supplied", "code": "below_threshold"})
+    if registration_date < berlin_today():
+        errors.append({"field": "critical_facility.registration.date", "code": "in_past"})
+    if errors or service is None:
+        raise FieldProblem(errors)
+    scope: Scope = Scope.objects.create(
+        name=name,
+        kind=ScopeKind.CRITICAL_FACILITY,
+        sector=sector,
+        critical_service=critical_service,
+        people_supplied=people_supplied,
+        threshold=service.threshold,
+        location=location,
+        registration_status=RegistrationStatus.PLANNED,
+        registration_date=registration_date,
+    )
+    return scope
+
+
+def berlin_today() -> date:
+    # Deadlines are German law; a date counts as past by the calendar in Germany.
+    return timezone.now().astimezone(ZoneInfo("Europe/Berlin")).date()
+
+
+def load_scopes(scopes: list[dict[str, Any]], ids: dict[str, UUID]) -> None:
+    """Loads Scopes into the active Tenant under stable identifiers."""
+    for scope in scopes:
+        facility = scope.get("critical_facility") or {}
+        registration = facility.get("registration") or {}
+        date_text = registration.get("date")
+        Scope.objects.update_or_create(
+            id=ids[scope["id"]],
+            defaults={
+                "name": scope["name"],
+                "kind": scope["kind"],
+                "sector": facility.get("sector", ""),
+                "critical_service": facility.get("critical_service", ""),
+                "people_supplied": facility.get("people_supplied"),
+                "threshold": facility.get("threshold"),
+                "location": facility.get("location", ""),
+                "registration_status": registration.get("status", ""),
+                "registration_date": date.fromisoformat(date_text) if date_text else None,
+            },
+        )
 
 
 def _too_many_attempts() -> Problem:

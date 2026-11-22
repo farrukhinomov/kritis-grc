@@ -7,7 +7,17 @@ from django.db.models import QuerySet
 
 from grc.core.actor import Actor
 from grc.core.tenancy import tenant_context, user_context
-from grc.organization.models import Membership, MembershipScope, Role, Tenant, User
+from grc.organization.models import (
+    Membership,
+    MembershipScope,
+    RegistrationStatus,
+    Role,
+    Scope,
+    ScopeKind,
+    Tenant,
+    User,
+)
+from grc.organization.selectors.legal import deadlines_for
 
 
 class TenantSummary(TypedDict):
@@ -130,4 +140,38 @@ def present_member(membership: Membership) -> dict[str, Any]:
         "email": user.email,
         "role": membership.role,
         "job_title": user.job_title,
+    }
+
+
+def scopes(actor: Actor, *, kind: str | None = None) -> QuerySet[Scope]:
+    """The Scopes the actor may see: all of the Tenant's, or only those of their Membership."""
+    items = Scope.objects.order_by("kind", "name")
+    if actor.scope_ids is not None:
+        items = items.filter(id__in=actor.scope_ids)
+    if kind is not None:
+        items = items.filter(kind=kind)
+    return items
+
+
+def present_scope(scope: Scope) -> dict[str, Any]:
+    facility = None
+    if scope.kind == ScopeKind.CRITICAL_FACILITY and scope.registration_date is not None:
+        confirmed = scope.registration_status == RegistrationStatus.CONFIRMED
+        facility = {
+            "sector": scope.sector,
+            "critical_service": scope.critical_service,
+            "people_supplied": scope.people_supplied,
+            "threshold": scope.threshold,
+            "location": scope.location,
+            "registration": {
+                "status": scope.registration_status,
+                "date": scope.registration_date.isoformat(),
+            },
+            "deadlines": deadlines_for(scope.registration_date, confirmed, scope.sector),
+        }
+    return {
+        "id": str(scope.id),
+        "name": scope.name,
+        "kind": scope.kind,
+        "critical_facility": facility,
     }
