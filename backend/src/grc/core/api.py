@@ -12,7 +12,8 @@ from typing import Any
 
 from django.conf import settings
 from django.utils.module_loading import import_string
-from rest_framework import status
+from drf_spectacular.utils import inline_serializer
+from rest_framework import serializers, status
 from rest_framework.exceptions import NotFound
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -57,9 +58,11 @@ def page_of(request: Request, items: Any) -> dict[str, Any]:
     limit = _positive(request.query_params.get("limit"), DEFAULT_LIMIT)
     limit = min(limit, MAX_LIMIT)
     start = (number - 1) * limit
+    # A queryset counts in the database; a list that was already assembled counts itself.
+    total = len(items) if isinstance(items, list) else items.count()
     return {
         "items": list(items[start : start + limit]),
-        "page": {"number": number, "limit": limit, "total": items.count()},
+        "page": {"number": number, "limit": limit, "total": total},
     }
 
 
@@ -73,3 +76,16 @@ def _positive(value: str | None, fallback: int) -> int:
             "page and limit must be positive integers.",
         )
     return int(value)
+
+
+class PageInfo(serializers.Serializer[Any]):
+    number = serializers.IntegerField()
+    limit = serializers.IntegerField()
+    total = serializers.IntegerField()
+
+
+def page_schema(name: str, item: serializers.BaseSerializer[Any]) -> Any:
+    """The OpenAPI shape of a page of `item`."""
+    return inline_serializer(
+        f"{name}Page", {"items": item.__class__(many=True), "page": PageInfo()}
+    )

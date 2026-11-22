@@ -8,7 +8,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from grc.core.actor import Permission
-from grc.core.api import TenantScopedAPIView, page_of
+from grc.core.api import TenantScopedAPIView, page_of, page_schema
 from grc.organization import services
 from grc.organization.models import Role, Theme
 from grc.organization.selectors import (
@@ -28,30 +28,16 @@ TenantSchema = inline_serializer(
     },
 )
 
-MemberPageSchema = inline_serializer(
-    "MemberPage",
-    {
-        "items": inline_serializer(
-            "Member",
-            {
-                "id": serializers.CharField(),
-                "display_name": serializers.CharField(),
-                "email": serializers.EmailField(),
-                "role": serializers.ChoiceField(choices=Role.choices),
-                "job_title": serializers.CharField(),
-            },
-            many=True,
-        ),
-        "page": inline_serializer(
-            "PageInfo",
-            {
-                "number": serializers.IntegerField(),
-                "limit": serializers.IntegerField(),
-                "total": serializers.IntegerField(),
-            },
-        ),
-    },
-)
+
+class MemberOut(serializers.Serializer[Any]):
+    id = serializers.CharField()
+    display_name = serializers.CharField()
+    email = serializers.EmailField()
+    role = serializers.ChoiceField(choices=Role.choices)
+    job_title = serializers.CharField()
+
+
+MemberPageSchema = page_schema("Member", MemberOut())
 
 
 class ThemeChangeSerializer(serializers.Serializer[Any]):

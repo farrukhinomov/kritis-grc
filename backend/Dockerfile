@@ -55,6 +55,10 @@ RUN apt-get update \
 WORKDIR /app
 # Files stay owned by root, so the application user can read but never modify its code.
 COPY --from=builder /app /app
+# The shared demo fixtures live outside this build context and come in as the named
+# context "seed" (compose: additional_contexts, CI: build-contexts).
+COPY --from=seed . /app/seed
+ENV SEED_DIR=/app/seed
 
 USER app
 EXPOSE 8080

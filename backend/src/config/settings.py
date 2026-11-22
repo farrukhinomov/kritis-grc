@@ -129,6 +129,7 @@ ACCOUNT_RATE_LIMITS = {
 HEADLESS_ONLY = True
 HEADLESS_FRONTEND_URLS: dict[str, str] = {}
 DEMO_LOGIN_ENABLED = env.demo_login_enabled
+SEED_DIR = env.seed_dir
 # Finds the caller's Membership for /api/v1/tenants/{tenant_slug}/… requests.
 GRC_ACTOR_RESOLVER = "grc.organization.selectors.resolve_actor"
 

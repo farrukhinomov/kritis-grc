@@ -1,1 +1,106 @@
-"""Persistence models. Only this module writes these tables."""
+"""Frameworks, their Requirements and the Mappings between them.
+
+The legal content is platform-wide: every Tenant reads the same Requirements and the
+same curated Platform Mappings, and none can change them. Its identifiers are the
+stable ones from the published catalogue, so references stay valid when the catalogue
+or a Demo Tenant is loaded again. Tenant Mappings belong to one Tenant and count once
+its GRC Manager approved them.
+"""
+
+import uuid
+from typing import ClassVar
+
+from django.conf import settings
+from django.db import models
+
+from grc.core.models import TenantOwnedModel
+
+CATALOGUE_ID_LENGTH = 64
+
+
+class FrameworkKey(models.TextChoices):
+    KRITIS_DACHG = "kritis_dachg", "KRITIS-Dachgesetz"
+    BSIG = "bsig", "NIS2 (BSIG 2025)"
+
+
+class Coverage(models.TextChoices):
+    FULL = "full", "full"
+    PARTIAL = "partial", "partial"
+
+
+class Framework(models.Model):
+    id = models.CharField(primary_key=True, max_length=CATALOGUE_ID_LENGTH)
+    key = models.CharField(max_length=32, choices=FrameworkKey.choices, unique=True)
+    name = models.CharField(max_length=200)
+    position = models.PositiveSmallIntegerField(default=0)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class FrameworkVersion(models.Model):
+    id = models.CharField(primary_key=True, max_length=CATALOGUE_ID_LENGTH)
+    framework = models.ForeignKey(Framework, on_delete=models.PROTECT, related_name="versions")
+    label = models.CharField(max_length=200)
+    effective_from = models.DateField()
+    source_url = models.URLField()
+    retrieved_at = models.DateField()
+
+    def __str__(self) -> str:
+        return f"{self.framework_id} {self.label}"
+
+
+class Requirement(models.Model):
+    id = models.CharField(primary_key=True, max_length=CATALOGUE_ID_LENGTH)
+    framework_version = models.ForeignKey(
+        FrameworkVersion, on_delete=models.PROTECT, related_name="requirements"
+    )
+    paragraph = models.CharField(max_length=32)
+    citation = models.CharField(max_length=64)
+    title_de = models.CharField(max_length=300)
+    title_en = models.CharField(max_length=300)
+    # The statute's own words, shown in German in every interface language.
+    text_de = models.TextField()
+    summary_en = models.TextField()
+    # Set while the obligation's specifics still await an ordinance or template.
+    pending_reason_de = models.TextField(blank=True)
+    pending_reason_en = models.TextField(blank=True)
+    # The catalogue's order: Frameworks as published, each in the order of its statute,
+    # which sorting by citation text can't reproduce ("§ 8a" after "§ 8", "Nr. 10" last).
+    position = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering: ClassVar = ["position"]
+
+    def __str__(self) -> str:
+        return self.citation
+
+
+class PlatformMapping(models.Model):
+    """Curated with a legal justification; the same for, and read-only to, every Tenant."""
+
+    id = models.CharField(primary_key=True, max_length=CATALOGUE_ID_LENGTH)
+    target_requirement = models.ForeignKey(Requirement, on_delete=models.PROTECT, related_name="+")
+    source_requirement = models.ForeignKey(Requirement, on_delete=models.PROTECT, related_name="+")
+    coverage = models.CharField(max_length=16, choices=Coverage.choices)
+    justification_de = models.TextField()
+    gap_note_de = models.TextField(blank=True)
+
+    def __str__(self) -> str:
+        return f"{self.target_requirement_id} <- {self.source_requirement_id}"
+
+
+class TenantMapping(TenantOwnedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    target_requirement = models.ForeignKey(Requirement, on_delete=models.PROTECT, related_name="+")
+    source_requirement = models.ForeignKey(Requirement, on_delete=models.PROTECT, related_name="+")
+    coverage = models.CharField(max_length=16, choices=Coverage.choices)
+    justification_de = models.TextField()
+    gap_note_de = models.TextField(blank=True)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, related_name="+"
+    )
+    approved_at = models.DateTimeField(null=True)
+
+    def __str__(self) -> str:
+        return f"{self.target_requirement_id} <- {self.source_requirement_id}"

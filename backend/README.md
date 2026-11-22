@@ -23,13 +23,14 @@ Point `DATABASE_URL` in `.env` at `localhost:55432`. The tests use this throwawa
 | Task | Command |
 |---|---|
 | Run the dev server | `uv run python manage.py runserver` |
+| Load or restore the Demo Tenant (idempotent) | `uv run python manage.py seed_demo` |
 | Tests with coverage (≥ 80 % enforced) | `uv run pytest` |
 | Lint | `uv run ruff check .` |
 | Format | `uv run ruff format .` |
 | Type-check (strict) | `uv run mypy src manage.py` |
 | Module boundaries | `PYTHONPATH=src uv run lint-imports` |
 | Deployment checks | `APP_ENV=production uv run python manage.py check --deploy` |
-| Container image | `docker build -t grc-backend .` |
+| Container image | `docker build --build-context seed=../seed -t grc-backend .` |
 
 `mypy` and `manage.py` load the settings, so they need the variables from `.env`.
 
@@ -39,7 +40,8 @@ Point `DATABASE_URL` in `.env` at `localhost:55432`. The tests use this throwawa
 src/
   config/         settings, URLs, WSGI, gunicorn, validated environment (env.py)
   grc/
-    core/         request/trace IDs, access log, cache headers, health probes
+    core/         request/trace IDs, access log, cache headers, health probes,
+                  tenant context and RLS helpers, Actor, Problem Details, paging
     <module>/     organization · assets · compliance · risk · activity · demo
       api/ services/ selectors/ models/ events/ tests/
 ```
@@ -54,3 +56,6 @@ The import rules between modules and layers are enforced by import-linter (see `
 | `GET /health/ready` | Database reachable, `503` otherwise |
 | `GET /api/v1/schema` | OpenAPI schema |
 | `/api/_admin/` | Django admin (Platform Admins) |
+| `GET /api/v1/me`, `POST /api/v1/auth/{login,demo-login,logout}` | Session |
+| `GET`/`PATCH /api/v1/tenants/{slug}`, `GET …/members` | The Tenant, its Theme and people |
+| `GET …/frameworks`, `…/requirements[/{id}]`, `…/mappings` | Legal catalogue and Mappings |

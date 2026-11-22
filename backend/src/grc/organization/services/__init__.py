@@ -6,6 +6,8 @@ door: it exists only while switched on, only for the Demo Tenant's shared accoun
 has its own rate limit because it needs no secret.
 """
 
+from typing import Any
+
 from allauth.account.adapter import get_adapter
 from allauth.core import ratelimit
 from django.conf import settings
@@ -16,7 +18,8 @@ from rest_framework import status
 
 from grc.core.actor import Actor, Permission
 from grc.core.problems import Problem
-from grc.organization.models import Role, Tenant, Theme, User
+from grc.core.tenancy import tenant_context
+from grc.organization.models import Membership, Role, Tenant, Theme, User
 from grc.organization.selectors import Session, demo_account, session_of, tenant_of
 
 AUTH_BACKEND = "allauth.account.auth_backends.AuthenticationBackend"
@@ -68,6 +71,45 @@ def change_theme(actor: Actor, theme: Theme) -> Tenant:
         tenant.theme = theme
         tenant.save(update_fields=["theme"])
     return tenant
+
+
+def load_tenant(
+    tenant: dict[str, Any],
+    people: list[dict[str, Any]],
+    *,
+    is_demo: bool = False,
+    demo_accounts: frozenset[str] = frozenset(),
+) -> tuple[Tenant, dict[str, int]]:
+    """Creates or updates a Tenant and its people; returns it and their IDs by fixture ID.
+
+    Loaded people get no usable password: they sign in through the demo login (the ones
+    listed in `demo_accounts`) or not at all, until someone sets a password for them.
+    """
+    row, _ = Tenant.objects.update_or_create(
+        slug=tenant["slug"],
+        defaults={
+            "name": tenant["name"],
+            "theme": tenant.get("theme", Theme.SAAR_GREEN),
+            "sector": tenant.get("sector", ""),
+            "is_demo": is_demo,
+        },
+    )
+    ids: dict[str, int] = {}
+    for person in people:
+        user = User.objects.filter(email=person["email"]).first()
+        if user is None:
+            user = User(email=person["email"])
+            user.set_unusable_password()
+        user.display_name = person["display_name"]
+        user.job_title = person.get("job_title", "")
+        user.is_demo_account = person["id"] in demo_accounts
+        user.save()
+        ids[person["id"]] = user.pk
+        with tenant_context(row.id):
+            Membership.objects.update_or_create(
+                tenant=row, user=user, defaults={"role": person["role"]}
+            )
+    return row, ids
 
 
 def _too_many_attempts() -> Problem:
