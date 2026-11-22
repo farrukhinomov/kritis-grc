@@ -10,6 +10,8 @@ x-backend-env: &backend-env
   DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY in .env}
   ALLOWED_HOSTS: localhost,backend
   CSRF_TRUSTED_ORIGINS: http://localhost:8081
+  # Both local stacks run the demo, so its one-click logins are on.
+  DEMO_LOGIN_ENABLED: "true"
 
 services:
   postgres:

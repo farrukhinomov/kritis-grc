@@ -43,6 +43,8 @@ class AppSettings(BaseSettings):
     allowed_hosts: Annotated[list[str], NoDecode] = Field(default_factory=list)
     csrf_trusted_origins: Annotated[list[str], NoDecode] = Field(default_factory=list)
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+    # Off unless asked for: the password-less demo login must never appear by accident.
+    demo_login_enabled: bool = False
 
     @field_validator("allowed_hosts", "csrf_trusted_origins", mode="before")
     @classmethod

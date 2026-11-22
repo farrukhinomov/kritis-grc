@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db import transaction
-from django.urls import path
+from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView
 
 urlpatterns = [
@@ -12,4 +12,5 @@ urlpatterns = [
         transaction.non_atomic_requests(SpectacularAPIView.as_view()),
         name="openapi-schema",
     ),
+    path("api/v1/", include("grc.organization.api.urls")),
 ]

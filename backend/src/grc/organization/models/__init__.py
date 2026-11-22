@@ -48,6 +48,10 @@ class User(AbstractUser):
 
     username = None  # type: ignore[assignment]
     email = models.EmailField(unique=True)
+    display_name = models.CharField(max_length=200, blank=True)
+    # Shared, password-less accounts behind the public demo logins. They can only be
+    # entered through the demo login and never get a usable password.
+    is_demo_account = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: ClassVar[list[str]] = []
