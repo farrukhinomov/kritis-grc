@@ -767,6 +767,49 @@ export const en: Translation = {
       hint: "Only visible in development. Settings are kept in this browser.",
     },
   },
+  legal: {
+    imprint: {
+      title: "Legal notice",
+      basis: "Information pursuant to § 5 DDG (German Digital Services Act)",
+      prototype:
+        "This platform is a public demonstration with fictional data. It does not constitute legal advice.",
+    },
+    privacy: {
+      title: "Privacy policy",
+      controller: {
+        title: "Controller",
+        text: "The controller responsible for processing personal data on this platform is:",
+      },
+      data: {
+        title: "What we process",
+        text: "When you sign in, we process your email address and check your password; only a hash of the password is stored. Changes to compliance data are recorded with your name and the time in the Activity Log, so it stays traceable who changed what (Art. 6(1)(b) and (f) GDPR).",
+      },
+      cookies: {
+        title: "Cookies",
+        text: "We only set technically necessary cookies: a session cookie that keeps you signed in, and a cookie that protects against forged requests (CSRF). No consent is required for these (§ 25(2) no. 2 TDDDG). We use no analytics or advertising cookies.",
+      },
+      logs: {
+        title: "Server logs",
+        text: "For operation and security we log, for each request, the time, the path without query parameters, the response status and a request ID. The logs are deleted after a short period (Art. 6(1)(f) GDPR).",
+      },
+      demo: {
+        title: "Demo access",
+        text: "The Demo Tenant contains only fictional data and is fully reset every night, including uploaded files. Please do not enter real or personal data there.",
+      },
+      hosting: {
+        title: "Hosting",
+        text: "The application, database and files run in data centres within the European Union. The providers process data only on our behalf (Art. 28 GDPR). Features using artificial intelligence receive only public statute text, never your data.",
+      },
+      rights: {
+        title: "Your rights",
+        text: "You have the right of access, rectification, erasure, restriction of processing, data portability and objection (Art. 15 to 21 GDPR). You may also lodge a complaint with a data protection supervisory authority, such as the Independent Data Protection Centre Saarland.",
+      },
+    },
+    notConfigured: "The operator's details have not been set up for this installation yet.",
+    email: "Email",
+    imprintLink: "Legal notice",
+    privacyLink: "Privacy",
+  },
   notFound: {
     title: "Page not found",
     backHome: "Back to start",

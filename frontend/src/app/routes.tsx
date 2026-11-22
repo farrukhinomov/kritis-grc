@@ -86,6 +86,21 @@ export const routes: RouteObject[] = [
               Component: (await import("@/features/auth/LoginPage")).LoginPage,
             }),
           },
+          // German paths in every language: that is where people and courts look for them.
+          {
+            path: "impressum",
+            ...titled("legal.imprint.title"),
+            lazy: async () => ({
+              Component: (await import("@/features/legal/LegalPage")).ImprintPage,
+            }),
+          },
+          {
+            path: "datenschutz",
+            ...titled("legal.privacy.title"),
+            lazy: async () => ({
+              Component: (await import("@/features/legal/LegalPage")).PrivacyPage,
+            }),
+          },
           { path: "*", ...titled("notFound.title"), lazy: notFound },
         ],
       },
