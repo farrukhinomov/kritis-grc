@@ -34,11 +34,19 @@ class Actor:
     role: str
     # None means the whole Tenant; otherwise only these Scopes are visible and editable.
     scope_ids: frozenset[UUID] | None = None
+    # A read-only API Token keeps the Membership's view but none of its other rights.
+    read_only: bool = False
 
     def can(self, permission: Permission) -> bool:
+        if self.read_only and permission is not Permission.VIEW:
+            return False
         return permission in ROLE_PERMISSIONS.get(self.role, frozenset())
 
     def require(self, permission: Permission) -> None:
+        if self.read_only and permission is not Permission.VIEW:
+            raise Problem(
+                status.HTTP_403_FORBIDDEN, "read_only_token", "This API Token can only read."
+            )
         if not self.can(permission):
             raise Problem(
                 status.HTTP_403_FORBIDDEN,

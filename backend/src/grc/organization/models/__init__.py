@@ -177,3 +177,29 @@ class IdempotencyRecord(TenantOwnedModel):
         constraints: ClassVar = [
             models.UniqueConstraint(fields=["tenant", "user", "key"], name="one_answer_per_key"),
         ]
+
+
+class TokenScope(models.TextChoices):
+    READ = "read", "read"
+    READ_WRITE = "read_write", "read and write"
+
+
+class ApiToken(TenantOwnedModel):
+    """A secret that lets a program act for one Membership, never with more rights.
+
+    Only a hash is stored; the full token is shown once, when it is created. The short
+    prefix is stored in clear to find the row, since a hash can't be looked up by value.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name="+")
+    name = models.CharField(max_length=100)
+    prefix = models.CharField(max_length=16, unique=True)
+    token_hash = models.CharField(max_length=64)
+    scope = models.CharField(max_length=16, choices=TokenScope.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    revoked_at = models.DateTimeField(null=True)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.prefix})"

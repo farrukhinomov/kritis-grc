@@ -181,7 +181,12 @@ STORAGES = {
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],
+    # Programs use API Tokens, browsers the session; the token class comes first so its
+    # Bearer challenge is what a 401 names.
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "grc.organization.authentication.ApiTokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
     # Closed by default: an endpoint must opt in to being public.
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
