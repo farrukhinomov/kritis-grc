@@ -49,6 +49,7 @@ class User(AbstractUser):
     username = None  # type: ignore[assignment]
     email = models.EmailField(unique=True)
     display_name = models.CharField(max_length=200, blank=True)
+    job_title = models.CharField(max_length=200, blank=True)
     # Shared, password-less accounts behind the public demo logins. They can only be
     # entered through the demo login and never get a usable password.
     is_demo_account = models.BooleanField(default=False)
@@ -70,6 +71,7 @@ class Tenant(models.Model):
     slug = models.SlugField(max_length=64, unique=True)
     name = models.CharField(max_length=200)
     theme = models.CharField(max_length=32, choices=Theme.choices, default=Theme.SAAR_GREEN)
+    sector = models.CharField(max_length=64, blank=True)
     is_demo = models.BooleanField(default=False)
 
     def __str__(self) -> str:

@@ -1,9 +1,13 @@
 """Read access to Tenants, Memberships and the signed-in session."""
 
-from typing import TypedDict
+from typing import Any, TypedDict
 
+from django.contrib.auth.models import AnonymousUser
+from django.db.models import QuerySet
+
+from grc.core.actor import Actor
 from grc.core.tenancy import tenant_context, user_context
-from grc.organization.models import Membership, Role, Tenant, User
+from grc.organization.models import Membership, MembershipScope, Role, Tenant, User
 
 
 class TenantSummary(TypedDict):
@@ -72,3 +76,58 @@ def demo_account(role: Role) -> User | None:
             .first()
         )
     return membership.user if membership else None
+
+
+def resolve_actor(user: User | AnonymousUser, tenant_slug: str) -> Actor | None:
+    """The caller's Membership in the Tenant named by the URL, or None if they have none."""
+    if not isinstance(user, User) or not user.is_active:
+        return None
+    tenant = Tenant.objects.filter(slug=tenant_slug).first()
+    if tenant is None:
+        return None
+    with tenant_context(tenant.id), user_context(user.pk):
+        membership = Membership.objects.filter(tenant=tenant, user=user).first()
+        if membership is None:
+            return None
+        scope_ids = frozenset(
+            MembershipScope.objects.filter(membership=membership).values_list("scope_id", flat=True)
+        )
+    return Actor(
+        user_id=user.pk,
+        membership_id=membership.id,
+        tenant_id=tenant.id,
+        role=membership.role,
+        scope_ids=scope_ids or None,
+    )
+
+
+def tenant_of(actor: Actor) -> Tenant:
+    return Tenant.objects.get(id=actor.tenant_id)
+
+
+def present_tenant(tenant: Tenant) -> dict[str, Any]:
+    return {
+        "slug": tenant.slug,
+        "name": tenant.name,
+        "theme": tenant.theme,
+        "sector": tenant.sector,
+    }
+
+
+def members_of(actor: Actor) -> QuerySet[Membership]:
+    return (
+        Membership.objects.filter(tenant_id=actor.tenant_id)
+        .select_related("user")
+        .order_by("user__display_name", "user__email")
+    )
+
+
+def present_member(membership: Membership) -> dict[str, Any]:
+    user = membership.user
+    return {
+        "id": str(user.pk),
+        "display_name": user.display_name or user.email,
+        "email": user.email,
+        "role": membership.role,
+        "job_title": user.job_title,
+    }
