@@ -1,4 +1,4 @@
-"""Signing in and out.
+"""Signing in and out, and changes to the Tenant itself.
 
 Passwords are verified by allauth, which also rate-limits failed attempts by address and
 by IP; this module only decides who may get a session. The demo login is a separate
@@ -14,9 +14,10 @@ from django.core.exceptions import ValidationError
 from django.http import HttpRequest
 from rest_framework import status
 
+from grc.core.actor import Actor, Permission
 from grc.core.problems import Problem
-from grc.organization.models import Role, User
-from grc.organization.selectors import Session, demo_account, session_of
+from grc.organization.models import Role, Tenant, Theme, User
+from grc.organization.selectors import Session, demo_account, session_of, tenant_of
 
 AUTH_BACKEND = "allauth.account.auth_backends.AuthenticationBackend"
 
@@ -57,6 +58,16 @@ def demo_login(request: HttpRequest, role: Role) -> Session:
 
 def sign_out(request: HttpRequest) -> None:
     logout(request)
+
+
+def change_theme(actor: Actor, theme: Theme) -> Tenant:
+    """The Theme is the Tenant's, so it changes for everyone in it."""
+    actor.require(Permission.CHANGE)
+    tenant = tenant_of(actor)
+    if tenant.theme != theme:
+        tenant.theme = theme
+        tenant.save(update_fields=["theme"])
+    return tenant
 
 
 def _too_many_attempts() -> Problem:
