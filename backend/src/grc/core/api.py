@@ -36,7 +36,7 @@ class TenantScopedAPIView(APIView):
         # The resolver lives with the Memberships; naming it in settings keeps this shared
         # code free of imports from any business module.
         resolve = import_string(settings.GRC_ACTOR_RESOLVER)
-        actor: Actor | None = resolve(request.user, kwargs["tenant_slug"])
+        actor: Actor | None = resolve(request.user, kwargs["tenant_slug"], request.auth)
         if actor is None:
             raise NotFound
         self.actor = actor

@@ -63,11 +63,16 @@ def handle_exception(exc: Exception, context: dict[str, Any]) -> Response | None
             _field_errors(exc.get_codes()),
         )
     if isinstance(exc, exceptions.NotAuthenticated | exceptions.AuthenticationFailed):
-        # A session API has no WWW-Authenticate challenge, so DRF would answer 403; the
-        # client needs 401 to tell "log in" apart from "not allowed".
-        return problem_response(
+        # The client needs 401 to tell "log in" apart from "not allowed", even where only
+        # a session could authenticate and DRF would answer 403.
+        unauthenticated = problem_response(
             status.HTTP_401_UNAUTHORIZED, "not_authenticated", "Authentication is required."
         )
+        view = context.get("view")
+        challenge = view.get_authenticate_header(context["request"]) if view else None
+        if challenge:
+            unauthenticated["WWW-Authenticate"] = challenge
+        return unauthenticated
     if isinstance(exc, Http404 | exceptions.NotFound):
         return problem_response(status.HTTP_404_NOT_FOUND, "not_found", "Not found.")
     if isinstance(exc, FieldProblem):

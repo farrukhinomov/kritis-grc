@@ -8,6 +8,7 @@ from django.db.models import QuerySet
 from grc.core.actor import Actor
 from grc.core.tenancy import tenant_context, user_context
 from grc.organization.models import (
+    ApiToken,
     Membership,
     MembershipScope,
     RegistrationStatus,
@@ -15,6 +16,7 @@ from grc.organization.models import (
     Scope,
     ScopeKind,
     Tenant,
+    TokenScope,
     User,
 )
 from grc.organization.selectors.legal import deadlines_for
@@ -88,15 +90,25 @@ def demo_account(role: Role) -> User | None:
     return membership.user if membership else None
 
 
-def resolve_actor(user: User | AnonymousUser, tenant_slug: str) -> Actor | None:
-    """The caller's Membership in the Tenant named by the URL, or None if they have none."""
+def resolve_actor(user: User | AnonymousUser, tenant_slug: str, auth: Any = None) -> Actor | None:
+    """The caller's Membership in the Tenant named by the URL, or None if they have none.
+
+    With an API Token, it is the token's Membership, and only in the token's Tenant.
+    """
     if not isinstance(user, User) or not user.is_active:
         return None
     tenant = Tenant.objects.filter(slug=tenant_slug).first()
     if tenant is None:
         return None
+    token = auth if isinstance(auth, ApiToken) else None
+    if token is not None and token.tenant_id != tenant.id:
+        return None
     with tenant_context(tenant.id), user_context(user.pk):
-        membership = Membership.objects.filter(tenant=tenant, user=user).first()
+        membership = (
+            token.membership
+            if token is not None
+            else Membership.objects.filter(tenant=tenant, user=user).first()
+        )
         if membership is None:
             return None
         scope_ids = frozenset(
@@ -108,6 +120,7 @@ def resolve_actor(user: User | AnonymousUser, tenant_slug: str) -> Actor | None:
         tenant_id=tenant.id,
         role=membership.role,
         scope_ids=scope_ids or None,
+        read_only=token is not None and token.scope == TokenScope.READ,
     )
 
 
