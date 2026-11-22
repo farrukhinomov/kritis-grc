@@ -168,6 +168,8 @@ USE_TZ = True
 # Only /api/* is routed to Django in front of the SPA, so admin assets live under it.
 STATIC_URL = "/api/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# Third-party front-end assets fetched at image build time (the API reference's Scalar).
+STATICFILES_DIRS = [BASE_DIR / "vendor-static"]
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {
@@ -200,6 +202,10 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SCHEMA_PATH_PREFIX": r"/api/v1",
+    "POSTPROCESSING_HOOKS": [
+        "drf_spectacular.hooks.postprocess_schema_enums",
+        "grc.core.schema.add_problem_responses",
+    ],
     # Several resources have a "status"; each gets its own named enum in the schema.
     "ENUM_NAME_OVERRIDES": {
         "ImplementationStatus": "grc.compliance.models.ImplementationStatus",
