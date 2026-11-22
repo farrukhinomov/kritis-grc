@@ -175,3 +175,8 @@ def present_scope(scope: Scope) -> dict[str, Any]:
         "kind": scope.kind,
         "critical_facility": facility,
     }
+
+
+def is_member(actor: Actor, user_id: int) -> bool:
+    """Whether a user belongs to the actor's Tenant, e.g. to be made an owner."""
+    return Membership.objects.filter(tenant_id=actor.tenant_id, user_id=user_id).exists()

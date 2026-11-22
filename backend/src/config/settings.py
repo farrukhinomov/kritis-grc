@@ -179,6 +179,11 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SCHEMA_PATH_PREFIX": r"/api/v1",
+    # Several resources have a "status"; each gets its own named enum in the schema.
+    "ENUM_NAME_OVERRIDES": {
+        "ImplementationStatus": "grc.compliance.models.ImplementationStatus",
+        "RegistrationStatus": "grc.organization.models.RegistrationStatus",
+    },
 }
 
 # TLS ends at the platform's load balancer, which reports the original scheme.

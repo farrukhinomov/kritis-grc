@@ -104,3 +104,39 @@ class TenantMapping(TenantOwnedModel):
 
     def __str__(self) -> str:
         return f"{self.target_requirement_id} <- {self.source_requirement_id}"
+
+
+class ImplementationStatus(models.TextChoices):
+    OPEN = "open", "open"
+    PARTIAL = "partial", "partial"
+    IMPLEMENTED = "implemented", "implemented"
+    NOT_APPLICABLE = "not_applicable", "not applicable"
+
+
+class Implementation(TenantOwnedModel):
+    """One Requirement applied to one Scope. Evidence attaches here, never to Requirements."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    requirement = models.ForeignKey(Requirement, on_delete=models.PROTECT, related_name="+")
+    scope = models.ForeignKey("organization.Scope", on_delete=models.CASCADE, related_name="+")
+    status = models.CharField(
+        max_length=16, choices=ImplementationStatus.choices, default=ImplementationStatus.OPEN
+    )
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="+"
+    )
+    due_date = models.DateField(null=True)
+    note_de = models.TextField(blank=True)
+    # Sent to clients as the ETag; a write based on an older version is refused.
+    version = models.PositiveIntegerField(default=1)
+    updated_at = models.DateTimeField()
+
+    class Meta:
+        constraints: ClassVar = [
+            models.UniqueConstraint(
+                fields=["requirement", "scope"], name="one_implementation_per_scope"
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.requirement_id} in {self.scope_id}"

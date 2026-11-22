@@ -3,12 +3,19 @@
 from collections.abc import Callable
 
 import pytest
+from django.core.cache import cache
 from django.db import connection
 
 # The test database is reached as a superuser, which row-level security never applies
 # to. Isolation tests switch to this role, which has the application role's rights: data
 # access, no table ownership, no BYPASSRLS.
 RLS_PROBE_ROLE = "grc_rls_probe"
+
+
+@pytest.fixture(autouse=True)
+def _fresh_cache() -> None:
+    # Rate-limit counters live in the cache; one test's logins must not limit the next.
+    cache.clear()
 
 
 @pytest.fixture
