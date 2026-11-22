@@ -1,6 +1,7 @@
 """Fixtures shared by every module's tests."""
 
 from collections.abc import Callable
+from typing import Any
 
 import pytest
 from django.core.cache import cache
@@ -10,6 +11,15 @@ from django.db import connection
 # to. Isolation tests switch to this role, which has the application role's rights: data
 # access, no table ownership, no BYPASSRLS.
 RLS_PROBE_ROLE = "grc_rls_probe"
+
+
+@pytest.fixture(autouse=True)
+def _memory_storage(settings: Any) -> None:
+    # Tests never reach a real object store; the in-memory one starts empty every time.
+    from grc.core.testing.storage import MemoryStorage
+
+    settings.GRC_STORAGE = "grc.core.testing.storage.MemoryStorage"
+    MemoryStorage.reset()
 
 
 @pytest.fixture(autouse=True)

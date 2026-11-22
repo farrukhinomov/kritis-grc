@@ -1,6 +1,7 @@
 from django.urls import path
 
 from grc.compliance.api import FrameworksView, MappingsView, RequirementsView, RequirementView
+from grc.compliance.api.evidence import EvidenceListView, EvidenceView, UploadsView
 from grc.compliance.api.implementations import (
     ComplianceParagraphsView,
     ComplianceSummaryView,
@@ -19,6 +20,17 @@ urlpatterns = [
         ImplementationView.as_view(),
         name="implementation",
     ),
+    path(
+        "implementations/<uuid:implementation_id>/evidence",
+        EvidenceListView.as_view(),
+        name="evidence-list",
+    ),
+    path(
+        "implementations/<uuid:implementation_id>/evidence/<uuid:evidence_id>",
+        EvidenceView.as_view(),
+        name="evidence",
+    ),
+    path("uploads", UploadsView.as_view(), name="uploads"),
     path("compliance-summary", ComplianceSummaryView.as_view(), name="compliance-summary"),
     path("compliance-paragraphs", ComplianceParagraphsView.as_view(), name="compliance-paragraphs"),
 ]
