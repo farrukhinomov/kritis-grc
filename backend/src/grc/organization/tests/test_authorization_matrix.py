@@ -8,6 +8,7 @@ import json
 from collections.abc import Callable
 from http import HTTPStatus
 from typing import Any
+from uuid import UUID
 
 import pytest
 from django.test import Client
@@ -18,9 +19,11 @@ from grc.organization.models import Membership, MembershipScope, Role, Scope, Te
 
 pytestmark = pytest.mark.django_db
 
+OTHER_SCOPE = UUID("00000000-0000-4000-8000-000000000001")
+
 ACTORS = ("anonymous", "auditor", "manager", "scoped_manager", "outsider")
 
-OK, NO_CONTENT = HTTPStatus.OK, HTTPStatus.NO_CONTENT
+OK, CREATED, NO_CONTENT = HTTPStatus.OK, HTTPStatus.CREATED, HTTPStatus.NO_CONTENT
 UNAUTHENTICATED, FORBIDDEN, NOT_FOUND = (
     HTTPStatus.UNAUTHORIZED,
     HTTPStatus.FORBIDDEN,
@@ -34,6 +37,16 @@ def _row(anonymous: int, auditor: int, manager: int, scoped: int, outsider: int)
 
 
 READ = _row(UNAUTHENTICATED, OK, OK, OK, NOT_FOUND)
+NEW_FACILITY = {
+    "name": "Wasserwerk Ost",
+    "location": "Musterstadt-Ost",
+    "critical_facility": {
+        "sector": "water",
+        "critical_service": "drinking_water_supply",
+        "people_supplied": 600_000,
+        "registration": {"status": "planned", "date": "2099-01-01"},
+    },
+}
 CHANGE = _row(UNAUTHENTICATED, FORBIDDEN, OK, OK, NOT_FOUND)
 
 # (method, path template) -> (request body, expected status per actor)
@@ -53,6 +66,17 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
     ("GET", "/api/v1/tenants/{tenant_slug}"): (None, READ),
     ("PATCH", "/api/v1/tenants/{tenant_slug}"): ({"theme": "blue"}, CHANGE),
     ("GET", "/api/v1/tenants/{tenant_slug}/members"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/scopes"): (None, READ),
+    # The scope-limited manager sees only their own plant, and creating stays theirs to do.
+    ("POST", "/api/v1/tenants/{tenant_slug}/scopes"): (
+        NEW_FACILITY,
+        _row(UNAUTHENTICATED, FORBIDDEN, CREATED, CREATED, NOT_FOUND),
+    ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/scopes/{scope_id}"): (
+        None,
+        _row(UNAUTHENTICATED, OK, OK, NOT_FOUND, NOT_FOUND),
+    ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/critical-services"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/frameworks"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/requirements"): (None, READ),
     # The catalogue is empty in this test, so a member gets 404 and so does the outsider.
@@ -81,8 +105,11 @@ def clients() -> dict[str, Callable[[], Client]]:
         with tenant_context(tenant.id):
             membership = Membership.objects.create(tenant=tenant, user=user, role=role)
             if name == "scoped_manager":
-                scope = Scope.objects.create(name="North plant")
-                MembershipScope.objects.create(membership=membership, scope=scope)
+                plant = Scope.objects.create(name="North plant")
+                MembershipScope.objects.create(membership=membership, scope=plant)
+    with tenant_context(north.id):
+        # The Scope every path with {scope_id} names: outside the scope-limited manager's.
+        Scope.objects.create(id=OTHER_SCOPE, name="North office")
 
     def client_for(name: str) -> Callable[[], Client]:
         def make() -> Client:
@@ -115,7 +142,11 @@ def test_operation_answers_each_actor_as_expected(
     method: str, template: str, clients: dict[str, Callable[[], Client]]
 ) -> None:
     body, expected = EXPECTED[(method, template)]
-    path = template.replace("{tenant_slug}", "north").replace("{requirement_id}", "req-x")
+    path = (
+        template.replace("{tenant_slug}", "north")
+        .replace("{requirement_id}", "req-x")
+        .replace("{scope_id}", str(OTHER_SCOPE))
+    )
 
     actual = {}
     for actor in ACTORS:

@@ -78,6 +78,16 @@ def _positive(value: str | None, fallback: int) -> int:
     return int(value)
 
 
+class DateIn(serializers.DateField):
+    """An ISO date; anything else is reported as `invalid_date`, the code the UI knows."""
+
+    def to_internal_value(self, value: Any) -> Any:
+        try:
+            return super().to_internal_value(value)
+        except serializers.ValidationError as error:
+            raise serializers.ValidationError("Not an ISO date.", code="invalid_date") from error
+
+
 class PageInfo(serializers.Serializer[Any]):
     number = serializers.IntegerField()
     limit = serializers.IntegerField()
