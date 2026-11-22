@@ -23,6 +23,18 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 COPY manage.py ./
 COPY src ./src
 
+# Scalar renders the API reference at /api/ui. It is served from here rather than from a
+# CDN, so the page runs under a self-only CSP and never loads third-party code. The
+# download is pinned by checksum; the version was at least two weeks old when chosen.
+ARG SCALAR_VERSION=1.76.4
+ADD --checksum=sha256:b8b74a96c74c6fd06f1dc604ddbf8385fd0b14a0bb9467bb8f27b59978be168c \
+    https://registry.npmjs.org/@scalar/api-reference/-/api-reference-${SCALAR_VERSION}.tgz \
+    /tmp/scalar.tgz
+RUN mkdir -p vendor-static/scalar \
+    && tar -xzf /tmp/scalar.tgz -O package/dist/browser/standalone.js \
+       > vendor-static/scalar/standalone.js \
+    && rm /tmp/scalar.tgz
+
 # Settings are validated even for collectstatic. These placeholders exist only in this
 # build step; the runtime image gets its real configuration from the platform.
 RUN APP_ENV=production \
