@@ -11,7 +11,17 @@ from grc.core.models import TenantManager, TenantOwnedModel
 from grc.core.rls import POLICY_NAME
 
 # Platform-wide data: identical for every Tenant or the root of isolation itself.
-PLATFORM_MODELS = frozenset({"organization.User", "organization.Tenant"})
+PLATFORM_MODELS = frozenset(
+    {
+        "organization.User",
+        "organization.Tenant",
+        # The legal catalogue is public law, the same for every Tenant.
+        "compliance.Framework",
+        "compliance.FrameworkVersion",
+        "compliance.Requirement",
+        "compliance.PlatformMapping",
+    }
+)
 # Tenant data read by its own user before a Tenant is chosen; the row policy admits both.
 USER_READABLE_MODELS = frozenset({"organization.Membership"})
 

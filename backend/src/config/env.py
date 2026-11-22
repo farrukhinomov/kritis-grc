@@ -45,6 +45,8 @@ class AppSettings(BaseSettings):
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     # Off unless asked for: the password-less demo login must never appear by accident.
     demo_login_enabled: bool = False
+    # The shared demo fixtures; next to the backend in the repository, copied into images.
+    seed_dir: Path = BACKEND_DIR.parent / "seed"
 
     @field_validator("allowed_hosts", "csrf_trusted_origins", mode="before")
     @classmethod

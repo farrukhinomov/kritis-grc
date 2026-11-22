@@ -45,8 +45,13 @@ services:
 
   # One-off job: migrations run as the owner role, before the API starts.
   migrate:
-    build: ./backend
-    command: ["python", "manage.py", "migrate", "--noinput"]
+    build:
+      context: ./backend
+      additional_contexts:
+        seed: ./seed
+    # Both local stacks run the demo, so the Demo Tenant is loaded right after migrating;
+    # loading again on every start changes nothing.
+    command: ["sh", "-c", "python manage.py migrate --noinput && python manage.py seed_demo"]
     environment:
       <<: *backend-env
       DATABASE_URL: postgres://grc_owner:${POSTGRES_OWNER_PASSWORD}@postgres:5432/grc
@@ -57,7 +62,10 @@ services:
         condition: service_healthy
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      additional_contexts:
+        seed: ./seed
     command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     environment:
       <<: *backend-env

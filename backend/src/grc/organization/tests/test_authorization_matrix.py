@@ -53,6 +53,14 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
     ("GET", "/api/v1/tenants/{tenant_slug}"): (None, READ),
     ("PATCH", "/api/v1/tenants/{tenant_slug}"): ({"theme": "blue"}, CHANGE),
     ("GET", "/api/v1/tenants/{tenant_slug}/members"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/frameworks"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/requirements"): (None, READ),
+    # The catalogue is empty in this test, so a member gets 404 and so does the outsider.
+    ("GET", "/api/v1/tenants/{tenant_slug}/requirements/{requirement_id}"): (
+        None,
+        _row(UNAUTHENTICATED, NOT_FOUND, NOT_FOUND, NOT_FOUND, NOT_FOUND),
+    ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/mappings"): (None, READ),
 }
 
 
@@ -107,7 +115,7 @@ def test_operation_answers_each_actor_as_expected(
     method: str, template: str, clients: dict[str, Callable[[], Client]]
 ) -> None:
     body, expected = EXPECTED[(method, template)]
-    path = template.replace("{tenant_slug}", "north")
+    path = template.replace("{tenant_slug}", "north").replace("{requirement_id}", "req-x")
 
     actual = {}
     for actor in ACTORS:
