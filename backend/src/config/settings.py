@@ -29,6 +29,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
+    "allauth",
+    "allauth.account",
+    "allauth.headless",
+    "pgtrigger",
+    "pghistory",
     "grc.organization",
     "grc.assets",
     "grc.compliance",
@@ -50,6 +55,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -101,6 +107,47 @@ DATABASES = {
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+AUTH_USER_MODEL = "organization.User"
+
+# Passwords are checked by allauth, which also rate-limits failed attempts per address
+# and per IP. Argon2 is the hasher for new and changed passwords; the others only let
+# older hashes be verified and upgraded on the next login.
+AUTHENTICATION_BACKENDS = ["allauth.account.auth_backends.AuthenticationBackend"]
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+]
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*"]
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_RATE_LIMITS = {
+    "login_failed": "10/m/ip,5/300s/key",
+    # The demo login creates sessions without credentials, so it gets its own budget.
+    "demo_login": "20/m/ip",
+}
+# Only allauth's logic is used, behind the platform's own /api/v1/auth endpoints; there
+# is no self-service sign-up, so no account pages are served.
+HEADLESS_ONLY = True
+HEADLESS_FRONTEND_URLS: dict[str, str] = {}
+DEMO_LOGIN_ENABLED = env.demo_login_enabled
+SEED_DIR = env.seed_dir
+GRC_STORAGE = "grc.core.storage.S3Storage"
+
+STORAGE = {
+    "endpoint_url": env.storage_endpoint_url,
+    "public_endpoint_url": env.storage_public_endpoint_url,
+    "bucket": env.storage_bucket,
+    "region": env.storage_region,
+    "access_key_id": (
+        env.storage_access_key_id.get_secret_value() if env.storage_access_key_id else None
+    ),
+    "secret_access_key": (
+        env.storage_secret_access_key.get_secret_value() if env.storage_secret_access_key else None
+    ),
+}
+# Finds the caller's Membership for /api/v1/tenants/{tenant_slug}/… requests.
+GRC_ACTOR_RESOLVER = "grc.organization.selectors.resolve_actor"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -121,6 +168,8 @@ USE_TZ = True
 # Only /api/* is routed to Django in front of the SPA, so admin assets live under it.
 STATIC_URL = "/api/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# Third-party front-end assets fetched at image build time (the API reference's Scalar).
+STATICFILES_DIRS = [BASE_DIR / "vendor-static"]
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {
@@ -134,11 +183,17 @@ STORAGES = {
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],
+    # Programs use API Tokens, browsers the session; the token class comes first so its
+    # Bearer challenge is what a 401 names.
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "grc.organization.authentication.ApiTokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
     # Closed by default: an endpoint must opt in to being public.
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
     "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
+    "EXCEPTION_HANDLER": "grc.core.problems.handle_exception",
 }
 
 SPECTACULAR_SETTINGS = {
@@ -147,6 +202,18 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SCHEMA_PATH_PREFIX": r"/api/v1",
+    "POSTPROCESSING_HOOKS": [
+        "drf_spectacular.hooks.postprocess_schema_enums",
+        "grc.core.schema.add_problem_responses",
+    ],
+    # Several resources have a "status"; each gets its own named enum in the schema.
+    "ENUM_NAME_OVERRIDES": {
+        "ImplementationStatus": "grc.compliance.models.ImplementationStatus",
+        "RegistrationStatus": "grc.organization.models.RegistrationStatus",
+        "EvidenceKind": "grc.compliance.models.EvidenceKind",
+        "ScopeKind": "grc.organization.models.ScopeKind",
+        "MappingKind": [("platform", "platform"), ("tenant", "tenant")],
+    },
 }
 
 # TLS ends at the platform's load balancer, which reports the original scheme.

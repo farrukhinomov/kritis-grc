@@ -15,6 +15,11 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
+backend/staticfiles/
+# Fetched at image build time; only the folder itself is kept.
+backend/vendor-static/**
+!backend/vendor-static/**/
+!backend/vendor-static/**/.gitkeep
 
 # Node
 node_modules/

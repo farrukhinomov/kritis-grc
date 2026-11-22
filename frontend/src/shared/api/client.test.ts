@@ -88,6 +88,39 @@ describe("apiRequest", () => {
     });
   });
 
+  it("echoes the CSRF cookie on writes but not on reads", async () => {
+    document.cookie = "csrftoken=token%2Fone";
+    const seen: (string | null)[] = [];
+    const record = ({ request }: { request: Request }) => {
+      seen.push(request.headers.get("X-CSRFToken"));
+      return HttpResponse.json({});
+    };
+    server.use(http.get("/api/v1/things", record), http.post("/api/v1/things", record));
+
+    try {
+      await apiGet("/api/v1/things");
+      await apiRequest("/api/v1/things", { method: "POST", body: {} });
+    } finally {
+      document.cookie = "csrftoken=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
+
+    expect(seen).toEqual([null, "token/one"]);
+  });
+
+  it("sends no CSRF header while there is no cookie yet", async () => {
+    let header: string | null = "unset";
+    server.use(
+      http.post("/api/v1/things", ({ request }) => {
+        header = request.headers.get("X-CSRFToken");
+        return HttpResponse.json({});
+      }),
+    );
+
+    await apiRequest("/api/v1/things", { method: "POST", body: {} });
+
+    expect(header).toBeNull();
+  });
+
   it("returns undefined for a response without content", async () => {
     server.use(http.delete("/api/v1/things/1", () => new HttpResponse(null, { status: 204 })));
 

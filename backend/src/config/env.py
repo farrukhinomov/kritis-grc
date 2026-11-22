@@ -43,6 +43,18 @@ class AppSettings(BaseSettings):
     allowed_hosts: Annotated[list[str], NoDecode] = Field(default_factory=list)
     csrf_trusted_origins: Annotated[list[str], NoDecode] = Field(default_factory=list)
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+    # Off unless asked for: the password-less demo login must never appear by accident.
+    demo_login_enabled: bool = False
+    # The shared demo fixtures; next to the backend in the repository, copied into images.
+    seed_dir: Path = BACKEND_DIR.parent / "seed"
+    # S3-compatible object store for Evidence files. Unset, uploads answer 503.
+    storage_endpoint_url: str | None = None
+    # What browsers reach; defaults to the endpoint when server and browser share it.
+    storage_public_endpoint_url: str | None = None
+    storage_bucket: str | None = None
+    storage_region: str = "auto"
+    storage_access_key_id: SecretStr | None = None
+    storage_secret_access_key: SecretStr | None = None
 
     @field_validator("allowed_hosts", "csrf_trusted_origins", mode="before")
     @classmethod

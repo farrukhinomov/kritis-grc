@@ -279,6 +279,8 @@ jobs:
         include:
           - name: backend
             context: backend
+            # The demo fixtures the seed command loads sit outside the build context.
+            build-contexts: seed=seed
           - name: risk-engine
             context: services/risk-engine
           - name: frontend
