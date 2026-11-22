@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.headless",
+    "pgtrigger",
+    "pghistory",
     "grc.organization",
     "grc.assets",
     "grc.compliance",
@@ -131,6 +133,7 @@ HEADLESS_FRONTEND_URLS: dict[str, str] = {}
 DEMO_LOGIN_ENABLED = env.demo_login_enabled
 SEED_DIR = env.seed_dir
 GRC_STORAGE = "grc.core.storage.S3Storage"
+
 STORAGE = {
     "endpoint_url": env.storage_endpoint_url,
     "public_endpoint_url": env.storage_public_endpoint_url,

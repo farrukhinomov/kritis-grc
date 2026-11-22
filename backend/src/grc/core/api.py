@@ -20,6 +20,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from grc.core.actor import Actor
+from grc.core.history import acting
 from grc.core.problems import Problem
 from grc.core.tenancy import tenant_context, user_context
 
@@ -42,6 +43,7 @@ class TenantScopedAPIView(APIView):
         self._contexts = ExitStack()
         self._contexts.enter_context(tenant_context(actor.tenant_id))
         self._contexts.enter_context(user_context(actor.user_id))
+        self._contexts.enter_context(acting(actor.user_id, actor.membership_id))
 
     def finalize_response(
         self, request: Request, response: Response, *args: Any, **kwargs: Any

@@ -14,4 +14,5 @@ urlpatterns = [
     ),
     path("api/v1/", include("grc.organization.api.urls")),
     path("api/v1/tenants/<slug:tenant_slug>/", include("grc.compliance.api.urls")),
+    path("api/v1/tenants/<slug:tenant_slug>/", include("grc.activity.api.urls")),
 ]

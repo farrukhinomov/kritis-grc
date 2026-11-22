@@ -112,6 +112,7 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
         _row(UNAUTHENTICATED, FORBIDDEN, CREATED, CREATED, NOT_FOUND),
     ),
     ("GET", "/api/v1/tenants/{tenant_slug}/compliance-summary"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/activity"): (None, READ),
     # Without its required filters: answered after the membership check.
     ("GET", "/api/v1/tenants/{tenant_slug}/compliance-paragraphs"): (
         None,

@@ -3,6 +3,7 @@
 A new model fails here until it has made that choice, so isolation can't be forgotten.
 """
 
+import pghistory.models
 import pytest
 from django.apps import apps
 from django.db import connection, models
@@ -50,6 +51,9 @@ def test_tenant_owned_models_filter_by_the_active_tenant() -> None:
         for m in _grc_models()
         if _has_tenant(m)
         and m._meta.label not in USER_READABLE_MODELS
+        # Activity Log events are read by the log with an explicit Tenant filter, and the
+        # database policy applies to them like to every other tenant table.
+        and not issubclass(m, pghistory.models.Event)
         and not (issubclass(m, TenantOwnedModel) and isinstance(m._default_manager, TenantManager))
     ]
 
