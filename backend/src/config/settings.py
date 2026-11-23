@@ -27,6 +27,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Postgres lookups such as unaccent, for search.
+    "django.contrib.postgres",
     "rest_framework",
     "drf_spectacular",
     "allauth",

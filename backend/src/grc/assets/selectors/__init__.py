@@ -36,3 +36,18 @@ def present_asset(asset: Asset) -> dict[str, Any]:
         "depends_on": [str(d.depends_on_id) for d in asset.dependencies.all()],
         "description": asset.description,
     }
+
+
+def search_assets(actor: Actor, query: str, *, limit: int) -> tuple[list[dict[str, Any]], int]:
+    """The actor's Assets whose name holds the query, ignoring case and accents."""
+    found = (
+        Asset.objects.filter(name__unaccent__icontains=query)
+        .filter(**({} if actor.scope_ids is None else {"scope_id__in": actor.scope_ids}))
+        .order_by("name", "id")
+    )
+    return [
+        {"id": str(asset_id), "name": name, "scope_id": str(scope_id), "scope_name": scope_name}
+        for asset_id, name, scope_id, scope_name in found.values_list(
+            "id", "name", "scope_id", "scope__name"
+        )[:limit]
+    ], found.count()
