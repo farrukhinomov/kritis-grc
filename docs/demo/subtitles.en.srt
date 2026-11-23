@@ -1,0 +1,51 @@
+1
+00:00:00,000 --> 00:00:10,000
+The KRITIS-Dachgesetz has applied since March, the new BSIG since December.
+
+2
+00:00:10,000 --> 00:00:20,000
+A waterworks must meet both. This platform brings them together. I sign in as the GRC Manager.
+
+3
+00:00:20,000 --> 00:00:33,000
+The overview shows the state per law and facility, the next deadlines and the residual risk matrix.
+
+4
+00:00:33,000 --> 00:00:45,000
+The deadlines are projected: the Registration is still planned, as the thresholds ordinance isn't in force yet.
+
+5
+00:00:45,000 --> 00:01:00,000
+In the cockpit I open the resilience measures under § 13 for Wasserwerk Nord.
+
+6
+00:01:00,000 --> 00:01:15,000
+The backup power is already proven for the BSIG. I refer to that work and upload the test report.
+
+7
+00:01:15,000 --> 00:01:30,000
+I set the status to "implemented". The risk engine recalculates the residual risk.
+
+8
+00:01:30,000 --> 00:01:45,000
+The power outage leaves the critical area. If the engine is down, the rating is pending and retried automatically.
+
+9
+00:01:45,000 --> 00:02:00,000
+Under "Approvals" the AI's suggestions wait. The AI only ever sees the public statute text.
+
+10
+00:02:00,000 --> 00:02:15,000
+A suggestion counts only once a person approves it, and nobody approves their own Risk Assessment.
+
+11
+00:02:15,000 --> 00:02:30,000
+Now as the Auditor, who sees everything and changes nothing.
+
+12
+00:02:30,000 --> 00:02:45,000
+The Activity Log shows every change: who, when, from which value to which. The database forbids editing it.
+
+13
+00:02:45,000 --> 00:03:00,000
+Every organization is isolated twice, in the application and in the database. Thanks for watching.

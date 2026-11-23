@@ -12,13 +12,14 @@
 | [../CLAUDE.md](../CLAUDE.md) | Rules for AI assistants (other tools' files are generated from it) | Any of the above changes in a way an assistant must know |
 | [ai-log.md](ai-log.md) | Where was AI output accepted, changed or rejected, and why? | Every milestone |
 | [security/threat-model.md](security/threat-model.md) | What can go wrong, and what stops it? | Every milestone, and with any new boundary or asset |
+| [architecture.md](architecture.md) | What runs where, and how does a change travel through it? (C4 and event flow in Mermaid) | A container, a boundary or the event flow changes |
+| [demo/](demo/script.md) | The 3-minute demo: narration, subtitles, how to record it | The v1 flow or its screens change |
 
 ## Planned (created with the milestone that needs them)
 
 | Document | Milestone |
 |---|---|
 | `events.md` (generated from event schemas) | M2 |
-| `architecture.md` (C4 and event-flow diagrams in Mermaid) | M3 |
 
 ## Rules for this folder
 
