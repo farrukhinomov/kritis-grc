@@ -148,6 +148,10 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
     ("GET", "/api/v1/tenants/{tenant_slug}/activity"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/assets"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/hazards"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/dependency-graph"): (
+        None,
+        _row(UNAUTHENTICATED, BAD_REQUEST, BAD_REQUEST, BAD_REQUEST, NOT_FOUND),
+    ),
     ("GET", "/api/v1/tenants/{tenant_slug}/risks"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/risk-matrix"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/risk-assessments"): (None, READ),

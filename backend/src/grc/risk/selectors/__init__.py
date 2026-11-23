@@ -1,6 +1,7 @@
 """Reading the Hazard catalogue, Risks and the risk matrix."""
 
 from typing import Any
+from uuid import UUID
 
 from django.db.models import F, Prefetch, QuerySet
 from rest_framework import status
@@ -189,3 +190,30 @@ def search_risks(actor: Actor, query: str, *, limit: int) -> tuple[list[dict[str
         {"id": str(risk_id), "title_de": title, "scope_name": scope_name}
         for risk_id, title, scope_name in found.values_list("id", "title_de", "scope__name")[:limit]
     ], found.count()
+
+
+def threats_by_asset(actor: Actor, scope_id: UUID) -> dict[str, dict[str, Any]]:
+    """For each Asset named by a Risk of this Scope: how many, and the highest Residual
+    Rating. The highest is unknown while any of them is pending: the pending one may be
+    the highest, and an Asset must never look less threatened than it is."""
+    named: dict[str, list[Risk]] = {}
+    for risk in risks(actor).filter(scope_id=scope_id):
+        for link in risk.affected.all():
+            named.setdefault(str(link.asset_id), []).append(risk)
+    return {
+        asset_id: {"count": len(found), "highest": _highest(found)}
+        for asset_id, found in named.items()
+    }
+
+
+def _highest(found: list[Risk]) -> dict[str, Any] | None:
+    if any(risk.residual_score is None for risk in found):
+        return None
+    worst = max(
+        found,
+        key=lambda r: (r.residual_score or 0, r.inherent_likelihood * r.inherent_impact),
+    )
+    residual = _residual(worst)
+    if residual is None:  # pragma: no cover - excluded above
+        return None
+    return {key: residual[key] for key in ("likelihood", "impact", "score", "category")}
