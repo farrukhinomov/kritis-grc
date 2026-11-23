@@ -16,6 +16,7 @@ from grc.compliance.models import (
     Requirement,
 )
 from grc.core.actor import Actor
+from grc.core.ids import uuid_or_none
 from grc.core.problems import Problem
 
 ORDERINGS = {
@@ -41,7 +42,7 @@ def implementations(
     if actor.scope_ids is not None:
         items = items.filter(scope_id__in=actor.scope_ids)
     if scope is not None:
-        items = items.filter(scope_id=_uuid_or_none(scope))
+        items = items.filter(scope_id=uuid_or_none(scope))
     if requirement is not None:
         items = items.filter(requirement_id=requirement)
     if owner is not None:
@@ -134,13 +135,6 @@ def paragraph_order(paragraph: str) -> tuple[int, str]:
     """ "§ 8" before "§ 8a" before "§ 12": the number counts, a letter comes after it."""
     match = re.search(r"(\d+)\s*([a-z]*)", paragraph)
     return (int(match.group(1)), match.group(2)) if match else (0, paragraph)
-
-
-def _uuid_or_none(value: str) -> UUID | None:
-    try:
-        return UUID(value)
-    except ValueError:
-        return None
 
 
 def evidence_of(actor: Actor, implementation_id: UUID) -> QuerySet[Evidence] | None:

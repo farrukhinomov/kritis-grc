@@ -12,3 +12,11 @@ _NAMESPACE = UUID("6f1c2a4e-3b7d-4e0a-9c55-2d8b1f6a7e30")
 
 def fixture_uuid(tenant_slug: str, fixture_id: str) -> UUID:
     return uuid5(_NAMESPACE, f"{tenant_slug}/{fixture_id}")
+
+
+def uuid_or_none(value: str) -> UUID | None:
+    """A UUID from a query parameter; None for anything else, which then matches nothing."""
+    try:
+        return UUID(value)
+    except ValueError:
+        return None

@@ -11,12 +11,14 @@ from typing import Any
 
 from django.db import transaction
 
+from grc.assets.services import load_assets
 from grc.compliance import services as compliance
 from grc.compliance.services.evidence import load_evidence
 from grc.compliance.services.implementations import load_implementations
 from grc.core.ids import fixture_uuid
 from grc.core.tenancy import tenant_context
 from grc.organization import services as organization
+from grc.risk.services import load_hazards
 
 # The people behind the two demo logins, as the prototype's mock API also uses them.
 DEMO_ACCOUNTS = frozenset({"u-kramer", "u-wolff"})
@@ -47,6 +49,10 @@ def load_demo(seed_dir: Path) -> None:
             load_implementations(implementations, implementation_ids, scope_ids, users)
             evidence = read("evidence")
             load_evidence(evidence, _ids(tenant.slug, evidence), implementation_ids, users)
+            assets = read("assets")
+            load_assets(assets, _ids(tenant.slug, assets), scope_ids)
+            hazards = read("hazards")
+            load_hazards(hazards, _ids(tenant.slug, hazards))
 
 
 def _ids(tenant_slug: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
