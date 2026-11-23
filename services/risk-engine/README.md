@@ -13,7 +13,7 @@ Requires [uv](https://docs.astral.sh/uv/). Run everything from this folder.
 | Run with auto-reload | `APP_ENV=local uv run uvicorn risk_engine.main:create_app_from_env --factory --reload --app-dir src --port 8080` |
 | Tests with coverage (≥ 80 % enforced) | `uv run pytest` |
 | Lint and format | `uv run ruff check . && uv run ruff format --check .` |
-| Type-check (strict) | `uv run mypy src tests` |
+| Type-check (strict) | `uv run mypy src tests evals` |
 | Export the OpenAPI schema (committed: the backend's tests hold the engine to it, CI checks it is current) | `PYTHONPATH=src uv run python -m risk_engine.export_openapi openapi.json` |
 | Container image | `docker build -t grc-risk-engine .` |
 
@@ -24,6 +24,7 @@ Requires [uv](https://docs.astral.sh/uv/). Run everything from this folder.
 | `APP_ENV` | yes | `local`, `test` or `production`. Production serves no docs and no schema. |
 | `LOG_LEVEL` | no | `DEBUG`, `INFO` (default), `WARNING`, `ERROR` |
 | `PORT` | no | Listen port, default `8080` |
+| `ANTHROPIC_API_KEY` | no | For Mapping Suggestions. Unset, `POST /v1/mapping-suggestions:generate` answers 503; risk scores are unaffected. |
 
 ## Layout
 

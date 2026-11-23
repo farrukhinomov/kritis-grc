@@ -121,6 +121,7 @@ services:
       ]
     environment:
       APP_ENV: local
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     volumes:
       - ./services/risk-engine/src:/app/src:ro
     ports:

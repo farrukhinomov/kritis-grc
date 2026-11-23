@@ -33,6 +33,9 @@ class Storage(Protocol):
 
     def delete(self, key: str) -> None: ...
 
+    def delete_prefix(self, prefix: str) -> int:
+        """Deletes every object whose key starts with `prefix`; returns how many."""
+
 
 def storage() -> Storage:
     return _storage(settings.GRC_STORAGE)
@@ -103,3 +106,21 @@ class S3Storage:
 
     def delete(self, key: str) -> None:
         self.internal.delete_object(Bucket=self.bucket, Key=key)
+
+    def delete_prefix(self, prefix: str) -> int:
+        if not prefix.endswith("/"):
+            # A bare prefix would also match "tenants/1x/…" when meaning "tenants/1".
+            raise ValueError("A prefix to delete must end with '/'.")
+        deleted = 0
+        pages = self.internal.get_paginator("list_objects_v2").paginate(
+            Bucket=self.bucket, Prefix=prefix
+        )
+        for page in pages:
+            # S3 deletes at most 1000 keys per request, which is also its page size.
+            keys = [{"Key": item["Key"]} for item in page.get("Contents", [])]
+            if keys:
+                self.internal.delete_objects(
+                    Bucket=self.bucket, Delete={"Objects": keys, "Quiet": True}
+                )
+                deleted += len(keys)
+        return deleted

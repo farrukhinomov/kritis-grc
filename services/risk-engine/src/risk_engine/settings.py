@@ -6,7 +6,7 @@ Errors name the variables but never echo their values.
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import ValidationError
+from pydantic import SecretStr, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     app_env: Environment
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     port: int = 8080
+    # Only Mapping Suggestions need it; unset, that endpoint answers 503 and the risk
+    # calculation keeps working.
+    anthropic_api_key: SecretStr | None = None
 
     @property
     def is_production(self) -> bool:

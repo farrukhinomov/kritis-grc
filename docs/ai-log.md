@@ -522,3 +522,61 @@ Each was confirmed with a mutation or a throwaway test.
 - **The entry signs in as the GRC Manager, and keeps an existing session.** A visitor who chose Auditor in this tab and then opens the main address would otherwise be switched back without asking.
 - **Light is the default, even on a dark system.** The palette is designed light first, and a recruiter should see the same screens everyone else sees. Following the system stays a choice in the user menu.
 - **Only the entry changed; deep links without a session still lead to the login page.** The login page offers both demo roles with one click and returns to the link afterwards.
+
+---
+
+## M1 Compliance core (2026-11-22)
+
+### Accepted
+- **Isolation built once, first,** as the backlog proposed: a tenant-owned base model whose manager refuses to query without a Tenant, row-level security on every tenant table, and a test that fails for any new model missing either.
+- **Review findings that were real bugs**, each with a regression test: an API Token whose secret contained "_" was split wrongly; the `WWW-Authenticate` header was lost on a 401; rate-limit counters leaked from one test into the next.
+
+### Changed
+- **The tenant context in middleware didn't hold.** `ATOMIC_REQUESTS` opens the transaction around the view, not the middleware, so a transaction-local setting made in middleware was gone before the first query. The Tenant is now set in the view's `initial()`, inside the transaction.
+- **The API reference build failed** because the vendored Scalar bundle pointed at a source map that wasn't shipped. The reference now ships without the pointer, verified by a production build.
+
+### Rejected
+- **Tests of the demo seed that read other modules' models.** They would have broken the module boundaries the import linter enforces; they go through the API, as a client would.
+
+### Lesson
+- **Check where a framework opens its transaction before relying on transaction-local state.**
+
+---
+
+## M2 Risk and events (2026-11-23)
+
+### Accepted
+- **A transactional outbox that walks Tenants one at a time** instead of scanning all deliveries, so the worker never needs a way around row-level security.
+- **Locking Risks before reading Implementation statuses**, so of two racing recalculations the one that writes last has also read last.
+
+### Changed
+- **A worker without a health check broke the production-like stack.** `docker compose up --wait` refuses a service whose check is disabled. The worker now touches a heartbeat file, and the check fails when it is older than a minute.
+- **"Assets depend only on Assets of their own Scope"** was a rule the AI wrote; the seed disproved it at once (plants depend on the organization's shared data center). The rule was removed before it shipped.
+- **The approvals inbox was missing.** The scope calls it a prototype-only screen, but a hand run of the real stack showed that Risk Assessments could then not be decided from the UI. It was added with the assessments.
+- **A test that the reset leaves no Activity Log passed only in real transactions.** Inside one test transaction, the person a request named stayed named during the reload. The test now commits per request, as production does.
+
+### Rejected
+- **A generated client for the risk engine** (datamodel-code-generator, as the conventions first said). For one endpoint it would add a generator and generated code. Instead the engine's OpenAPI schema is committed and checked by CI, and the backend's tests validate every request and answer against it.
+- **Staying on the stable nginx line** with time-boxed scanner exceptions. The fixes existed only on mainline, so the image moved to mainline and the exceptions were removed.
+
+### Lesson
+- **Run the real stack by hand once per milestone.** Two of the four changes above came from looking at the screens, not from tests.
+
+---
+
+## M3 AI and polish (2026-11-23)
+
+### Accepted
+- **Claude Sonnet 5.5 with structured output, a cached candidate list and server-side refusal fallbacks,** as the API guidance recommends. Answers naming a provision that wasn't offered are dropped before anyone sees them.
+- **An eval that never counts an unlabelled pair as wrong.** The gold set lists only the curated Mappings and clear non-overlaps; everything else is set aside for review, so an incomplete gold set can't punish a correct suggestion.
+
+### Changed
+- **A log field named `created`** crashed the logging call, because `logging` reserves that name. The counts got their own names.
+- **Scope-limited GRC Managers may not decide Mapping Suggestions.** The prototype allowed it, but a Mapping applies to the whole Tenant. Recorded as a deliberate deviation in the authorization matrix.
+- **The image scan flagged the Anthropic SDK.** Trivy's secret scanner read placeholder JSON in the SDK's docstrings as a Google service-account key. Narrowing the scan is a change to a security control, so the AI stopped and asked. The maintainer chose an allow rule for the SDK's own files only, over a 7-day `.trivyignore` entry, which would have covered the whole image, and over dropping the SDK.
+
+### Rejected
+- **Running the eval without asking.** Every run costs money; the runner prints an estimate and asks first, and the workflow never runs on pull requests.
+
+### Lesson
+- **A security control that blocks a release is the maintainer's call, even when the finding is a false positive.**
