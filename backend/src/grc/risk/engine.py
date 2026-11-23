@@ -7,7 +7,6 @@ and the outbox retries later. A circuit breaker stops a request from waiting on 
 engine that has just failed several times in a row.
 """
 
-import secrets
 import threading
 import time
 from dataclasses import dataclass
@@ -82,7 +81,7 @@ def score(risks: list[dict[str, Any]]) -> tuple[str, list[Scored]]:
         base_url=base_url,
         timeout=TIMEOUT,
         transport=_transport(),
-        headers=_trace_headers(),
+        headers=request_context.outgoing_headers(),
     ) as client:
         for start in range(0, len(risks), MAX_BATCH):
             method_version, batch = _post(client, risks[start : start + MAX_BATCH])
@@ -127,15 +126,3 @@ def _post(client: httpx.Client, risks: list[dict[str, Any]]) -> tuple[str, list[
         )
         for item in body["results"]
     ]
-
-
-def _trace_headers() -> dict[str, str]:
-    # The engine logs under the caller's request and trace, so one user action can be
-    # followed across both services. Outside a request, a fresh trace starts there.
-    trace_id = request_context.current_trace_id()
-    headers = {"X-Request-ID": request_context.current_request_id()}
-    if trace_id != "-":
-        headers["traceparent"] = f"00-{trace_id}-{secrets.token_hex(8)}-01"
-    if headers["X-Request-ID"] == "-":
-        del headers["X-Request-ID"]
-    return headers

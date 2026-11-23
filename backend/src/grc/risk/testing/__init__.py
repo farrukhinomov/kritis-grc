@@ -7,22 +7,19 @@ the engine's to test; this one follows the same published method so results are 
 """
 
 import json
-from pathlib import Path
 from typing import Any
 
 import httpx
-from jsonschema import Draft202012Validator
 
+from grc.core.testing.contract import Contract
 from grc.risk import engine
 
-CONTRACT = Path(__file__).resolve().parents[5] / "services" / "risk-engine" / "openapi.json"
 METHOD_VERSION = "qualitative-4x4/1"
 
 
 class FakeRiskEngine:
     def __init__(self) -> None:
-        document = json.loads(CONTRACT.read_text(encoding="utf-8"))
-        self.components = {"components": document["components"]}
+        self.contract = Contract()
         self.requests: list[dict[str, Any]] = []
         self.down = False
 
@@ -30,9 +27,7 @@ class FakeRiskEngine:
         return httpx.MockTransport(self._handle)
 
     def validate(self, schema: str, body: Any) -> None:
-        Draft202012Validator(
-            {"$ref": f"#/components/schemas/{schema}", **self.components}
-        ).validate(body)
+        self.contract.validate(schema, body)
 
     def _handle(self, request: httpx.Request) -> httpx.Response:
         if self.down:

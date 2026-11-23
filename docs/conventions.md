@@ -159,6 +159,11 @@ See [ADR 0017](adr/0017-http-standard-responses-no-envelope.md), [ADR 0018](adr/
 
 - Mapping Suggestions use **Claude Sonnet 5.5** (`claude-sonnet-5-5`) with structured output and a daily call cap. Only public requirement text is sent ([ADR 0007](adr/0007-llm-sees-only-public-requirement-text.md)).
 - Each call sends one KRITIS-DachG Requirement and all BSIG Requirements as candidates. Results are validated: citations not in the candidate list are discarded, and only full/partial become suggestions.
+- How it is built:
+  - The FastAPI service makes the call (`POST /v1/mapping-suggestions:generate`). Its request schema holds only id, citation and statute text, with extra fields refused, so there is no place for tenant data. Django's `grc.compliance.suggester` is the only caller.
+  - The prompt lives in `risk_engine/mapping/prompt.py` with a `PROMPT_VERSION`. The candidate list is a cached system block, the same for every target; the target goes in the user message. Effort is `high`, and server-side refusal fallbacks are on (`fallbacks: "default"`).
+  - A refused or cut-off answer is never used (502 `model_declined`). An unconfigured key, rate limit or overload answers 503 with `Retry-After`.
+  - `manage.py suggest_mappings <tenant>` asks once per KRITIS-DachG Requirement without a Mapping or suggestion. Each call is counted before it is made against `MAPPING_SUGGESTION_DAILY_CALLS` (default 20 per Tenant and day). Calls run outside database transactions.
 - Evaluation: a gold set built from the Platform Mappings plus known non-overlaps. Precision and recall are measured per coverage level. It runs on prompt changes, not on every PR, and the latest results go in the README.
 - Development with AI:
   - [CLAUDE.md](../CLAUDE.md) is the source of truth. `AGENTS.md`, `.github/copilot-instructions.md` and `.cursor/rules/project.mdc` (Cursor's current format, replacing the deprecated `.cursorrules`) are generated from it.
@@ -183,6 +188,7 @@ Every check below is required before merging into `main`.
 - Security and licensing:
   - Scanners: osv-scanner (lockfiles), Trivy (images), gitleaks (full git history), CodeQL with `security-extended` (while the repo is public), Dependabot with a 7-day cooldown. High/critical fixable findings block merges.
   - A finding is ignored only in `.trivyignore`, only when it cannot be exploited in our configuration and no fixed version is installable, with that reason next to it and an expiry of at most 7 days.
+  - A false positive of the secret scanner in third-party code is allowed only in `trivy-secret.yaml`, by the path of that package's files alone, with the reason next to it and the maintainer's approval. Today that covers placeholder JSON in the Anthropic SDK's docstrings.
   - Scanners run as digest-pinned containers, not through third-party actions. Actions are pinned to commit SHAs, workflows have `permissions: {}` by default, and checkout never persists credentials. `actionlint` and `zizmor` check the workflows themselves.
   - A license check enforces ADR 0016 against `.github/license-policy.json` for runtime dependencies only.
   - Runtime images ship without pip and get OS security patches at build time.

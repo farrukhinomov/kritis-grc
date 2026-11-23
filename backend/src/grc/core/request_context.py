@@ -58,3 +58,17 @@ def unbind(tokens: Bound) -> None:
     request_token, trace_token = tokens
     _request_id.reset(request_token)
     _trace_id.reset(trace_token)
+
+
+def outgoing_headers() -> dict[str, str]:
+    """Headers that carry this request's IDs to a service it calls.
+
+    The callee logs under the caller's request and trace, so one user action can be
+    followed across both. Outside a request, the callee starts a fresh trace.
+    """
+    headers: dict[str, str] = {}
+    if (request_id := current_request_id()) != _UNSET:
+        headers["X-Request-ID"] = request_id
+    if (trace_id := current_trace_id()) != _UNSET:
+        headers["traceparent"] = f"00-{trace_id}-{secrets.token_hex(8)}-01"
+    return headers

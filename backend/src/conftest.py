@@ -75,3 +75,15 @@ def risk_engine(settings: Any, monkeypatch: pytest.MonkeyPatch) -> Any:
     settings.RISK_ENGINE_URL = "http://risk-engine.test"
     monkeypatch.setattr(engine, "_transport", fake.transport)
     return fake
+
+
+@pytest.fixture
+def ai_service(settings: Any, monkeypatch: pytest.MonkeyPatch) -> Any:
+    """The AI service's Mapping Suggestions, held to its published contract."""
+    from grc.compliance import suggester
+    from grc.compliance.testing import FakeSuggester
+
+    fake = FakeSuggester()
+    settings.RISK_ENGINE_URL = "http://risk-engine.test"
+    monkeypatch.setattr(suggester, "_transport", fake.transport)
+    return fake

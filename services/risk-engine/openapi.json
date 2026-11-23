@@ -77,6 +77,56 @@
         "title": "ExplanationOut",
         "type": "object"
       },
+      "GenerateRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/RequirementIn"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Candidates",
+            "type": "array"
+          },
+          "target": {
+            "$ref": "#/components/schemas/RequirementIn"
+          }
+        },
+        "required": [
+          "target",
+          "candidates"
+        ],
+        "title": "GenerateRequest",
+        "type": "object"
+      },
+      "GenerateResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/SuggestionOut"
+            },
+            "title": "Suggestions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "model",
+          "prompt_version",
+          "suggestions"
+        ],
+        "title": "GenerateResponse",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -140,6 +190,36 @@
           "impact"
         ],
         "title": "RatingOut",
+        "type": "object"
+      },
+      "RequirementIn": {
+        "additionalProperties": false,
+        "properties": {
+          "citation": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Citation",
+            "type": "string"
+          },
+          "id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "citation",
+          "text"
+        ],
+        "title": "RequirementIn",
         "type": "object"
       },
       "RiskCategory": {
@@ -213,6 +293,46 @@
           "explanations"
         ],
         "title": "RiskScoreOut",
+        "type": "object"
+      },
+      "SuggestionOut": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "coverage": {
+            "enum": [
+              "full",
+              "partial"
+            ],
+            "title": "Coverage",
+            "type": "string"
+          },
+          "rationale_de": {
+            "title": "Rationale De",
+            "type": "string"
+          },
+          "rationale_en": {
+            "title": "Rationale En",
+            "type": "string"
+          },
+          "source_requirement_id": {
+            "title": "Source Requirement Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_requirement_id",
+          "coverage",
+          "confidence",
+          "rationale_de",
+          "rationale_en"
+        ],
+        "title": "SuggestionOut",
         "type": "object"
       },
       "TreatmentIn": {
@@ -341,6 +461,54 @@
         "summary": "Ready",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/v1/mapping-suggestions:generate": {
+      "post": {
+        "description": "Suggest which candidate Requirements fully or partly cover the target.",
+        "operationId": "generate_v1_mapping_suggestions_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenerateResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "502": {
+            "description": "The model gave no usable answer."
+          },
+          "503": {
+            "description": "No model answer now; retry later."
+          }
+        },
+        "summary": "Generate",
+        "tags": [
+          "mapping suggestions"
         ]
       }
     },

@@ -24,6 +24,7 @@ Requires [uv](https://docs.astral.sh/uv/). Run everything from this folder.
 | `APP_ENV` | yes | `local`, `test` or `production`. Production serves no docs and no schema. |
 | `LOG_LEVEL` | no | `DEBUG`, `INFO` (default), `WARNING`, `ERROR` |
 | `PORT` | no | Listen port, default `8080` |
+| `ANTHROPIC_API_KEY` | no | For Mapping Suggestions. Unset, `POST /v1/mapping-suggestions:generate` answers 503; risk scores are unaffected. |
 
 ## Layout
 
