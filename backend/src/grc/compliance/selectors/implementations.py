@@ -16,6 +16,7 @@ from grc.compliance.models import (
     Requirement,
 )
 from grc.core.actor import Actor
+from grc.core.ids import uuid_or_none
 from grc.core.problems import Problem
 
 ORDERINGS = {
@@ -41,7 +42,7 @@ def implementations(
     if actor.scope_ids is not None:
         items = items.filter(scope_id__in=actor.scope_ids)
     if scope is not None:
-        items = items.filter(scope_id=_uuid_or_none(scope))
+        items = items.filter(scope_id=uuid_or_none(scope))
     if requirement is not None:
         items = items.filter(requirement_id=requirement)
     if owner is not None:
@@ -136,13 +137,6 @@ def paragraph_order(paragraph: str) -> tuple[int, str]:
     return (int(match.group(1)), match.group(2)) if match else (0, paragraph)
 
 
-def _uuid_or_none(value: str) -> UUID | None:
-    try:
-        return UUID(value)
-    except ValueError:
-        return None
-
-
 def evidence_of(actor: Actor, implementation_id: UUID) -> QuerySet[Evidence] | None:
     """The Evidence of a visible Implementation, oldest first; None if it isn't visible."""
     if not implementations(actor).filter(id=implementation_id).exists():
@@ -171,3 +165,11 @@ def present_evidence(evidence: Evidence) -> dict[str, Any]:
         "added_by_id": str(evidence.added_by_id) if evidence.added_by_id else None,
         "added_at": evidence.added_at.isoformat().replace("+00:00", "Z"),
     }
+
+
+def implementation_statuses(ids: set[UUID]) -> dict[UUID, str]:
+    """The current status of each of the active Tenant's Implementations among `ids`.
+
+    For recalculations that run for the Tenant as a whole, not for a person.
+    """
+    return dict(Implementation.objects.filter(id__in=ids).values_list("id", "status"))

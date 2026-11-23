@@ -25,7 +25,11 @@ OBJECT_TYPES = {
     "compliance.Evidence": "evidence",
     "compliance.TenantMapping": "mapping",
     "organization.Scope": "scope",
+    "risk.Risk": "risk",
+    "risk.RiskAssessment": "risk_assessment",
 }
+# Changes worth showing: an edit lists what changed, a decision its outcome and reason.
+CHANGE_LABELS = ("updated", "approved", "rejected")
 DEFAULT_LIMIT, MAX_LIMIT = 20, 100
 
 
@@ -91,7 +95,7 @@ class _Names:
                 self._change(field, before, after)
                 for field, (before, after) in sorted((event.pgh_diff or {}).items())
             ]
-            if event.pgh_label == "updated"
+            if event.pgh_label in CHANGE_LABELS
             else [],
         }
 
@@ -102,7 +106,7 @@ class _Names:
         if model == "compliance.TenantMapping":
             target = self.citations.get(data["target_requirement_id"], "")
             return f"{target} ← {self.citations.get(data['source_requirement_id'], '')}"
-        return str(data.get("title") or data.get("name") or "")
+        return str(data.get("title") or data.get("title_de") or data.get("name") or "")
 
     def _change(self, field: str, before: Any, after: Any) -> dict[str, Any]:
         if field == "owner_id":

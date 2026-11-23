@@ -100,6 +100,7 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
         _row(UNAUTHENTICATED, OK, OK, NOT_FOUND, NOT_FOUND),
     ),
     ("GET", "/api/v1/tenants/{tenant_slug}/critical-services"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/deadlines"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/frameworks"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/requirements"): (None, READ),
     # The catalogue is empty in this test, so a member gets 404 and so does the outsider.
@@ -136,6 +137,27 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
     ),
     ("GET", "/api/v1/tenants/{tenant_slug}/compliance-summary"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/activity"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/assets"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/hazards"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/risks"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/risk-matrix"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/risk-assessments"): (None, READ),
+    # Readable by every member; what it lists depends on who may approve.
+    ("GET", "/api/v1/tenants/{tenant_slug}/approvals"): (None, READ),
+    # No assessment exists here: deciding needs approval rights, then finds nothing.
+    ("POST", "/api/v1/tenants/{tenant_slug}/risk-assessments/{assessment_id}/approve"): (
+        {},
+        _row(UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, NOT_FOUND, NOT_FOUND),
+    ),
+    ("POST", "/api/v1/tenants/{tenant_slug}/risk-assessments/{assessment_id}/reject"): (
+        {"note_de": "Unvollständig."},
+        _row(UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, NOT_FOUND, NOT_FOUND),
+    ),
+    # No Risk exists here: members get 404 after the role check.
+    ("GET", "/api/v1/tenants/{tenant_slug}/risks/{risk_id}"): (
+        None,
+        _row(UNAUTHENTICATED, NOT_FOUND, NOT_FOUND, NOT_FOUND, NOT_FOUND),
+    ),
     ("GET", "/api/v1/tenants/{tenant_slug}/api-tokens"): (None, READ),
     # Every member may hold a read-only token, so the Auditor may create this one.
     ("POST", "/api/v1/tenants/{tenant_slug}/api-tokens"): (
@@ -230,6 +252,8 @@ def test_operation_answers_each_actor_as_expected(
         .replace("{implementation_id}", str(OTHER_SCOPE))
         .replace("{evidence_id}", str(OTHER_SCOPE))
         .replace("{token_id}", str(OTHER_SCOPE))
+        .replace("{risk_id}", str(OTHER_SCOPE))
+        .replace("{assessment_id}", str(OTHER_SCOPE))
     )
 
     actual = {}

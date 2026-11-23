@@ -11,6 +11,7 @@ x-backend-env: &backend-env
   CSRF_TRUSTED_ORIGINS: http://localhost:5173
   # Both local stacks run the demo, so its one-click logins are on.
   DEMO_LOGIN_ENABLED: "true"
+  RISK_ENGINE_URL: http://risk-engine:8080
 
 services:
   postgres:
@@ -80,6 +81,33 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  # Delivers domain events that failed right after their commit, as a scheduler would.
+  outbox-worker:
+    build:
+      context: ./backend
+      additional_contexts:
+        seed: ./seed
+    command: ["python", "manage.py", "drain_outbox", "--loop", "--heartbeat-file", "/tmp/outbox-alive"]
+    environment:
+      <<: *backend-env
+      DATABASE_URL: postgres://grc_app:${APP_DB_PASSWORD}@postgres:5432/grc
+    volumes:
+      - ./backend/src:/app/src:ro
+    # Alive while the loop keeps touching its heartbeat; a hung loop turns unhealthy.
+    healthcheck:
+      test:
+        [
+          "CMD", "python", "-c",
+          "import os, sys, time; sys.exit(time.time() - os.path.getmtime('/tmp/outbox-alive') > 60)",
+        ]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
     depends_on:
       migrate:
         condition: service_completed_successfully

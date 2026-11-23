@@ -3,6 +3,7 @@
 Two people can open the same Implementation; whoever saves second must not silently undo
 the first. Every change names the version it was based on, and a stale one is refused.
 Saving without any actual change keeps the version, so it can't cause conflicts either.
+A status change is announced as an event, for whatever depends on it (Residual Ratings).
 """
 
 from datetime import date, datetime
@@ -12,8 +13,10 @@ from uuid import UUID
 from django.utils import timezone
 from rest_framework import status
 
+from grc.compliance.events import ImplementationStatusChanged
 from grc.compliance.models import Implementation
 from grc.core.actor import Actor, Permission
+from grc.core.outbox.services import publish
 from grc.core.problems import FieldProblem, Problem
 from grc.organization.selectors import is_member
 
@@ -54,11 +57,20 @@ def change_implementation(
     }
     if all(getattr(implementation, field) == value for field, value in new.items()):
         return implementation
+    previous_status = implementation.status
     for field, value in new.items():
         setattr(implementation, field, value)
     implementation.version += 1
     implementation.updated_at = timezone.now()
     implementation.save()
+    if implementation.status != previous_status:
+        publish(
+            ImplementationStatusChanged(
+                implementation_id=implementation.id,
+                from_status=previous_status,
+                to_status=implementation.status,
+            )
+        )
     return implementation
 
 

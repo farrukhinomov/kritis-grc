@@ -1,6 +1,7 @@
 from django.urls import path
 
 from grc.organization.api import DemoLoginView, LoginView, LogoutView, MeView
+from grc.organization.api.deadlines import DeadlinesView
 from grc.organization.api.tenants import (
     CriticalServicesView,
     MembersView,
@@ -25,6 +26,7 @@ urlpatterns = [
         ApiTokenView.as_view(),
         name="api-token",
     ),
+    path("tenants/<slug:tenant_slug>/deadlines", DeadlinesView.as_view(), name="deadlines"),
     path(
         "tenants/<slug:tenant_slug>/critical-services",
         CriticalServicesView.as_view(),

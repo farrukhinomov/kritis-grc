@@ -11,12 +11,15 @@ from typing import Any
 
 from django.db import transaction
 
+from grc.assets.services import load_assets
 from grc.compliance import services as compliance
 from grc.compliance.services.evidence import load_evidence
 from grc.compliance.services.implementations import load_implementations
 from grc.core.ids import fixture_uuid
 from grc.core.tenancy import tenant_context
 from grc.organization import services as organization
+from grc.risk.services import load_hazards, load_risks
+from grc.risk.services.assessments import load_risk_assessments
 
 # The people behind the two demo logins, as the prototype's mock API also uses them.
 DEMO_ACCOUNTS = frozenset({"u-kramer", "u-wolff"})
@@ -47,6 +50,31 @@ def load_demo(seed_dir: Path) -> None:
             load_implementations(implementations, implementation_ids, scope_ids, users)
             evidence = read("evidence")
             load_evidence(evidence, _ids(tenant.slug, evidence), implementation_ids, users)
+            assets = read("assets")
+            asset_ids = _ids(tenant.slug, assets)
+            load_assets(assets, asset_ids, scope_ids)
+            hazards = read("hazards")
+            hazard_ids = _ids(tenant.slug, hazards)
+            load_hazards(hazards, hazard_ids)
+            risks = read("risks")
+            risk_ids = _ids(tenant.slug, risks)
+            load_risks(
+                risks,
+                risk_ids,
+                scope_ids=scope_ids,
+                hazard_ids=hazard_ids,
+                asset_ids=asset_ids,
+                implementation_ids=implementation_ids,
+                user_ids=users,
+            )
+            assessments = read("risk-assessments")
+            load_risk_assessments(
+                assessments,
+                _ids(tenant.slug, assessments),
+                scope_ids=scope_ids,
+                risk_ids=risk_ids,
+                user_ids=users,
+            )
 
 
 def _ids(tenant_slug: str, rows: list[dict[str, Any]]) -> dict[str, Any]:

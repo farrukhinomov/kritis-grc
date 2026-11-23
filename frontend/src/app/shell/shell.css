@@ -457,3 +457,22 @@
     min-height: 44px;
   }
 }
+
+/* Legal links under every public page, including the sign-in screen. */
+.grc-public-footer {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  padding: 16px 32px 24px;
+}
+
+.grc-public-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--grc-text-secondary);
+}
+
+.grc-legal-operator {
+  font-style: normal;
+}

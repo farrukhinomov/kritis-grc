@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "allauth.headless",
     "pgtrigger",
     "pghistory",
+    "grc.core.outbox",
     "grc.organization",
     "grc.assets",
     "grc.compliance",
@@ -146,8 +147,11 @@ STORAGE = {
         env.storage_secret_access_key.get_secret_value() if env.storage_secret_access_key else None
     ),
 }
+RISK_ENGINE_URL = str(env.risk_engine_url).rstrip("/") if env.risk_engine_url else None
 # Finds the caller's Membership for /api/v1/tenants/{tenant_slug}/… requests.
 GRC_ACTOR_RESOLVER = "grc.organization.selectors.resolve_actor"
+# Lists every Tenant, so the outbox drain can work through them one at a time.
+GRC_OUTBOX_TENANTS = "grc.organization.selectors.tenant_ids"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -213,6 +217,12 @@ SPECTACULAR_SETTINGS = {
         "EvidenceKind": "grc.compliance.models.EvidenceKind",
         "ScopeKind": "grc.organization.models.ScopeKind",
         "MappingKind": [("platform", "platform"), ("tenant", "tenant")],
+        "RiskCategory": "grc.risk.models.RiskCategory",
+        "RiskDimension": "grc.risk.models.Dimension",
+        "HazardCategory": "grc.risk.models.HazardCategory",
+        "RiskAssessmentStatus": "grc.risk.models.AssessmentStatus",
+        "AssetKind": "grc.assets.models.AssetKind",
+        "Criticality": "grc.assets.models.Criticality",
     },
 }
 

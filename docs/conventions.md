@@ -56,28 +56,30 @@ This applies to all source code, tests, migrations, Dockerfiles and CI/CD workfl
 - Errors are RFC 9457 Problem Details, like the public API.
 - No database. It can only be called by Django's service account (IAM). `/docs` is turned off in production.
 - `POST /v1/risk-scores:batch` takes Risks with their Inherent Rating and Treatments. It returns the Residual Rating, category and explanations, plus `method_version` ([ADR 0014](adr/0014-qualitative-versioned-risk-method.md)).
-- Django's client is generated from FastAPI's OpenAPI with datamodel-code-generator. CI fails if the generated client is out of date.
+- The engine's exported OpenAPI schema is committed as `services/risk-engine/openapi.json`; CI fails if it differs from the code. Django's client (`grc.risk.engine`, the only module that talks to the engine) is small and hand-written. Its tests run against a stand-in that validates every request and every answer against that schema, so drift on either side fails the backend's tests. A generated client was dropped: for one endpoint it would add a code generator and generated code without catching more.
 - Django calls it with a sync httpx client:
   - Timeouts: 2 s connect, 10 s read.
-  - Retries with exponential backoff and jitter, for idempotent calls only.
-  - A circuit breaker.
-- If a risk recalculation fails, the Risk shows "calculation pending" and the outbox retries it.
+  - Connection failures are retried by the transport with exponential backoff. Every other failure is left to the outbox, whose retries back off with jitter for up to two hours.
+  - A circuit breaker: after 5 failures in a row, calls pause for 30 s.
+  - The request's trace continues in the engine (`traceparent`, `X-Request-ID`).
+- `RISK_ENGINE_URL` is required in production. If a risk recalculation fails, the Risk shows "calculation pending" and the outbox retries it. A recalculation that changes nothing writes nothing.
 
 ## Domain events and outbox
 
 See [ADR 0011](adr/0011-transactional-outbox-in-postgres.md).
 
 - Envelope: `event_id`, `type`, `schema_version`, `occurred_at`, `tenant_id`, `actor_id`, `aggregate_type`, `aggregate_id`, `payload`.
-- The payload is a Pydantic model carrying IDs and the changed facts. Schemas change additively only; a breaking change gets a new `schema_version`.
+- An event is a `grc.core.events.DomainEvent` subclass in the emitting module's `events` package: a Pydantic model carrying IDs and the changed facts, with a stable `event_type` such as `compliance.implementation_status_changed`. Schemas change additively only; a breaking change gets a new `schema_version`, and a delivery stored with another version ends `dead` instead of being misread.
+- Services publish with `grc.core.outbox.services.publish()` inside their transaction. Handlers subscribe with `@subscribe(Event)` in `<module>/events/handlers.py`, which is imported at startup. A handler's import path is its delivery key, so renaming one strands its pending deliveries.
 - Events are named in the past tense. Initial events:
   - `compliance`: `ImplementationStatusChanged`, `EvidenceAttached`, `EvidenceRemoved`, `MappingSuggested`, `MappingApproved`, `MappingRejected`.
   - `assets`: `AssetCriticalityChanged`, `AssetDependencyChanged`.
   - `risk`: `RiskScoreChanged`.
 - `docs/events.md` is generated from the schemas in CI.
 - Delivery:
-  - First attempt right after commit (`transaction.on_commit`).
-  - After that, an authenticated `/internal/outbox/drain` endpoint is called every minute.
-  - Each handler gets its own delivery row: 8 attempts with exponential backoff, then `dead`. Dead deliveries are visible in admin with a retry button.
+  - First attempt right after commit (`transaction.on_commit`), in its own transaction acting for the event's Tenant. It never fails the request that published.
+  - After that, `manage.py drain_outbox` works through the Tenants one at a time and claims due rows with `FOR UPDATE SKIP LOCKED`, so it needs no way around row-level security. The compose stacks run it with `--loop`; in the cloud, an authenticated `/internal/outbox/drain` endpoint will call the same drain every minute.
+  - Each handler gets its own delivery row: 8 attempts with exponential backoff and jitter (30 s doubling up to 1 h), then `dead`. A dead delivery stores only the error's type; the log has the details. `drain_outbox --revive-dead` retries dead deliveries once the cause is fixed.
 - Handlers are idempotent and re-read current state. They never rely on event order.
 
 ## API
