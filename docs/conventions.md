@@ -68,16 +68,17 @@ This applies to all source code, tests, migrations, Dockerfiles and CI/CD workfl
 See [ADR 0011](adr/0011-transactional-outbox-in-postgres.md).
 
 - Envelope: `event_id`, `type`, `schema_version`, `occurred_at`, `tenant_id`, `actor_id`, `aggregate_type`, `aggregate_id`, `payload`.
-- The payload is a Pydantic model carrying IDs and the changed facts. Schemas change additively only; a breaking change gets a new `schema_version`.
+- An event is a `grc.core.events.DomainEvent` subclass in the emitting module's `events` package: a Pydantic model carrying IDs and the changed facts, with a stable `event_type` such as `compliance.implementation_status_changed`. Schemas change additively only; a breaking change gets a new `schema_version`, and a delivery stored with another version ends `dead` instead of being misread.
+- Services publish with `grc.core.outbox.services.publish()` inside their transaction. Handlers subscribe with `@subscribe(Event)` in `<module>/events/handlers.py`, which is imported at startup. A handler's import path is its delivery key, so renaming one strands its pending deliveries.
 - Events are named in the past tense. Initial events:
   - `compliance`: `ImplementationStatusChanged`, `EvidenceAttached`, `EvidenceRemoved`, `MappingSuggested`, `MappingApproved`, `MappingRejected`.
   - `assets`: `AssetCriticalityChanged`, `AssetDependencyChanged`.
   - `risk`: `RiskScoreChanged`.
 - `docs/events.md` is generated from the schemas in CI.
 - Delivery:
-  - First attempt right after commit (`transaction.on_commit`).
-  - After that, an authenticated `/internal/outbox/drain` endpoint is called every minute.
-  - Each handler gets its own delivery row: 8 attempts with exponential backoff, then `dead`. Dead deliveries are visible in admin with a retry button.
+  - First attempt right after commit (`transaction.on_commit`), in its own transaction acting for the event's Tenant. It never fails the request that published.
+  - After that, `manage.py drain_outbox` works through the Tenants one at a time and claims due rows with `FOR UPDATE SKIP LOCKED`, so it needs no way around row-level security. The compose stacks run it with `--loop`; in the cloud, an authenticated `/internal/outbox/drain` endpoint will call the same drain every minute.
+  - Each handler gets its own delivery row: 8 attempts with exponential backoff and jitter (30 s doubling up to 1 h), then `dead`. A dead delivery stores only the error's type; the log has the details. `drain_outbox --revive-dead` retries dead deliveries once the cause is fixed.
 - Handlers are idempotent and re-read current state. They never rely on event order.
 
 ## API

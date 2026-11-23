@@ -1,6 +1,7 @@
 """Read access to Tenants, Memberships and the signed-in session."""
 
 from typing import Any, TypedDict
+from uuid import UUID
 
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import QuerySet
@@ -122,6 +123,11 @@ def resolve_actor(user: User | AnonymousUser, tenant_slug: str, auth: Any = None
         scope_ids=scope_ids or None,
         read_only=token is not None and token.scope == TokenScope.READ,
     )
+
+
+def tenant_ids() -> list[UUID]:
+    """Every Tenant, for platform jobs that work through Tenants one at a time."""
+    return list(Tenant.objects.order_by("id").values_list("id", flat=True))
 
 
 def tenant_of(actor: Actor) -> Tenant:

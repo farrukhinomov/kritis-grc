@@ -48,6 +48,33 @@ services:
         condition: service_completed_successfully
     restart: unless-stopped
 
+  # Delivers domain events that failed right after their commit. A real deployment calls
+  # the same drain from a scheduler instead of keeping a process running.
+  outbox-worker:
+    build:
+      context: ./backend
+      additional_contexts:
+        seed: ./seed
+    command: ["python", "manage.py", "drain_outbox", "--loop", "--heartbeat-file", "/tmp/outbox-alive"]
+    environment:
+      <<: *backend-env
+      DATABASE_URL: postgres://grc_app:${APP_DB_PASSWORD}@postgres:5432/grc
+    # Alive while the loop keeps touching its heartbeat; a hung loop turns unhealthy.
+    healthcheck:
+      test:
+        [
+          "CMD", "python", "-c",
+          "import os, sys, time; sys.exit(time.time() - os.path.getmtime('/tmp/outbox-alive') > 60)",
+        ]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
   risk-engine:
     build: ./services/risk-engine
     environment:
