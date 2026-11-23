@@ -130,6 +130,11 @@ def tenant_ids() -> list[UUID]:
     return list(Tenant.objects.order_by("id").values_list("id", flat=True))
 
 
+def tenant_id_for(slug: str) -> UUID | None:
+    """The Tenant with this slug, for platform jobs started by name."""
+    return Tenant.objects.filter(slug=slug).values_list("id", flat=True).first()
+
+
 def tenant_of(actor: Actor) -> Tenant:
     return Tenant.objects.get(id=actor.tenant_id)
 

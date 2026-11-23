@@ -59,6 +59,9 @@ class AppSettings(BaseSettings):
     # The stateless service that calculates Residual Ratings. Unset outside production,
     # Risks stay "calculation pending" and their recalculation is retried.
     risk_engine_url: HttpUrl | None = None
+    # A cost guard: Mapping Suggestions may call the LLM at most this often per Tenant
+    # and day, however they are started.
+    mapping_suggestion_daily_calls: int = Field(default=20, ge=0)
 
     @field_validator("allowed_hosts", "csrf_trusted_origins", mode="before")
     @classmethod

@@ -269,3 +269,21 @@ class MappingSuggestion(TenantOwnedModel):
 
     def __str__(self) -> str:
         return f"{self.target_requirement_id} <- {self.source_requirement_id} ({self.status})"
+
+
+class ModelCall(TenantOwnedModel):
+    """One call to the LLM on behalf of a Tenant, counted against its daily cap.
+
+    Recorded before the call, so failed and timed-out calls count too: they cost money.
+    """
+
+    purpose = models.CharField(max_length=64)
+    called_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        indexes: ClassVar = [
+            models.Index(fields=["tenant", "called_at"], name="model_calls_by_day")
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.purpose} at {self.called_at}"

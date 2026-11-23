@@ -148,6 +148,7 @@ STORAGE = {
     ),
 }
 RISK_ENGINE_URL = str(env.risk_engine_url).rstrip("/") if env.risk_engine_url else None
+MAPPING_SUGGESTION_DAILY_CALLS = env.mapping_suggestion_daily_calls
 # Finds the caller's Membership for /api/v1/tenants/{tenant_slug}/… requests.
 GRC_ACTOR_RESOLVER = "grc.organization.selectors.resolve_actor"
 # Lists every Tenant, so the outbox drain can work through them one at a time.

@@ -1,8 +1,9 @@
+import anthropic
 from fastapi import FastAPI
 
 from risk_engine import problems
 from risk_engine.middleware import RequestContextMiddleware
-from risk_engine.routers import health, risk_scores
+from risk_engine.routers import health, mapping_suggestions, risk_scores
 from risk_engine.settings import Settings, load_settings
 
 VERSION = "0.1.0"
@@ -22,6 +23,8 @@ def create_app(settings: Settings) -> FastAPI:
     problems.install(app)
     app.include_router(health.router)
     app.include_router(risk_scores.router)
+    app.include_router(mapping_suggestions.router)
+    app.state.anthropic = _anthropic(settings)
     app.add_middleware(RequestContextMiddleware)
     return app
 
@@ -29,3 +32,15 @@ def create_app(settings: Settings) -> FastAPI:
 def create_app_from_env() -> FastAPI:
     """Factory for `uvicorn --factory --reload` in local development."""
     return create_app(load_settings())
+
+
+def _anthropic(settings: Settings) -> anthropic.Anthropic | None:
+    if settings.anthropic_api_key is None:
+        return None
+    # The caller waits for the answer, so a stuck call must end; the SDK retries
+    # connection errors, 429 and 5xx with backoff on its own.
+    return anthropic.Anthropic(
+        api_key=settings.anthropic_api_key.get_secret_value(),
+        timeout=anthropic.Timeout(120.0, connect=5.0),
+        max_retries=2,
+    )

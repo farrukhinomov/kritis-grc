@@ -80,6 +80,8 @@ services:
     build: ./services/risk-engine
     environment:
       APP_ENV: production
+      # Optional; without it Mapping Suggestions answer "unavailable".
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     restart: unless-stopped
 
   storage:
