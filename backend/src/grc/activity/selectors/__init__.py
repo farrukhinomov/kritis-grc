@@ -24,6 +24,7 @@ OBJECT_TYPES = {
     "compliance.Implementation": "implementation",
     "compliance.Evidence": "evidence",
     "compliance.TenantMapping": "mapping",
+    "compliance.MappingSuggestion": "mapping_suggestion",
     "organization.Scope": "scope",
     "risk.Risk": "risk",
     "risk.RiskAssessment": "risk_assessment",
@@ -103,7 +104,7 @@ class _Names:
         if model == "compliance.Implementation":
             citation = self.citations.get(data["requirement_id"], data["requirement_id"])
             return f"{citation} · {self.scopes.get(data['scope_id'], '')}"
-        if model == "compliance.TenantMapping":
+        if model in ("compliance.TenantMapping", "compliance.MappingSuggestion"):
             target = self.citations.get(data["target_requirement_id"], "")
             return f"{target} ← {self.citations.get(data['source_requirement_id'], '')}"
         return str(data.get("title") or data.get("title_de") or data.get("name") or "")

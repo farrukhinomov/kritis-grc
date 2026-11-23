@@ -9,6 +9,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from grc.compliance.selectors import suggestions as suggestion_selectors
 from grc.core.actor import Permission
 from grc.core.api import TenantScopedAPIView, page_of, page_schema
 from grc.risk import selectors
@@ -276,12 +277,18 @@ class ApprovalsView(TenantScopedAPIView):
         operation_id="approvals_list",
         summary="Everything waiting for the caller's approval, oldest first",
         description=(
-            "Submitted Risk Assessments the caller didn't submit. Mapping Suggestions join "
-            "this list once they exist. Callers who can't approve get an empty list."
+            "Pending Mapping Suggestions (for Memberships covering the whole Tenant) and "
+            "submitted Risk Assessments the caller didn't submit. Callers who can't approve "
+            "get an empty list."
         ),
         responses=ApprovalsOut,
     )
     def get(self, request: Request, tenant_slug: str) -> Response:
         self.actor.require(Permission.VIEW)
-        items = assessment_selectors.awaiting_decision_by(self.actor)
+        # The oldest first, whichever module it comes from: what waited longest is next.
+        items = sorted(
+            suggestion_selectors.awaiting_decision_by(self.actor)
+            + assessment_selectors.awaiting_decision_by(self.actor),
+            key=lambda item: (item["submitted_at"], item["id"]),
+        )
         return Response({"items": items, "total": len(items)})

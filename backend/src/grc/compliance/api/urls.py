@@ -8,8 +8,24 @@ from grc.compliance.api.implementations import (
     ImplementationsView,
     ImplementationView,
 )
+from grc.compliance.api.suggestions import (
+    ApproveMappingSuggestionView,
+    MappingSuggestionsView,
+    RejectMappingSuggestionView,
+)
 
 urlpatterns = [
+    path("mapping-suggestions", MappingSuggestionsView.as_view(), name="mapping-suggestions"),
+    path(
+        "mapping-suggestions/<uuid:suggestion_id>/approve",
+        ApproveMappingSuggestionView.as_view(),
+        name="mapping-suggestion-approve",
+    ),
+    path(
+        "mapping-suggestions/<uuid:suggestion_id>/reject",
+        RejectMappingSuggestionView.as_view(),
+        name="mapping-suggestion-reject",
+    ),
     path("frameworks", FrameworksView.as_view(), name="frameworks"),
     path("requirements", RequirementsView.as_view(), name="requirements"),
     path("requirements/<str:requirement_id>", RequirementView.as_view(), name="requirement"),

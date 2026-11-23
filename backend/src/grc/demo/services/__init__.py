@@ -15,6 +15,7 @@ from grc.assets.services import load_assets
 from grc.compliance import services as compliance
 from grc.compliance.services.evidence import load_evidence
 from grc.compliance.services.implementations import load_implementations
+from grc.compliance.services.suggestions import load_mapping_suggestions
 from grc.core.ids import fixture_uuid
 from grc.core.tenancy import tenant_context
 from grc.organization import services as organization
@@ -50,6 +51,8 @@ def load_demo(seed_dir: Path) -> None:
             load_implementations(implementations, implementation_ids, scope_ids, users)
             evidence = read("evidence")
             load_evidence(evidence, _ids(tenant.slug, evidence), implementation_ids, users)
+            suggested = read("mapping-suggestions")
+            load_mapping_suggestions(suggested, _ids(tenant.slug, suggested), users)
             assets = read("assets")
             asset_ids = _ids(tenant.slug, assets)
             load_assets(assets, asset_ids, scope_ids)

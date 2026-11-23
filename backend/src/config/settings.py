@@ -221,6 +221,7 @@ SPECTACULAR_SETTINGS = {
         "RiskDimension": "grc.risk.models.Dimension",
         "HazardCategory": "grc.risk.models.HazardCategory",
         "RiskAssessmentStatus": "grc.risk.models.AssessmentStatus",
+        "SuggestionStatus": "grc.compliance.models.SuggestionStatus",
         "AssetKind": "grc.assets.models.AssetKind",
         "Criticality": "grc.assets.models.Criticality",
     },
