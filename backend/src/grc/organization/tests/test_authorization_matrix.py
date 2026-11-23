@@ -100,6 +100,7 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
         _row(UNAUTHENTICATED, OK, OK, NOT_FOUND, NOT_FOUND),
     ),
     ("GET", "/api/v1/tenants/{tenant_slug}/critical-services"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/deadlines"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/frameworks"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/requirements"): (None, READ),
     # The catalogue is empty in this test, so a member gets 404 and so does the outsider.
