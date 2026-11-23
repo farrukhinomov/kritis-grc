@@ -8,11 +8,14 @@ context table, which would have no Tenant and mix every Tenant's request metadat
 
 from collections.abc import Callable, Iterable, Iterator
 from contextlib import contextmanager
+from contextvars import ContextVar
 from typing import Any, TypeVar
 
 import pghistory
 
 M = TypeVar("M")
+
+_acting_user: ContextVar[int | None] = ContextVar("acting_user", default=None)
 
 
 def tracked(*, exclude: Iterable[str] = ()) -> Callable[[M], M]:
@@ -31,5 +34,14 @@ def tracked(*, exclude: Iterable[str] = ()) -> Callable[[M], M]:
 @contextmanager
 def acting(user_id: int, membership_id: Any) -> Iterator[None]:
     """Names who caused the writes of the current transaction."""
-    with pghistory.context(user=user_id, membership=str(membership_id)):
-        yield
+    token = _acting_user.set(user_id)
+    try:
+        with pghistory.context(user=user_id, membership=str(membership_id)):
+            yield
+    finally:
+        _acting_user.reset(token)
+
+
+def acting_user_id() -> int | None:
+    """The user named by `acting`, or None for writes without a person (seed, jobs)."""
+    return _acting_user.get()

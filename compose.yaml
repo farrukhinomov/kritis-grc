@@ -84,6 +84,24 @@ services:
       migrate:
         condition: service_completed_successfully
 
+  # Delivers domain events that failed right after their commit, as a scheduler would.
+  outbox-worker:
+    build:
+      context: ./backend
+      additional_contexts:
+        seed: ./seed
+    command: ["python", "manage.py", "drain_outbox", "--loop"]
+    environment:
+      <<: *backend-env
+      DATABASE_URL: postgres://grc_app:${APP_DB_PASSWORD}@postgres:5432/grc
+    volumes:
+      - ./backend/src:/app/src:ro
+    healthcheck:
+      disable: true
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
   risk-engine:
     build: ./services/risk-engine
     command:
