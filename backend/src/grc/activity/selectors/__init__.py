@@ -25,6 +25,7 @@ OBJECT_TYPES = {
     "compliance.Evidence": "evidence",
     "compliance.TenantMapping": "mapping",
     "organization.Scope": "scope",
+    "risk.Risk": "risk",
 }
 DEFAULT_LIMIT, MAX_LIMIT = 20, 100
 
@@ -102,7 +103,7 @@ class _Names:
         if model == "compliance.TenantMapping":
             target = self.citations.get(data["target_requirement_id"], "")
             return f"{target} ← {self.citations.get(data['source_requirement_id'], '')}"
-        return str(data.get("title") or data.get("name") or "")
+        return str(data.get("title") or data.get("title_de") or data.get("name") or "")
 
     def _change(self, field: str, before: Any, after: Any) -> dict[str, Any]:
         if field == "owner_id":

@@ -216,6 +216,11 @@ SPECTACULAR_SETTINGS = {
         "EvidenceKind": "grc.compliance.models.EvidenceKind",
         "ScopeKind": "grc.organization.models.ScopeKind",
         "MappingKind": [("platform", "platform"), ("tenant", "tenant")],
+        "RiskCategory": "grc.risk.models.RiskCategory",
+        "RiskDimension": "grc.risk.models.Dimension",
+        "HazardCategory": "grc.risk.models.HazardCategory",
+        "AssetKind": "grc.assets.models.AssetKind",
+        "Criticality": "grc.assets.models.Criticality",
     },
 }
 
