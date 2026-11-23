@@ -44,6 +44,7 @@ RUN APP_ENV=production \
     DATABASE_URL=postgres://build:build@localhost:5432/build \
     ALLOWED_HOSTS=build.invalid \
     CSRF_TRUSTED_ORIGINS=https://build.invalid \
+    RISK_ENGINE_URL=http://build.invalid \
     PYTHONPATH=/app/src \
     /app/.venv/bin/python manage.py collectstatic --noinput
 

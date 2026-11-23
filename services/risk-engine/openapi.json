@@ -1,0 +1,390 @@
+{
+  "components": {
+    "schemas": {
+      "BatchRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "risks": {
+            "items": {
+              "$ref": "#/components/schemas/RiskIn"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Risks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "risks"
+        ],
+        "title": "BatchRequest",
+        "type": "object"
+      },
+      "BatchResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "method_version": {
+            "title": "Method Version",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/RiskScoreOut"
+            },
+            "title": "Results",
+            "type": "array"
+          }
+        },
+        "required": [
+          "method_version",
+          "results"
+        ],
+        "title": "BatchResponse",
+        "type": "object"
+      },
+      "Dimension": {
+        "enum": [
+          "likelihood",
+          "impact"
+        ],
+        "title": "Dimension",
+        "type": "string"
+      },
+      "ExplanationOut": {
+        "additionalProperties": false,
+        "properties": {
+          "dimension": {
+            "$ref": "#/components/schemas/Dimension"
+          },
+          "implementation_id": {
+            "title": "Implementation Id",
+            "type": "string"
+          },
+          "implementation_status": {
+            "$ref": "#/components/schemas/ImplementationStatus"
+          },
+          "levels_applied": {
+            "title": "Levels Applied",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "implementation_id",
+          "dimension",
+          "implementation_status",
+          "levels_applied"
+        ],
+        "title": "ExplanationOut",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "ImplementationStatus": {
+        "enum": [
+          "open",
+          "partial",
+          "implemented",
+          "not_applicable"
+        ],
+        "title": "ImplementationStatus",
+        "type": "string"
+      },
+      "RatingIn": {
+        "additionalProperties": false,
+        "properties": {
+          "impact": {
+            "maximum": 4.0,
+            "minimum": 1.0,
+            "title": "Impact",
+            "type": "integer"
+          },
+          "likelihood": {
+            "maximum": 4.0,
+            "minimum": 1.0,
+            "title": "Likelihood",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "likelihood",
+          "impact"
+        ],
+        "title": "RatingIn",
+        "type": "object"
+      },
+      "RatingOut": {
+        "additionalProperties": false,
+        "properties": {
+          "impact": {
+            "title": "Impact",
+            "type": "integer"
+          },
+          "likelihood": {
+            "title": "Likelihood",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "likelihood",
+          "impact"
+        ],
+        "title": "RatingOut",
+        "type": "object"
+      },
+      "RiskCategory": {
+        "enum": [
+          "low",
+          "medium",
+          "high",
+          "critical"
+        ],
+        "title": "RiskCategory",
+        "type": "string"
+      },
+      "RiskIn": {
+        "additionalProperties": false,
+        "properties": {
+          "inherent": {
+            "$ref": "#/components/schemas/RatingIn"
+          },
+          "risk_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Risk Id",
+            "type": "string"
+          },
+          "treatments": {
+            "items": {
+              "$ref": "#/components/schemas/TreatmentIn"
+            },
+            "maxItems": 50,
+            "title": "Treatments",
+            "type": "array"
+          }
+        },
+        "required": [
+          "risk_id",
+          "inherent"
+        ],
+        "title": "RiskIn",
+        "type": "object"
+      },
+      "RiskScoreOut": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/RiskCategory"
+          },
+          "explanations": {
+            "items": {
+              "$ref": "#/components/schemas/ExplanationOut"
+            },
+            "title": "Explanations",
+            "type": "array"
+          },
+          "residual": {
+            "$ref": "#/components/schemas/RatingOut"
+          },
+          "risk_id": {
+            "title": "Risk Id",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "risk_id",
+          "residual",
+          "score",
+          "category",
+          "explanations"
+        ],
+        "title": "RiskScoreOut",
+        "type": "object"
+      },
+      "TreatmentIn": {
+        "additionalProperties": false,
+        "properties": {
+          "dimension": {
+            "$ref": "#/components/schemas/Dimension"
+          },
+          "implementation_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Implementation Id",
+            "type": "string"
+          },
+          "implementation_status": {
+            "$ref": "#/components/schemas/ImplementationStatus"
+          },
+          "levels": {
+            "maximum": 3.0,
+            "minimum": 1.0,
+            "title": "Levels",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "implementation_id",
+          "dimension",
+          "levels",
+          "implementation_status"
+        ],
+        "title": "TreatmentIn",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "GRC Risk Engine",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/health/live": {
+      "get": {
+        "operationId": "live_health_live_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Live Health Live Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Live",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "ready_health_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Ready Health Ready Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Ready",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/v1/risk-scores:batch": {
+      "post": {
+        "description": "Calculate the Residual Rating of every Risk in the batch.",
+        "operationId": "score_batch_v1_risk_scores_batch_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Score Batch",
+        "tags": [
+          "risk scores"
+        ]
+      }
+    }
+  }
+}

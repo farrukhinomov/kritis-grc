@@ -3,6 +3,8 @@
 from typing import Any
 from uuid import UUID
 
+from grc.core.outbox.services import publish
+from grc.risk.events import RiskRatingInputsChanged
 from grc.risk.models import Hazard, Risk, RiskAsset, Treatment
 
 
@@ -33,7 +35,8 @@ def load_risks(
     """Loads Risks with their Assets and Treatments into the active Tenant.
 
     Assets and Treatments are replaced, not merged, so the fixtures stay the single
-    source of truth. A Residual Rating is never loaded: only the risk engine sets it.
+    source of truth. A Residual Rating is never loaded: only the risk engine sets it, so
+    every loaded Risk is queued for (re)calculation, which waits for the engine if needed.
     """
     for row in rows:
         risk, _ = Risk.objects.update_or_create(
@@ -61,3 +64,4 @@ def load_risks(
                 levels=treatment["levels"],
                 position=position,
             )
+        publish(RiskRatingInputsChanged(risk_id=risk.id))

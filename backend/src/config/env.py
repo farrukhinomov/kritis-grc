@@ -12,6 +12,7 @@ from typing import Annotated, Literal, Self
 from django.core.exceptions import ImproperlyConfigured
 from pydantic import (
     Field,
+    HttpUrl,
     PostgresDsn,
     SecretStr,
     ValidationError,
@@ -55,6 +56,9 @@ class AppSettings(BaseSettings):
     storage_region: str = "auto"
     storage_access_key_id: SecretStr | None = None
     storage_secret_access_key: SecretStr | None = None
+    # The stateless service that calculates Residual Ratings. Unset outside production,
+    # Risks stay "calculation pending" and their recalculation is retried.
+    risk_engine_url: HttpUrl | None = None
 
     @field_validator("allowed_hosts", "csrf_trusted_origins", mode="before")
     @classmethod
@@ -70,7 +74,7 @@ class AppSettings(BaseSettings):
         if self.app_env is Environment.PRODUCTION:
             missing = [
                 name
-                for name in ("allowed_hosts", "csrf_trusted_origins")
+                for name in ("allowed_hosts", "csrf_trusted_origins", "risk_engine_url")
                 if not getattr(self, name)
             ]
             if missing:

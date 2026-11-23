@@ -147,6 +147,7 @@ STORAGE = {
         env.storage_secret_access_key.get_secret_value() if env.storage_secret_access_key else None
     ),
 }
+RISK_ENGINE_URL = str(env.risk_engine_url).rstrip("/") if env.risk_engine_url else None
 # Finds the caller's Membership for /api/v1/tenants/{tenant_slug}/… requests.
 GRC_ACTOR_RESOLVER = "grc.organization.selectors.resolve_actor"
 # Lists every Tenant, so the outbox drain can work through them one at a time.

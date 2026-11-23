@@ -119,8 +119,11 @@ def _run_next(tenant_id: UUID, delivery_id: UUID | None = None) -> bool:
         )
         if delivery is None:
             return False
+        # Right after commit the publishing request's IDs still apply; in the drain,
+        # a fresh request ID joins the publisher's trace.
+        current = request_context.current_request_id()
         tokens = request_context.bind(
-            request_context.resolve_request_id(None),
+            current if current != "-" else request_context.resolve_request_id(None),
             delivery.event.trace_id or request_context.resolve_trace_id(None),
         )
         try:

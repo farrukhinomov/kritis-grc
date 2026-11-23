@@ -14,6 +14,7 @@ dependencies = [
     "djangorestframework>=3.18.3",
     "drf-spectacular>=0.30.0",
     "gunicorn>=26.2.0",
+    "httpx>=0.28.1",
     "psycopg[binary]>=3.3.6",
     "pydantic-settings>=2.16.1",
     "python-json-logger>=4.2.0",
@@ -30,12 +31,14 @@ dev = [
     "django-stubs[compatible-mypy]>=6.1.2",
     "djangorestframework-stubs>=3.18.1",
     "import-linter>=2.15",
+    "jsonschema>=4.26",
     "mypy>=2.4.0",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
     "pytest-django>=4.14.0",
     "pytest-env>=1.8.1",
     "ruff>=0.17.2",
+    "types-jsonschema>=4.26.0.20261006",
 ]
 
 [tool.pytest.ini_options]

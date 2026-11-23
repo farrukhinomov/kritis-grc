@@ -46,6 +46,7 @@ def test_production_settings_pass_djangos_deployment_checks() -> None:
         "DATABASE_URL": "postgres://app:pw@db.example.internal:6543/grc",
         "ALLOWED_HOSTS": "grc.example.com",
         "CSRF_TRUSTED_ORIGINS": "https://grc.example.com",
+        "RISK_ENGINE_URL": "https://risk-engine.example.internal",
     }
     result = subprocess.run(
         [sys.executable, "manage.py", "check", "--deploy", "--fail-level", "WARNING"],
@@ -59,13 +60,15 @@ def test_production_settings_pass_djangos_deployment_checks() -> None:
     assert result.returncode == 0, result.stderr + result.stdout
 
 
-def test_production_requires_hosts_and_trusted_origins(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_production_requires_hosts_trusted_origins_and_the_risk_engine(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("APP_ENV", "production")
-    monkeypatch.delenv("ALLOWED_HOSTS", raising=False)
-    monkeypatch.delenv("CSRF_TRUSTED_ORIGINS", raising=False)
+    for name in ("ALLOWED_HOSTS", "CSRF_TRUSTED_ORIGINS", "RISK_ENGINE_URL"):
+        monkeypatch.delenv(name, raising=False)
 
     with pytest.raises(ImproperlyConfigured) as excinfo:
         load_settings(env_file=None)
 
-    assert "ALLOWED_HOSTS" in str(excinfo.value)
-    assert "CSRF_TRUSTED_ORIGINS" in str(excinfo.value)
+    for name in ("ALLOWED_HOSTS", "CSRF_TRUSTED_ORIGINS", "RISK_ENGINE_URL"):
+        assert name in str(excinfo.value)

@@ -165,3 +165,11 @@ def present_evidence(evidence: Evidence) -> dict[str, Any]:
         "added_by_id": str(evidence.added_by_id) if evidence.added_by_id else None,
         "added_at": evidence.added_at.isoformat().replace("+00:00", "Z"),
     }
+
+
+def implementation_statuses(ids: set[UUID]) -> dict[UUID, str]:
+    """The current status of each of the active Tenant's Implementations among `ids`.
+
+    For recalculations that run for the Tenant as a whole, not for a person.
+    """
+    return dict(Implementation.objects.filter(id__in=ids).values_list("id", "status"))

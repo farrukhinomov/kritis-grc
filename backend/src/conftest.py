@@ -1,6 +1,6 @@
 """Fixtures shared by every module's tests."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from typing import Any
 
 import pytest
@@ -51,3 +51,27 @@ def as_application_role(db: None) -> Callable[[], None]:
             cursor.execute(f"SET LOCAL ROLE {RLS_PROBE_ROLE}")
 
     return switch
+
+
+@pytest.fixture(autouse=True)
+def _no_risk_engine(settings: Any) -> Iterator[None]:
+    # Tests never reach a real risk engine; without the fake below, none is configured
+    # and Residual Ratings stay pending, as they would with the engine down.
+    from grc.risk import engine
+
+    settings.RISK_ENGINE_URL = None
+    engine.reset_breaker()
+    yield
+    engine.reset_breaker()
+
+
+@pytest.fixture
+def risk_engine(settings: Any, monkeypatch: pytest.MonkeyPatch) -> Any:
+    """A risk engine held to its published contract; set `.down = True` to fail it."""
+    from grc.risk import engine
+    from grc.risk.testing import FakeRiskEngine
+
+    fake = FakeRiskEngine()
+    settings.RISK_ENGINE_URL = "http://risk-engine.test"
+    monkeypatch.setattr(engine, "_transport", fake.transport)
+    return fake
