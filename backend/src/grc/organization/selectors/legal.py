@@ -79,6 +79,39 @@ class Facility:
     assessed_on: date | None = None
 
 
+# Once a facility counts as critical, the operator has three months to register it.
+REGISTRATION_WITHIN_MONTHS = 3
+
+
+def check_applicability(
+    definition: CriticalServiceDefinition, people_supplied: int
+) -> dict[str, Any]:
+    """Whether a facility providing this Critical Service is a critical facility.
+
+    Reaching the threshold counts, as under the IT security ordinance's thresholds;
+    whether the KRITIS ordinance words it the same way is open while it is a draft, and
+    this is where to change it once it is in force. A threshold that is only the
+    statute's default binds no one yet: until the ordinance applies, nobody must register.
+    """
+    binding = definition.threshold_basis == "ordinance"
+    return {
+        "sector": definition.sector,
+        "critical_service": definition.critical_service,
+        "people_supplied": people_supplied,
+        "applies": people_supplied >= definition.threshold,
+        "threshold": definition.threshold,
+        "threshold_basis": definition.threshold_basis,
+        "binding": binding,
+        "not_binding_reason": None if binding else "ordinance_pending",
+        "registration_within_months": REGISTRATION_WITHIN_MONTHS,
+        "citations": {
+            "definition": "§ 2 Nr. 3",
+            "threshold": definition.citation,
+            "registration": "§ 8 Abs. 1",
+        },
+    }
+
+
 def service_for(sector: str, critical_service: str) -> CriticalServiceDefinition | None:
     return next(
         (
