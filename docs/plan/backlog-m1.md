@@ -80,7 +80,7 @@ As a GRC Manager, I want to change an Implementation's status safely, so that tw
 
 As a GRC Manager, I want to attach a document, a link or a reference to another Implementation, so that one piece of work counts as proof for several Frameworks.
 
-- [ ] Evidence of kind File, Link or Reference. A Reference must point to an Implementation in the same Scope.
+- [ ] Evidence of kind File, Link or Reference. A Reference must point to another Implementation of the same Tenant.
 - [ ] Files go through a storage adapter that speaks the S3 API: SeaweedFS locally, R2 later, with no vendor SDK outside the adapter. `POST uploads` returns a presigned PUT, limited in size and content type; the file key is scoped by Tenant.
 - [ ] `implementations/:id/evidence` list, create and delete.
 - [ ] Step 3 of the v1 flow works in the compose stack.
