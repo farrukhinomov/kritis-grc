@@ -188,6 +188,7 @@ Every check below is required before merging into `main`.
 - Security and licensing:
   - Scanners: osv-scanner (lockfiles), Trivy (images), gitleaks (full git history), CodeQL with `security-extended` (while the repo is public), Dependabot with a 7-day cooldown. High/critical fixable findings block merges.
   - A finding is ignored only in `.trivyignore`, only when it cannot be exploited in our configuration and no fixed version is installable, with that reason next to it and an expiry of at most 7 days.
+  - A false positive of the secret scanner in third-party code is allowed only in `trivy-secret.yaml`, by the path of that package's files alone, with the reason next to it and the maintainer's approval. Today that covers placeholder JSON in the Anthropic SDK's docstrings.
   - Scanners run as digest-pinned containers, not through third-party actions. Actions are pinned to commit SHAs, workflows have `permissions: {}` by default, and checkout never persists credentials. `actionlint` and `zizmor` check the workflows themselves.
   - A license check enforces ADR 0016 against `.github/license-policy.json` for runtime dependencies only.
   - Runtime images ship without pip and get OS security patches at build time.
