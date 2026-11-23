@@ -2,7 +2,9 @@
 
 # Base images are pinned by digest so builds are reproducible and updates deliberate.
 ARG NODE_IMAGE=node:24-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53
-ARG NGINX_IMAGE=nginxinc/nginx-unprivileged:1.30-alpine@sha256:f5116ed4606f3eb015dd4a8e28cb9b351476dc0ad4bc6e9f93b19cec130cdf03
+# nginx follows the mainline branch: it gets every fix first, while the stable branch only
+# receives the ones its maintainers backport, and its images lagged weeks behind on CVEs.
+ARG NGINX_IMAGE=nginxinc/nginx-unprivileged:1.31-alpine@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e
 
 FROM ${NODE_IMAGE} AS build
 # pnpm's exact version comes from the packageManager field in package.json.
