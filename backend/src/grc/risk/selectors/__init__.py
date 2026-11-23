@@ -176,3 +176,16 @@ def _residual(risk: Risk) -> dict[str, Any] | None:
         "method_version": risk.method_version,
         "explanation": risk.residual_explanation,
     }
+
+
+def search_risks(actor: Actor, query: str, *, limit: int) -> tuple[list[dict[str, Any]], int]:
+    """The actor's Risks whose title holds the query, ignoring case and accents."""
+    found = (
+        Risk.objects.filter(title_de__unaccent__icontains=query)
+        .filter(**({} if actor.scope_ids is None else {"scope_id__in": actor.scope_ids}))
+        .order_by("title_de", "id")
+    )
+    return [
+        {"id": str(risk_id), "title_de": title, "scope_name": scope_name}
+        for risk_id, title, scope_name in found.values_list("id", "title_de", "scope__name")[:limit]
+    ], found.count()

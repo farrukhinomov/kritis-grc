@@ -101,6 +101,10 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
     ),
     ("GET", "/api/v1/tenants/{tenant_slug}/critical-services"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/deadlines"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/search"): (
+        None,
+        _row(UNAUTHENTICATED, BAD_REQUEST, BAD_REQUEST, BAD_REQUEST, NOT_FOUND),
+    ),
     # Without its required parameters: members get 400 after the role check.
     ("GET", "/api/v1/tenants/{tenant_slug}/applicability-check"): (
         None,
