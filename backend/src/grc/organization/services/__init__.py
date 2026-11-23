@@ -22,9 +22,13 @@ from rest_framework import status
 
 from grc.core.actor import Actor, Permission
 from grc.core.problems import FieldProblem, Problem
+from grc.core.purge import purge_rows
 from grc.core.tenancy import tenant_context
 from grc.organization.models import (
+    ApiToken,
+    IdempotencyRecord,
     Membership,
+    MembershipScope,
     RegistrationStatus,
     Role,
     Scope,
@@ -201,3 +205,20 @@ def _too_many_attempts() -> Problem:
         "too_many_requests",
         "Too many attempts. Try again later.",
     )
+
+
+def purge_tenant_data() -> int:
+    """Removes the active Tenant's Scopes and their access settings, for the Demo Tenant
+    reset. Memberships and people stay: loading the Demo Tenant updates them."""
+    return purge_rows([ApiToken, IdempotencyRecord, MembershipScope, Scope])
+
+
+def end_demo_sessions() -> None:
+    """Signs every visitor out of the demo accounts.
+
+    A session stays valid only while its account's password hash is unchanged, so a new
+    unusable password ends them all at once, wherever they are stored.
+    """
+    for user in User.objects.filter(is_demo_account=True):
+        user.set_unusable_password()
+        user.save(update_fields=["password"])
