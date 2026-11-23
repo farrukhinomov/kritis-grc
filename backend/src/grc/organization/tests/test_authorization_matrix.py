@@ -152,6 +152,7 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
     ("GET", "/api/v1/tenants/{tenant_slug}/risk-matrix"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/risk-assessments"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/mapping-suggestions"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/coverage-matrix"): (None, READ),
     # Mappings apply to the whole Tenant: the Scope-limited manager can't decide them.
     ("POST", "/api/v1/tenants/{tenant_slug}/mapping-suggestions/{suggestion_id}/approve"): (
         None,
