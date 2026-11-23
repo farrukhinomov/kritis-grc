@@ -18,6 +18,7 @@ from grc.compliance.models import (
 from grc.core.actor import Actor
 from grc.core.ids import uuid_or_none
 from grc.core.problems import Problem
+from grc.core.text import compact, fold
 
 ORDERINGS = {
     "due_date": ("due_date",),
@@ -173,3 +174,55 @@ def implementation_statuses(ids: set[UUID]) -> dict[UUID, str]:
     For recalculations that run for the Tenant as a whole, not for a person.
     """
     return dict(Implementation.objects.filter(id__in=ids).values_list("id", "status"))
+
+
+def search_requirements(
+    actor: Actor, query: str, *, limit: int
+) -> tuple[list[dict[str, Any]], int]:
+    """Requirements the actor's Scopes apply, best match first, with where to open each.
+
+    Only applied Requirements are found, so every hit opens somewhere in the cockpit,
+    preferably at a Critical Facility, which the cockpit lists first. A citation match
+    ranks before a title match, a title match before one in the statute text; a query
+    without a digit is never taken for a citation, or "§." would match every one.
+    """
+    needle, citation = fold(query), compact(query)
+    citation_needle = citation if any(c.isdigit() for c in citation) else None
+    applying: dict[str, tuple[bool, UUID]] = {}
+    for requirement_id, scope_id, kind in implementations(actor).values_list(
+        "requirement_id", "scope_id", "scope__kind"
+    ):
+        facility = kind == "critical_facility"
+        if requirement_id not in applying or (facility and not applying[requirement_id][0]):
+            applying[requirement_id] = (facility, scope_id)
+    ranked: list[tuple[int, int, dict[str, Any]]] = []
+    for requirement in Requirement.objects.filter(id__in=applying).select_related(
+        "framework_version__framework"
+    ):
+        if citation_needle is not None and citation_needle in compact(requirement.citation):
+            rank = 0
+        elif needle in fold(f"{requirement.title_de} {requirement.title_en}"):
+            rank = 1
+        elif needle in fold(f"{requirement.text_de} {requirement.summary_en}"):
+            rank = 2
+        else:
+            continue
+        framework = requirement.framework_version.framework
+        ranked.append(
+            (
+                rank,
+                requirement.position,
+                {
+                    "id": requirement.id,
+                    "citation": requirement.citation,
+                    "title_de": requirement.title_de,
+                    "title_en": requirement.title_en,
+                    "framework_id": framework.id,
+                    "framework_name": framework.name,
+                    "paragraph": requirement.paragraph,
+                    "scope_id": str(applying[requirement.id][1]),
+                },
+            )
+        )
+    ranked.sort(key=lambda hit: (hit[0], hit[1]))
+    return [hit for _, _, hit in ranked[:limit]], len(ranked)

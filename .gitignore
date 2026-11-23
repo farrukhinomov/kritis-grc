@@ -51,3 +51,4 @@ Thumbs.db
 
 # Local link to a Vercel project
 .vercel
+scripts/demo/out/

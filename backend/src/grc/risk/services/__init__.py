@@ -4,8 +4,16 @@ from typing import Any
 from uuid import UUID
 
 from grc.core.outbox.services import publish
+from grc.core.purge import purge_rows
 from grc.risk.events import RiskRatingInputsChanged
-from grc.risk.models import Hazard, Risk, RiskAsset, Treatment
+from grc.risk.models import (
+    Hazard,
+    Risk,
+    RiskAssessment,
+    RiskAssessmentRisk,
+    RiskAsset,
+    Treatment,
+)
 
 
 def load_hazards(rows: list[dict[str, Any]], ids: dict[str, UUID]) -> None:
@@ -65,3 +73,8 @@ def load_risks(
                 position=position,
             )
         publish(RiskRatingInputsChanged(risk_id=risk.id))
+
+
+def purge_tenant_data() -> int:
+    """Removes the active Tenant's Risks and their catalogue, for the Demo Tenant reset."""
+    return purge_rows([RiskAssessmentRisk, RiskAssessment, Treatment, RiskAsset, Risk, Hazard])

@@ -4,6 +4,7 @@ from typing import Any
 from uuid import UUID
 
 from grc.assets.models import Asset, AssetDependency
+from grc.core.purge import purge_rows
 
 
 def load_assets(
@@ -29,3 +30,8 @@ def load_assets(
     for row in rows:
         for needed in row.get("depends_on", []):
             AssetDependency.objects.create(asset_id=ids[row["id"]], depends_on_id=ids[needed])
+
+
+def purge_tenant_data() -> int:
+    """Removes the active Tenant's Assets, for the Demo Tenant reset."""
+    return purge_rows([AssetDependency, Asset])

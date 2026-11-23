@@ -29,7 +29,7 @@ Risk engine (run in `services/risk-engine/`, details in [its README](services/ri
 ```bash
 uv run pytest
 uv run ruff check . && uv run ruff format --check .
-uv run mypy src tests
+uv run mypy src tests evals
 ```
 
 Frontend (run in `frontend/`, details in [its README](frontend/README.md)):

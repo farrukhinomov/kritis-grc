@@ -2,7 +2,9 @@ from django.urls import path
 
 from grc.organization.api import DemoLoginView, LoginView, LogoutView, MeView
 from grc.organization.api.deadlines import DeadlinesView
+from grc.organization.api.search import SearchView
 from grc.organization.api.tenants import (
+    ApplicabilityCheckView,
     CriticalServicesView,
     MembersView,
     ScopesView,
@@ -27,6 +29,12 @@ urlpatterns = [
         name="api-token",
     ),
     path("tenants/<slug:tenant_slug>/deadlines", DeadlinesView.as_view(), name="deadlines"),
+    path("tenants/<slug:tenant_slug>/search", SearchView.as_view(), name="search"),
+    path(
+        "tenants/<slug:tenant_slug>/applicability-check",
+        ApplicabilityCheckView.as_view(),
+        name="applicability-check",
+    ),
     path(
         "tenants/<slug:tenant_slug>/critical-services",
         CriticalServicesView.as_view(),

@@ -101,6 +101,15 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
     ),
     ("GET", "/api/v1/tenants/{tenant_slug}/critical-services"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/deadlines"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/search"): (
+        None,
+        _row(UNAUTHENTICATED, BAD_REQUEST, BAD_REQUEST, BAD_REQUEST, NOT_FOUND),
+    ),
+    # Without its required parameters: members get 400 after the role check.
+    ("GET", "/api/v1/tenants/{tenant_slug}/applicability-check"): (
+        None,
+        _row(UNAUTHENTICATED, BAD_REQUEST, BAD_REQUEST, BAD_REQUEST, NOT_FOUND),
+    ),
     ("GET", "/api/v1/tenants/{tenant_slug}/frameworks"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/requirements"): (None, READ),
     # The catalogue is empty in this test, so a member gets 404 and so does the outsider.
@@ -139,9 +148,24 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
     ("GET", "/api/v1/tenants/{tenant_slug}/activity"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/assets"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/hazards"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/dependency-graph"): (
+        None,
+        _row(UNAUTHENTICATED, BAD_REQUEST, BAD_REQUEST, BAD_REQUEST, NOT_FOUND),
+    ),
     ("GET", "/api/v1/tenants/{tenant_slug}/risks"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/risk-matrix"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/risk-assessments"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/mapping-suggestions"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/coverage-matrix"): (None, READ),
+    # Mappings apply to the whole Tenant: the Scope-limited manager can't decide them.
+    ("POST", "/api/v1/tenants/{tenant_slug}/mapping-suggestions/{suggestion_id}/approve"): (
+        None,
+        _row(UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, FORBIDDEN, NOT_FOUND),
+    ),
+    ("POST", "/api/v1/tenants/{tenant_slug}/mapping-suggestions/{suggestion_id}/reject"): (
+        None,
+        _row(UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, FORBIDDEN, NOT_FOUND),
+    ),
     # Readable by every member; what it lists depends on who may approve.
     ("GET", "/api/v1/tenants/{tenant_slug}/approvals"): (None, READ),
     # No assessment exists here: deciding needs approval rights, then finds nothing.
@@ -254,6 +278,7 @@ def test_operation_answers_each_actor_as_expected(
         .replace("{token_id}", str(OTHER_SCOPE))
         .replace("{risk_id}", str(OTHER_SCOPE))
         .replace("{assessment_id}", str(OTHER_SCOPE))
+        .replace("{suggestion_id}", str(OTHER_SCOPE))
     )
 
     actual = {}

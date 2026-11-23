@@ -22,7 +22,7 @@ from grc.organization.selectors import (
     scopes,
     tenant_of,
 )
-from grc.organization.selectors.legal import CRITICAL_SERVICES
+from grc.organization.selectors.legal import CRITICAL_SERVICES, check_applicability, service_for
 from grc.organization.services.idempotency import once
 
 TenantSchema = inline_serializer(
@@ -209,3 +209,51 @@ class CriticalServicesView(TenantScopedAPIView):
     def get(self, request: Request, tenant_slug: str) -> Response:
         self.actor.require(Permission.VIEW)
         return Response(page_of(request, [s.present() for s in CRITICAL_SERVICES]))
+
+
+class ApplicabilityCitationsOut(serializers.Serializer[Any]):
+    definition = serializers.CharField()
+    threshold = serializers.CharField()
+    registration = serializers.CharField()
+
+
+class ApplicabilityOut(serializers.Serializer[Any]):
+    sector = serializers.CharField()
+    critical_service = serializers.CharField()
+    people_supplied = serializers.IntegerField()
+    applies = serializers.BooleanField()
+    threshold = serializers.IntegerField()
+    threshold_basis = serializers.ChoiceField(choices=["statutory_default", "ordinance"])
+    binding = serializers.BooleanField(help_text="False while the thresholds ordinance is pending.")
+    not_binding_reason = serializers.ChoiceField(choices=["ordinance_pending"], allow_null=True)
+    registration_within_months = serializers.IntegerField()
+    citations = ApplicabilityCitationsOut()
+
+
+class ApplicabilityCheckView(TenantScopedAPIView):
+    @extend_schema(
+        operation_id="applicability_check_retrieve",
+        summary="Whether the KRITIS-Dachgesetz applies to a facility, and on what basis",
+        responses=ApplicabilityOut,
+        parameters=[
+            OpenApiParameter("sector", str, required=True, description="e.g. water"),
+            OpenApiParameter(
+                "critical_service", str, required=True, description="e.g. drinking_water_supply"
+            ),
+            OpenApiParameter(
+                "people_supplied", int, required=True, description="A whole number, 0 or more."
+            ),
+        ],
+    )
+    def get(self, request: Request, tenant_slug: str) -> Response:
+        self.actor.require(Permission.VIEW)
+        query = request.query_params
+        definition = service_for(query.get("sector", ""), query.get("critical_service", ""))
+        people = query.get("people_supplied", "")
+        if definition is None or not people.isdigit():
+            raise Problem(
+                status.HTTP_400_BAD_REQUEST,
+                "invalid_filter",
+                "Name a known Critical Service and a whole number.",
+            )
+        return Response(check_applicability(definition, int(people)))

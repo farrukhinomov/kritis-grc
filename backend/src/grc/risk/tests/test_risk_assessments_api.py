@@ -135,21 +135,23 @@ def test_the_database_enforces_four_eyes_too() -> None:
             assessment.save()
 
 
-def test_the_inbox_lists_what_the_caller_may_decide() -> None:
-    manager = _demo_client("grc_manager").get(f"{TENANT}/approvals").json()
-    author = _as("deniz.yilmaz@example.com").get(f"{TENANT}/approvals").json()
-    auditor = _demo_client("auditor").get(f"{TENANT}/approvals").json()
+def test_the_inbox_lists_the_assessments_the_caller_may_decide() -> None:
+    def assessments(client: Client) -> list[dict[str, Any]]:
+        items = client.get(f"{TENANT}/approvals").json()["items"]
+        return [item for item in items if item["kind"] == "risk_assessment"]
 
-    assert manager["total"] == 1
-    assert manager["items"][0] == {
+    manager = assessments(_demo_client("grc_manager"))
+
+    assert len(manager) == 1
+    assert manager[0] == {
         "kind": "risk_assessment",
         "id": _uuid(SUBMITTED),
         "title": "Risikobewertung Wasserwerk Nord 2026",
         "detail": "Wasserwerk Nord",
         "scope_id": _uuid("sc-nord"),
-        "submitted_by_name": manager["items"][0]["submitted_by_name"],
+        "submitted_by_name": manager[0]["submitted_by_name"],
         "submitted_at": "2026-10-21T14:05:00Z",
     }
     # Four eyes: the author's own submission never waits for the author.
-    assert author == {"items": [], "total": 0}
-    assert auditor == {"items": [], "total": 0}
+    assert assessments(_as("deniz.yilmaz@example.com")) == []
+    assert _demo_client("auditor").get(f"{TENANT}/approvals").json() == {"items": [], "total": 0}
