@@ -1,8 +1,11 @@
 """Hazards and Risks. Only this module writes these tables."""
 
+import functools
+import operator
 import uuid
 from typing import ClassVar
 
+import pghistory
 from django.db import models
 
 from grc.core.history import tracked
@@ -158,3 +161,104 @@ class Treatment(TenantOwnedModel):
 
     def __str__(self) -> str:
         return f"{self.implementation_id} lowers {self.dimension} of {self.risk_id}"
+
+
+class AssessmentStatus(models.TextChoices):
+    SUBMITTED = "submitted", "submitted"
+    APPROVED = "approved", "approved"
+    REJECTED = "rejected", "rejected"
+
+
+_DECIDED_FROM_SUBMITTED = {"old__status": AssessmentStatus.SUBMITTED}
+_EDITABLE = ("title_de", "summary_de", "assessed_on", "scope_id")
+
+
+# Who decided and when is the event's own actor and time, so those columns aren't copied.
+@tracked(
+    exclude=["decided_by", "decided_at"],
+    events=[
+        pghistory.InsertEvent("created"),
+        pghistory.UpdateEvent(
+            "approved",
+            condition=pghistory.Q(**_DECIDED_FROM_SUBMITTED, new__status=AssessmentStatus.APPROVED),
+        ),
+        pghistory.UpdateEvent(
+            "rejected",
+            condition=pghistory.Q(**_DECIDED_FROM_SUBMITTED, new__status=AssessmentStatus.REJECTED),
+        ),
+        # Any other change of what the assessment says, with its status unchanged.
+        pghistory.UpdateEvent(
+            "updated",
+            condition=pghistory.Q(old__status=pghistory.F("new__status"))
+            & functools.reduce(
+                operator.or_,
+                (
+                    pghistory.Q(**{f"old__{field}__df": pghistory.F(f"new__{field}")})
+                    for field in _EDITABLE
+                ),
+            ),
+        ),
+        pghistory.DeleteEvent("deleted"),
+    ],
+)
+class RiskAssessment(TenantOwnedModel):
+    """A dated review of all Risks of one Critical Facility, approved by a second person."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    scope = models.ForeignKey("organization.Scope", on_delete=models.CASCADE, related_name="+")
+    title_de = models.CharField(max_length=300)
+    assessed_on = models.DateField()
+    summary_de = models.TextField(blank=True)
+    status = models.CharField(
+        max_length=16, choices=AssessmentStatus.choices, default=AssessmentStatus.SUBMITTED
+    )
+    submitted_by = models.ForeignKey(
+        "organization.User", on_delete=models.PROTECT, related_name="+"
+    )
+    submitted_at = models.DateTimeField()
+    decided_by = models.ForeignKey(
+        "organization.User", on_delete=models.PROTECT, null=True, related_name="+"
+    )
+    decided_at = models.DateTimeField(null=True)
+    decision_note_de = models.TextField(blank=True)
+
+    class Meta:
+        constraints: ClassVar = [
+            # Decided exactly when it is no longer submitted.
+            models.CheckConstraint(
+                condition=(
+                    models.Q(status="submitted", decided_by__isnull=True, decided_at__isnull=True)
+                    | (
+                        ~models.Q(status="submitted")
+                        & models.Q(decided_by__isnull=False, decided_at__isnull=False)
+                    )
+                ),
+                name="risk_assessment_decided_when_not_submitted",
+            ),
+            # Four eyes, enforced by the database as well as by the service.
+            models.CheckConstraint(
+                condition=~models.Q(decided_by=models.F("submitted_by")),
+                name="risk_assessment_four_eyes",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return self.title_de
+
+
+class RiskAssessmentRisk(TenantOwnedModel):
+    """A Risk reviewed by a Risk Assessment, in the order the assessment lists them."""
+
+    assessment = models.ForeignKey(
+        RiskAssessment, on_delete=models.CASCADE, related_name="reviewed"
+    )
+    risk = models.ForeignKey(Risk, on_delete=models.CASCADE, related_name="+")
+    position = models.PositiveSmallIntegerField()
+
+    class Meta:
+        constraints: ClassVar = [
+            models.UniqueConstraint(fields=["assessment", "risk"], name="unique_assessed_risk"),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.assessment_id} reviews {self.risk_id}"
