@@ -14,6 +14,8 @@ from django.core.management import call_command
 from django.test import Client
 from pytest_django.fixtures import Settings
 
+from grc.core.ids import fixture_uuid
+
 pytestmark = pytest.mark.django_db
 
 TENANT = "/api/v1/tenants/muster-stadtwerke"
@@ -50,7 +52,8 @@ def _all(client: Client, path: str) -> list[dict[str, Any]]:
 
 def _snapshot(client: Client) -> tuple[Any, ...]:
     return tuple(
-        _all(client, path) for path in ("frameworks", "requirements", "mappings", "members")
+        _all(client, path)
+        for path in ("frameworks", "requirements", "mappings", "members", "assets", "hazards")
     )
 
 
@@ -143,3 +146,39 @@ def test_mappings_filter_by_target_and_source(auditor: Client) -> None:
 
     assert {m["target_requirement_id"] for m in to_twelve} == {"req-k-12-1"}
     assert {m["source_requirement_id"] for m in from_thirty} == {"req-b-30-2-1"}
+
+
+def _uuid(fixture_id: str) -> str:
+    return str(fixture_uuid("muster-stadtwerke", fixture_id))
+
+
+def test_assets_match_the_prototype_with_their_dependencies(auditor: Client) -> None:
+    expected = [
+        {
+            **asset,
+            "id": _uuid(asset["id"]),
+            "scope_id": _uuid(asset["scope_id"]),
+            "depends_on": sorted(_uuid(d) for d in asset["depends_on"]),
+        }
+        for asset in _fixture("assets")
+    ]
+    loaded = [{**a, "depends_on": sorted(a["depends_on"])} for a in _all(auditor, "assets")]
+
+    assert sorted(loaded, key=lambda a: a["id"]) == sorted(expected, key=lambda a: a["id"])
+    assert [a["name"] for a in loaded] == sorted(a["name"] for a in loaded)
+
+
+def test_assets_filter_by_scope(auditor: Client) -> None:
+    north = _all(auditor, f"assets?scope={_uuid('sc-nord')}")
+
+    assert {a["scope_id"] for a in north} == {_uuid("sc-nord")}
+    assert len(north) == sum(1 for a in _fixture("assets") if a["scope_id"] == "sc-nord")
+    assert _all(auditor, "assets?scope=not-a-uuid") == []
+
+
+def test_hazards_match_the_prototype(auditor: Client) -> None:
+    expected = [{**h, "id": _uuid(h["id"])} for h in _fixture("hazards")]
+
+    assert sorted(_all(auditor, "hazards"), key=lambda h: h["id"]) == sorted(
+        expected, key=lambda h: h["id"]
+    )

@@ -136,6 +136,8 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
     ),
     ("GET", "/api/v1/tenants/{tenant_slug}/compliance-summary"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/activity"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/assets"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/hazards"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/api-tokens"): (None, READ),
     # Every member may hold a read-only token, so the Auditor may create this one.
     ("POST", "/api/v1/tenants/{tenant_slug}/api-tokens"): (

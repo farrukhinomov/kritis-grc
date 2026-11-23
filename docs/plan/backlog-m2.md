@@ -32,8 +32,8 @@ As the platform operator, I want modules to react to each other's changes throug
 
 As a GRC Manager, I want the Assets of each Critical Facility and the Hazard catalogue, so that Risks name what is threatened and by what.
 
-- [ ] `Asset` (Scope, name, kind, criticality, description, dependencies on other Assets of the same Scope) and `Hazard` (category natural / technical / human-made, German and English name and description), both tenant-owned.
-- [ ] Endpoints `assets` (filter `scope`) and `hazards`. The seed loads both; the catalogue is marked as a sample.
+- [ ] `Asset` (Scope, name, kind, criticality, description, dependencies on other Assets of the Tenant, across Scopes) and `Hazard` (category natural / technical / human-made, German and English name and description), both tenant-owned.
+- [ ] Endpoints `assets` (filter `scope`) and `hazards`. The seed loads both.
 
 ### M2-03 Risks and the risk matrix
 **Labels:** `module:risk`, `type:feature`, `prio:must` · **Estimate:** 3 h · **Depends on:** M2-02, M1-06
