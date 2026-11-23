@@ -52,10 +52,22 @@ class Suggestion:
 
 
 @dataclass(frozen=True, slots=True)
+class Usage:
+    input_tokens: int
+    cache_creation_input_tokens: int
+    cache_read_input_tokens: int
+    output_tokens: int
+
+
+@dataclass(frozen=True, slots=True)
 class Result:
+    # The model that answered, which a refusal fallback can make differ from MODEL.
     model: str
     prompt_version: str
     suggestions: list[Suggestion]
+    usage: Usage
+    # Answers as the model gave them, before the checks; for the eval's transcripts.
+    raw_matches: list[dict[str, object]]
 
 
 class ModelUnavailableError(RuntimeError):
@@ -117,6 +129,13 @@ def suggest(
         model=response.model,
         prompt_version=PROMPT_VERSION,
         suggestions=_checked(answer, target, candidates),
+        usage=Usage(
+            input_tokens=usage.input_tokens,
+            cache_creation_input_tokens=usage.cache_creation_input_tokens or 0,
+            cache_read_input_tokens=usage.cache_read_input_tokens or 0,
+            output_tokens=usage.output_tokens,
+        ),
+        raw_matches=[m.model_dump() for m in answer.matches],
     )
 
 

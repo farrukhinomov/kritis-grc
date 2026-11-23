@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "about": "Positives are the curated Platform Mappings (seed/mappings.json, kind platform), each with its legal justification. Negatives are pairs whose duties share no concrete obligation; a suggestion for one is a false positive. Pairs in neither list are unlabelled and reviewed by hand, so an incomplete gold set never counts a correct suggestion as wrong.",
+  "positives": [
+    {"target": "req-k-8-1", "source": "req-b-33-1", "coverage": "partial"},
+    {"target": "req-k-12-1", "source": "req-b-30-2-1", "coverage": "partial"},
+    {"target": "req-k-13-3-4", "source": "req-b-30-2-3", "coverage": "partial"},
+    {"target": "req-k-13-3-5", "source": "req-b-30-2-9", "coverage": "partial"},
+    {"target": "req-k-13-3-6", "source": "req-b-30-2-7", "coverage": "partial"},
+    {"target": "req-k-16-3", "source": "req-b-39-1", "coverage": "partial"},
+    {"target": "req-k-18-1", "source": "req-b-32-1", "coverage": "partial"}
+  ],
+  "negatives": [
+    {"target": "req-k-8-1", "source": "req-b-30-2-8", "why": "Registration of a facility vs. use of cryptography."},
+    {"target": "req-k-8-6", "source": "req-b-30-2-8", "why": "Updating registration data vs. use of cryptography."},
+    {"target": "req-k-12-1", "source": "req-b-32-1", "why": "Risk analysis before an incident vs. reporting an incident."},
+    {"target": "req-k-13-3-1", "source": "req-b-30-2-8", "why": "Emergency preparedness vs. use of cryptography."},
+    {"target": "req-k-13-3-2", "source": "req-b-30-2-8", "why": "Physical protection of sites vs. use of cryptography."},
+    {"target": "req-k-13-3-6", "source": "req-b-30-2-8", "why": "Training staff vs. use of cryptography."},
+    {"target": "req-k-13-4", "source": "req-b-33-1", "why": "Keeping a resilience plan vs. registering with the BSI."},
+    {"target": "req-k-16-2", "source": "req-b-30-2-10", "why": "Proving compliance on request vs. multi-factor authentication."},
+    {"target": "req-k-18-2", "source": "req-b-30-2-5", "why": "Content of incident reports vs. security in acquiring and maintaining systems."},
+    {"target": "req-k-20-1", "source": "req-b-30-2-10", "why": "Management's duty to implement vs. multi-factor authentication."}
+  ]
+}

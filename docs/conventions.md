@@ -165,6 +165,10 @@ See [ADR 0017](adr/0017-http-standard-responses-no-envelope.md), [ADR 0018](adr/
   - A refused or cut-off answer is never used (502 `model_declined`). An unconfigured key, rate limit or overload answers 503 with `Retry-After`.
   - `manage.py suggest_mappings <tenant>` asks once per KRITIS-DachG Requirement without a Mapping or suggestion. Each call is counted before it is made against `MAPPING_SUGGESTION_DAILY_CALLS` (default 20 per Tenant and day). Calls run outside database transactions.
 - Evaluation: a gold set built from the Platform Mappings plus known non-overlaps. Precision and recall are measured per coverage level. It runs on prompt changes, not on every PR, and the latest results go in the README.
+  - `services/risk-engine/evals/`: `gold.json` (versioned), `grading.py` (pure, tested offline with an oracle and a null model) and `run.py`. `run.py` calls the service's own `suggest()` with the production prompt, prints a cost estimate and asks before spending.
+  - A suggestion is a true positive (curated Mapping), a false positive (known non-overlap) or unlabelled (in neither). Unlabelled ones are reviewed by hand and never counted as wrong, so an incomplete gold set can't punish a correct answer. Precision is over labelled pairs; recall is over the curated Mappings.
+  - Refusals, cut-off answers and answers from a fallback model are counted as outcomes of their own, never as scores. Plumbing errors go to `errors.jsonl`. Several runs per case; the summary reports mean, min and max.
+  - The `eval` workflow runs on pushes to `main` that touch the prompt, the checks or the gold set, and on demand, with `ANTHROPIC_API_KEY` from the `eval` environment. Never on pull requests.
 - Development with AI:
   - [CLAUDE.md](../CLAUDE.md) is the source of truth. `AGENTS.md`, `.github/copilot-instructions.md` and `.cursor/rules/project.mdc` (Cursor's current format, replacing the deprecated `.cursorrules`) are generated from it.
   - Every PR gets an AI review step.
