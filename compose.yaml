@@ -11,6 +11,7 @@ x-backend-env: &backend-env
   CSRF_TRUSTED_ORIGINS: http://localhost:5173
   # Both local stacks run the demo, so its one-click logins are on.
   DEMO_LOGIN_ENABLED: "true"
+  RISK_ENGINE_URL: http://risk-engine:8080
 
 services:
   postgres:

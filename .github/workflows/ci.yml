@@ -50,6 +50,8 @@ jobs:
             backend:
               - *shared
               - backend/**
+              # The risk engine's contract, which the backend's tests hold it to.
+              - services/risk-engine/openapi.json
             risk-engine:
               - *shared
               - services/risk-engine/**
@@ -155,8 +157,12 @@ jobs:
       - run: uv run pytest
       - name: Runtime dependency licenses
         run: uv run python ../../scripts/check_python_licenses.py
-      - name: Export the OpenAPI schema
-        run: uv run python -m risk_engine.export_openapi openapi.json
+      # The committed schema is the contract the backend is tested against, so it must
+      # match what the code serves.
+      - name: The committed OpenAPI schema matches the code
+        run: |
+          uv run python -m risk_engine.export_openapi openapi.json
+          git diff --exit-code -- openapi.json
         env:
           PYTHONPATH: src
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
