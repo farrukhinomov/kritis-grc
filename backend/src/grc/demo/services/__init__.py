@@ -18,7 +18,7 @@ from grc.compliance.services.implementations import load_implementations
 from grc.core.ids import fixture_uuid
 from grc.core.tenancy import tenant_context
 from grc.organization import services as organization
-from grc.risk.services import load_hazards
+from grc.risk.services import load_hazards, load_risks
 
 # The people behind the two demo logins, as the prototype's mock API also uses them.
 DEMO_ACCOUNTS = frozenset({"u-kramer", "u-wolff"})
@@ -50,9 +50,21 @@ def load_demo(seed_dir: Path) -> None:
             evidence = read("evidence")
             load_evidence(evidence, _ids(tenant.slug, evidence), implementation_ids, users)
             assets = read("assets")
-            load_assets(assets, _ids(tenant.slug, assets), scope_ids)
+            asset_ids = _ids(tenant.slug, assets)
+            load_assets(assets, asset_ids, scope_ids)
             hazards = read("hazards")
-            load_hazards(hazards, _ids(tenant.slug, hazards))
+            hazard_ids = _ids(tenant.slug, hazards)
+            load_hazards(hazards, hazard_ids)
+            risks = read("risks")
+            load_risks(
+                risks,
+                _ids(tenant.slug, risks),
+                scope_ids=scope_ids,
+                hazard_ids=hazard_ids,
+                asset_ids=asset_ids,
+                implementation_ids=implementation_ids,
+                user_ids=users,
+            )
 
 
 def _ids(tenant_slug: str, rows: list[dict[str, Any]]) -> dict[str, Any]:

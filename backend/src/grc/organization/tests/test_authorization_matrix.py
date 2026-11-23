@@ -138,6 +138,13 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
     ("GET", "/api/v1/tenants/{tenant_slug}/activity"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/assets"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/hazards"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/risks"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/risk-matrix"): (None, READ),
+    # No Risk exists here: members get 404 after the role check.
+    ("GET", "/api/v1/tenants/{tenant_slug}/risks/{risk_id}"): (
+        None,
+        _row(UNAUTHENTICATED, NOT_FOUND, NOT_FOUND, NOT_FOUND, NOT_FOUND),
+    ),
     ("GET", "/api/v1/tenants/{tenant_slug}/api-tokens"): (None, READ),
     # Every member may hold a read-only token, so the Auditor may create this one.
     ("POST", "/api/v1/tenants/{tenant_slug}/api-tokens"): (
@@ -232,6 +239,7 @@ def test_operation_answers_each_actor_as_expected(
         .replace("{implementation_id}", str(OTHER_SCOPE))
         .replace("{evidence_id}", str(OTHER_SCOPE))
         .replace("{token_id}", str(OTHER_SCOPE))
+        .replace("{risk_id}", str(OTHER_SCOPE))
     )
 
     actual = {}
