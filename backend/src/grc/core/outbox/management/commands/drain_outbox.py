@@ -1,6 +1,7 @@
 import logging
 import signal
 import threading
+from pathlib import Path
 from types import FrameType
 from typing import Any
 
@@ -19,6 +20,11 @@ class Command(BaseCommand):
         parser.add_argument("--loop", action="store_true", help="Keep draining until stopped.")
         parser.add_argument("--interval", type=float, default=5.0, help="Seconds between runs.")
         parser.add_argument("--limit", type=int, default=100, help="Deliveries per run.")
+        parser.add_argument(
+            "--heartbeat-file",
+            type=Path,
+            help="Touched after every run, so a health check can tell the loop is alive.",
+        )
         parser.add_argument(
             "--revive-dead",
             action="store_true",
@@ -40,6 +46,8 @@ class Command(BaseCommand):
             ran = drain(options["limit"])
             if ran:
                 logger.info("outbox drained", extra={"deliveries": ran})
+            if options["heartbeat_file"]:
+                options["heartbeat_file"].touch()
             if not options["loop"]:
                 return
             # Outside the request cycle nothing closes connections, and the pooler gives

@@ -55,13 +55,21 @@ services:
       context: ./backend
       additional_contexts:
         seed: ./seed
-    command: ["python", "manage.py", "drain_outbox", "--loop"]
+    command: ["python", "manage.py", "drain_outbox", "--loop", "--heartbeat-file", "/tmp/outbox-alive"]
     environment:
       <<: *backend-env
       DATABASE_URL: postgres://grc_app:${APP_DB_PASSWORD}@postgres:5432/grc
-    # The image's probe checks the web server, which this process doesn't run.
+    # Alive while the loop keeps touching its heartbeat; a hung loop turns unhealthy.
     healthcheck:
-      disable: true
+      test:
+        [
+          "CMD", "python", "-c",
+          "import os, sys, time; sys.exit(time.time() - os.path.getmtime('/tmp/outbox-alive') > 60)",
+        ]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
     depends_on:
       migrate:
         condition: service_completed_successfully

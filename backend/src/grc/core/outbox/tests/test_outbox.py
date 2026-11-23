@@ -6,6 +6,7 @@ import threading
 from collections.abc import Callable, Iterator
 from contextlib import AbstractContextManager
 from datetime import timedelta
+from pathlib import Path
 from typing import Any, ClassVar
 from uuid import UUID, uuid4
 
@@ -363,7 +364,9 @@ def test_dead_deliveries_can_be_revived_after_a_fix() -> None:
 
 
 @pytest.mark.django_db(transaction=True)
-def test_the_loop_stops_cleanly_when_the_container_stops() -> None:
+def test_the_loop_stops_cleanly_when_the_container_stops(tmp_path: Path) -> None:
+    heartbeat = tmp_path / "alive"
+
     def stop_soon() -> None:
         os.kill(os.getpid(), signal.SIGTERM)
 
@@ -371,8 +374,12 @@ def test_the_loop_stops_cleanly_when_the_container_stops() -> None:
     previous = signal.getsignal(signal.SIGTERM)
     timer.start()
     try:
-        call_command("drain_outbox", "--loop", "--interval", "0.05")
+        call_command(
+            "drain_outbox", "--loop", "--interval", "0.05", "--heartbeat-file", str(heartbeat)
+        )
     finally:
         timer.cancel()
         signal.signal(signal.SIGTERM, previous)
         signal.signal(signal.SIGINT, signal.default_int_handler)
+
+    assert heartbeat.exists()  # proof of life for the container's health check
