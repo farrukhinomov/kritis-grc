@@ -1,18 +1,17 @@
 """Reading Risk Assessments."""
 
+from datetime import date
 from typing import Any
+from uuid import UUID
 
-from django.db.models import Prefetch, QuerySet
+from django.db.models import Max, Prefetch, QuerySet
 from rest_framework import status
 
 from grc.core.actor import Actor, Permission
 from grc.core.ids import uuid_or_none
 from grc.core.problems import Problem
-from grc.organization.selectors.legal import add_months
+from grc.organization.selectors.legal import RISK_ASSESSMENT_VALID_MONTHS, add_months
 from grc.risk.models import AssessmentStatus, RiskAssessment, RiskAssessmentRisk
-
-# The law asks for a new Risk Assessment at least every four years.
-VALID_MONTHS = 48
 
 
 def risk_assessments(
@@ -60,7 +59,9 @@ def present_assessment(assessment: RiskAssessment) -> dict[str, Any]:
         "decision_note_de": assessment.decision_note_de or None,
         # Calculated on every read, so a change of the rule can't leave stale dates behind.
         "next_due": (
-            add_months(assessment.assessed_on, VALID_MONTHS).isoformat() if approved else None
+            add_months(assessment.assessed_on, RISK_ASSESSMENT_VALID_MONTHS).isoformat()
+            if approved
+            else None
         ),
     }
 
@@ -93,3 +94,14 @@ def awaiting_decision_by(actor: Actor) -> list[dict[str, Any]]:
         }
         for item in waiting
     ]
+
+
+def latest_approved(actor: Actor) -> dict[UUID, date]:
+    """The date of each visible Scope's latest approved Risk Assessment."""
+    rows = (
+        risk_assessments(actor, status_filter=AssessmentStatus.APPROVED)
+        .order_by()
+        .values("scope_id")
+        .annotate(latest=Max("assessed_on"))
+    )
+    return {row["scope_id"]: row["latest"] for row in rows}
