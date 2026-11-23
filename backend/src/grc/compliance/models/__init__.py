@@ -10,8 +10,10 @@ its GRC Manager approved them.
 import uuid
 from typing import ClassVar
 
+import pghistory
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 from grc.core.history import tracked
 from grc.core.models import TenantOwnedModel
@@ -192,3 +194,78 @@ class Evidence(TenantOwnedModel):
 
     def __str__(self) -> str:
         return self.title
+
+
+class SuggestionStatus(models.TextChoices):
+    PENDING = "pending", "pending"
+    APPROVED = "approved", "approved"
+    REJECTED = "rejected", "rejected"
+
+
+def _decided(status: str) -> pghistory.UpdateEvent:
+    return pghistory.UpdateEvent(
+        status,
+        condition=pghistory.Q(old__status=SuggestionStatus.PENDING, new__status=status),
+    )
+
+
+# A suggestion is never edited, only decided; who decided and when are the event's own
+# actor and time, so those columns aren't copied.
+@tracked(
+    exclude=["decided_by", "decided_at"],
+    events=[
+        pghistory.InsertEvent("created"),
+        _decided(SuggestionStatus.APPROVED),
+        _decided(SuggestionStatus.REJECTED),
+        pghistory.DeleteEvent("deleted"),
+    ],
+)
+class MappingSuggestion(TenantOwnedModel):
+    """A Tenant Mapping proposed by the AI, waiting for a GRC Manager's decision.
+
+    Only public statute text went into it, so it carries nothing about the Tenant; it
+    becomes a Tenant Mapping only when someone approves it.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    target_requirement = models.ForeignKey(Requirement, on_delete=models.PROTECT, related_name="+")
+    source_requirement = models.ForeignKey(Requirement, on_delete=models.PROTECT, related_name="+")
+    coverage = models.CharField(max_length=16, choices=Coverage.choices)
+    confidence = models.DecimalField(max_digits=3, decimal_places=2)
+    rationale_de = models.TextField()
+    rationale_en = models.TextField()
+    model = models.CharField(max_length=64)
+    status = models.CharField(
+        max_length=16, choices=SuggestionStatus.choices, default=SuggestionStatus.PENDING
+    )
+    created_at = models.DateTimeField(default=timezone.now)
+    decided_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, related_name="+"
+    )
+    decided_at = models.DateTimeField(null=True)
+
+    class Meta:
+        constraints: ClassVar = [
+            # Asking the model again must not pile up the same proposal.
+            models.UniqueConstraint(
+                fields=["tenant", "target_requirement", "source_requirement"],
+                name="one_suggestion_per_pair",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(confidence__gte=0, confidence__lte=1),
+                name="suggestion_confidence_is_a_share",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(status="pending", decided_by__isnull=True, decided_at__isnull=True)
+                    | (
+                        ~models.Q(status="pending")
+                        & models.Q(decided_by__isnull=False, decided_at__isnull=False)
+                    )
+                ),
+                name="suggestion_decided_when_not_pending",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.target_requirement_id} <- {self.source_requirement_id} ({self.status})"

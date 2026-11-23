@@ -142,6 +142,16 @@ EXPECTED: dict[tuple[str, str], tuple[dict[str, Any] | None, dict[str, int]]] = 
     ("GET", "/api/v1/tenants/{tenant_slug}/risks"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/risk-matrix"): (None, READ),
     ("GET", "/api/v1/tenants/{tenant_slug}/risk-assessments"): (None, READ),
+    ("GET", "/api/v1/tenants/{tenant_slug}/mapping-suggestions"): (None, READ),
+    # Mappings apply to the whole Tenant: the Scope-limited manager can't decide them.
+    ("POST", "/api/v1/tenants/{tenant_slug}/mapping-suggestions/{suggestion_id}/approve"): (
+        None,
+        _row(UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, FORBIDDEN, NOT_FOUND),
+    ),
+    ("POST", "/api/v1/tenants/{tenant_slug}/mapping-suggestions/{suggestion_id}/reject"): (
+        None,
+        _row(UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, FORBIDDEN, NOT_FOUND),
+    ),
     # Readable by every member; what it lists depends on who may approve.
     ("GET", "/api/v1/tenants/{tenant_slug}/approvals"): (None, READ),
     # No assessment exists here: deciding needs approval rights, then finds nothing.
@@ -254,6 +264,7 @@ def test_operation_answers_each_actor_as_expected(
         .replace("{token_id}", str(OTHER_SCOPE))
         .replace("{risk_id}", str(OTHER_SCOPE))
         .replace("{assessment_id}", str(OTHER_SCOPE))
+        .replace("{suggestion_id}", str(OTHER_SCOPE))
     )
 
     actual = {}

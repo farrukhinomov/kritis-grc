@@ -78,7 +78,7 @@ def mappings(
     if source is not None:
         platform = platform.filter(source_requirement_id=source)
         own = own.filter(source_requirement_id=source)
-    return [_present_platform(m) for m in platform] + [_present_own(m) for m in own]
+    return [_present_platform(m) for m in platform] + [present_tenant_mapping(m) for m in own]
 
 
 def _present_platform(mapping: PlatformMapping) -> dict[str, Any]:
@@ -95,7 +95,7 @@ def _present_platform(mapping: PlatformMapping) -> dict[str, Any]:
     }
 
 
-def _present_own(mapping: TenantMapping) -> dict[str, Any]:
+def present_tenant_mapping(mapping: TenantMapping) -> dict[str, Any]:
     return {
         "id": str(mapping.id),
         "kind": "tenant",
