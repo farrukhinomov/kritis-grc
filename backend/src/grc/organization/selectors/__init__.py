@@ -135,6 +135,10 @@ def tenant_id_for(slug: str) -> UUID | None:
     return Tenant.objects.filter(slug=slug).values_list("id", flat=True).first()
 
 
+def is_demo_tenant(tenant_id: UUID) -> bool:
+    return Tenant.objects.filter(id=tenant_id, is_demo=True).exists()
+
+
 def tenant_of(actor: Actor) -> Tenant:
     return Tenant.objects.get(id=actor.tenant_id)
 

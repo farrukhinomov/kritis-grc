@@ -25,6 +25,14 @@ class MemoryStorage:
         self.objects.pop(key, None)
         self.deleted.append(key)
 
+    def delete_prefix(self, prefix: str) -> int:
+        if not prefix.endswith("/"):
+            raise ValueError("A prefix to delete must end with '/'.")
+        keys = [key for key in self.objects if key.startswith(prefix)]
+        for key in keys:
+            self.delete(key)
+        return len(keys)
+
     @classmethod
     def put(cls, key: str, data: bytes, content_type: str) -> None:
         """What a browser's PUT to the presigned URL would store."""

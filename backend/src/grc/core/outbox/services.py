@@ -26,6 +26,7 @@ from grc.core import request_context
 from grc.core.events import DomainEvent, event_class, subscribers, subscription
 from grc.core.history import acting_user_id
 from grc.core.outbox.models import DeliveryStatus, OutboxDelivery, OutboxEvent
+from grc.core.purge import purge_rows
 from grc.core.tenancy import NotInTransactionError, current_tenant_id, tenant_transaction
 
 logger = logging.getLogger(__name__)
@@ -186,3 +187,8 @@ def _describe(delivery: OutboxDelivery) -> dict[str, object]:
 def _known(value: str) -> str:
     # The request context reports "-" outside a request.
     return "" if value == "-" else value
+
+
+def purge_tenant_data() -> int:
+    """Removes the active Tenant's events and deliveries, for the Demo Tenant reset."""
+    return purge_rows([OutboxDelivery, OutboxEvent])

@@ -9,12 +9,18 @@ from typing import Any
 from uuid import UUID
 
 from grc.compliance.models import (
+    Evidence,
     Framework,
     FrameworkVersion,
+    Implementation,
+    MappingSuggestion,
+    ModelCall,
     PlatformMapping,
     Requirement,
     TenantMapping,
+    Upload,
 )
+from grc.core.purge import purge_rows
 
 
 def load_catalogue(
@@ -87,3 +93,14 @@ def _mapping_fields(mapping: dict[str, Any]) -> dict[str, Any]:
         "justification_de": mapping["justification_de"],
         "gap_note_de": mapping.get("gap_note_de") or "",
     }
+
+
+def purge_tenant_data() -> int:
+    """Removes the active Tenant's compliance work, for the Demo Tenant reset.
+
+    The stored files go separately, after the transaction commits: a rolled-back reset
+    must not have deleted them.
+    """
+    return purge_rows(
+        [Evidence, Upload, Implementation, MappingSuggestion, TenantMapping, ModelCall]
+    )

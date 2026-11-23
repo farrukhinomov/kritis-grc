@@ -209,6 +209,7 @@ Every check below is required before merging into `main`.
   - Images go to Artifact Registry. GitHub Actions authenticates with Workload Identity Federation, with no stored keys. Secrets live in Secret Manager.
   - Migrations run as a Cloud Run Job before traffic switches to the new revision.
 - **Cloud Scheduler:** the nightly Demo Tenant reset (a Job that also wipes the Tenant's R2 objects), and the every-minute outbox drain. This also keeps Supabase from pausing.
+  - The reset is `manage.py reset_demo`. In one transaction it purges the Demo Tenant's rows, children before parents, each module through its own `purge_tenant_data()`, together with their Activity Log events; that is the only place the purge switch is turned on. It then reloads the fixtures. Stored files under `tenants/<id>/` are deleted only after the commit. Demo visitors are signed out, and a Tenant that isn't a demo is refused. Locally: `docker compose run --rm backend python manage.py reset_demo`.
 - **Supabase:** `eu-central-1`, with the Data API switched off. Runtime uses the pooler on port 6543; migrations use a direct connection.
 - **Vercel:**
   - The app runs at `grc.inomov.online` (Cloudflare DNS, CNAME set to DNS only).
