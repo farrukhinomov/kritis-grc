@@ -18,12 +18,21 @@ M = TypeVar("M")
 _acting_user: ContextVar[int | None] = ContextVar("acting_user", default=None)
 
 
-def tracked(*, exclude: Iterable[str] = ()) -> Callable[[M], M]:
-    """Records creation, every change of a non-excluded field, and deletion."""
-    decorator: Callable[[M], M] = pghistory.track(
+def tracked(
+    *, exclude: Iterable[str] = (), events: Iterable[Any] | None = None
+) -> Callable[[M], M]:
+    """Records creation, every change of a non-excluded field, and deletion.
+
+    `events` replaces those three, for models whose changes have names of their own,
+    such as a decision being "approved" rather than merely "updated".
+    """
+    default = (
         pghistory.InsertEvent("created"),
         pghistory.UpdateEvent("updated"),
         pghistory.DeleteEvent("deleted"),
+    )
+    decorator: Callable[[M], M] = pghistory.track(
+        *(default if events is None else events),
         exclude=list(exclude),
         context_field=pghistory.ContextJSONField(),
         obj_field=pghistory.ObjForeignKey(related_name="+"),
