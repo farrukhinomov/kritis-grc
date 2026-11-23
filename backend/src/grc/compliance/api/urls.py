@@ -1,6 +1,7 @@
 from django.urls import path
 
 from grc.compliance.api import FrameworksView, MappingsView, RequirementsView, RequirementView
+from grc.compliance.api.coverage import CoverageMatrixView
 from grc.compliance.api.evidence import EvidenceListView, EvidenceView, UploadsView
 from grc.compliance.api.implementations import (
     ComplianceParagraphsView,
@@ -15,6 +16,7 @@ from grc.compliance.api.suggestions import (
 )
 
 urlpatterns = [
+    path("coverage-matrix", CoverageMatrixView.as_view(), name="coverage-matrix"),
     path("mapping-suggestions", MappingSuggestionsView.as_view(), name="mapping-suggestions"),
     path(
         "mapping-suggestions/<uuid:suggestion_id>/approve",

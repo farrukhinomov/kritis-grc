@@ -225,6 +225,7 @@ SPECTACULAR_SETTINGS = {
         "HazardCategory": "grc.risk.models.HazardCategory",
         "RiskAssessmentStatus": "grc.risk.models.AssessmentStatus",
         "SuggestionStatus": "grc.compliance.models.SuggestionStatus",
+        "FrameworkKey": "grc.compliance.models.FrameworkKey",
         "AssetKind": "grc.assets.models.AssetKind",
         "Criticality": "grc.assets.models.Criticality",
     },
