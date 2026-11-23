@@ -34,6 +34,14 @@ This applies to all source code, tests, migrations, Dockerfiles and CI/CD workfl
 - Configuration comes only from environment variables, validated at startup with **pydantic-settings**. A missing secret stops the process.
 - Runs synchronously under gunicorn with threads. Static files (admin, Scalar) are served by WhiteNoise.
 - Business logic never lives in views or serializers. Services receive the acting user and Membership ([ADR 0020](adr/0020-authorization-in-the-service-layer.md)).
+- Tenant isolation:
+  - Tenant-owned models inherit `grc.core.models.TenantOwnedModel`. Its default manager filters by the active Tenant and raises without one; saving refuses a row of another Tenant. Every table with `tenant_id` gets `grc.core.rls.tenant_rls()` in a migration.
+  - Code acts for a Tenant only inside `tenant_context()` (or `tenant_transaction()` for jobs and handlers), which sets the ORM filter and `app.tenant_id` together. `ATOMIC_REQUESTS` wraps the view but not middleware, so requests activate the Tenant at the start of the view, never in middleware.
+  - A test walks every model: each is tenant-owned with manager and forced policy, or declared platform-wide (User, Tenant). Memberships are the one exception: their policy also admits the user's own rows (`app.user_id`), because login lists them before a Tenant is chosen.
+  - Users log in by email (`organization.User`); there is no username.
+- Authorization: every endpoint under `/api/v1/tenants/{tenant_slug}/` extends `grc.core.api.TenantScopedAPIView`, which resolves the caller's Membership into an `Actor` (404 without one) and activates the Tenant. Services take the `Actor` and call `actor.require(Permission…)` themselves. Lists use `page_of()` for the `{items, page}` shape.
+- Activity Log: a model joins it with `@grc.core.history.tracked()` (excluding bookkeeping fields such as `version`), plus `tenant_rls()` and `immutable_events()` on its event table in a migration. Who acted comes from `TenantScopedAPIView`; writes without a person (the demo seed) are recorded but not listed.
+- `grc/organization/tests/test_authorization_matrix.py` lists every OpenAPI operation with the expected status per actor; a new endpoint fails CI until its row is added.
 - `ATOMIC_REQUESTS = True`. Under the pooler: `DISABLE_SERVER_SIDE_CURSORS = True`, `CONN_MAX_AGE = 0` and psycopg `prepare_threshold = None` ([ADR 0004](adr/0004-supavisor-transaction-pooling.md)). Production requires TLS to the database (`sslmode=require`).
 - `APP_ENV` is required, with no default. Production also requires `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`.
 - Logs never contain query strings or the serialized request object.
@@ -48,28 +56,30 @@ This applies to all source code, tests, migrations, Dockerfiles and CI/CD workfl
 - Errors are RFC 9457 Problem Details, like the public API.
 - No database. It can only be called by Django's service account (IAM). `/docs` is turned off in production.
 - `POST /v1/risk-scores:batch` takes Risks with their Inherent Rating and Treatments. It returns the Residual Rating, category and explanations, plus `method_version` ([ADR 0014](adr/0014-qualitative-versioned-risk-method.md)).
-- Django's client is generated from FastAPI's OpenAPI with datamodel-code-generator. CI fails if the generated client is out of date.
+- The engine's exported OpenAPI schema is committed as `services/risk-engine/openapi.json`; CI fails if it differs from the code. Django's client (`grc.risk.engine`, the only module that talks to the engine) is small and hand-written. Its tests run against a stand-in that validates every request and every answer against that schema, so drift on either side fails the backend's tests. A generated client was dropped: for one endpoint it would add a code generator and generated code without catching more.
 - Django calls it with a sync httpx client:
   - Timeouts: 2 s connect, 10 s read.
-  - Retries with exponential backoff and jitter, for idempotent calls only.
-  - A circuit breaker.
-- If a risk recalculation fails, the Risk shows "calculation pending" and the outbox retries it.
+  - Connection failures are retried by the transport with exponential backoff. Every other failure is left to the outbox, whose retries back off with jitter for up to two hours.
+  - A circuit breaker: after 5 failures in a row, calls pause for 30 s.
+  - The request's trace continues in the engine (`traceparent`, `X-Request-ID`).
+- `RISK_ENGINE_URL` is required in production. If a risk recalculation fails, the Risk shows "calculation pending" and the outbox retries it. A recalculation that changes nothing writes nothing.
 
 ## Domain events and outbox
 
 See [ADR 0011](adr/0011-transactional-outbox-in-postgres.md).
 
 - Envelope: `event_id`, `type`, `schema_version`, `occurred_at`, `tenant_id`, `actor_id`, `aggregate_type`, `aggregate_id`, `payload`.
-- The payload is a Pydantic model carrying IDs and the changed facts. Schemas change additively only; a breaking change gets a new `schema_version`.
+- An event is a `grc.core.events.DomainEvent` subclass in the emitting module's `events` package: a Pydantic model carrying IDs and the changed facts, with a stable `event_type` such as `compliance.implementation_status_changed`. Schemas change additively only; a breaking change gets a new `schema_version`, and a delivery stored with another version ends `dead` instead of being misread.
+- Services publish with `grc.core.outbox.services.publish()` inside their transaction. Handlers subscribe with `@subscribe(Event)` in `<module>/events/handlers.py`, which is imported at startup. A handler's import path is its delivery key, so renaming one strands its pending deliveries.
 - Events are named in the past tense. Initial events:
   - `compliance`: `ImplementationStatusChanged`, `EvidenceAttached`, `EvidenceRemoved`, `MappingSuggested`, `MappingApproved`, `MappingRejected`.
   - `assets`: `AssetCriticalityChanged`, `AssetDependencyChanged`.
   - `risk`: `RiskScoreChanged`.
 - `docs/events.md` is generated from the schemas in CI.
 - Delivery:
-  - First attempt right after commit (`transaction.on_commit`).
-  - After that, an authenticated `/internal/outbox/drain` endpoint is called every minute.
-  - Each handler gets its own delivery row: 8 attempts with exponential backoff, then `dead`. Dead deliveries are visible in admin with a retry button.
+  - First attempt right after commit (`transaction.on_commit`), in its own transaction acting for the event's Tenant. It never fails the request that published.
+  - After that, `manage.py drain_outbox` works through the Tenants one at a time and claims due rows with `FOR UPDATE SKIP LOCKED`, so it needs no way around row-level security. The compose stacks run it with `--loop`; in the cloud, an authenticated `/internal/outbox/drain` endpoint will call the same drain every minute.
+  - Each handler gets its own delivery row: 8 attempts with exponential backoff and jitter (30 s doubling up to 1 h), then `dead`. A dead delivery stores only the error's type; the log has the details. `drain_outbox --revive-dead` retries dead deliveries once the cause is fixed.
 - Handlers are idempotent and re-read current state. They never rely on event order.
 
 ## API
@@ -88,6 +98,7 @@ See [ADR 0017](adr/0017-http-standard-responses-no-envelope.md), [ADR 0018](adr/
 
 - Session idle timeout is 8 h, and the session ID is rotated on login. TOTP MFA is optional for users and mandatory for Platform Admins.
 - Django admin lives at `/api/_admin/`, for Platform Admins only.
+- Password login goes through allauth's adapter (Argon2, failed attempts limited per address and IP) behind `POST /api/v1/auth/login`; wrong and unknown accounts get the same `invalid_credentials`. allauth's own endpoints are not served.
 - Demo login: `POST /api/v1/auth/demo-login {role}`. It works only for the Demo Tenant, is rate-limited, and is disabled by an environment switch. Demo accounts can't change their password, email or MFA.
 - Permission sets: Auditor has `view`; GRC Manager has `view`, `change` and `approve`. In v1 one GRC Manager approves alone; requiring a second approver (four-eyes) is planned per Tenant.
 
@@ -102,6 +113,7 @@ See [ADR 0017](adr/0017-http-standard-responses-no-envelope.md), [ADR 0018](adr/
   - In development, a simulation panel adds latency, failures, a 412 conflict or an unreachable risk engine. Production builds don't contain it.
 - Sign-in: pages under `/t/…` sit behind a session gate that sends visitors to `/login` and back afterwards (only to paths under `/t/`). Login and logout clear the whole query cache, and a 401 from any request drops the session. The prototype refuses every password login; the two demo logins are the way in.
 - Write controls ask `useCan("change")` or `useCan("approve")` for the current Membership and are hidden or disabled when it says no, and the shell shows a read-only badge. This is presentation only: the API refuses the write anyway, and the mock answers 403 like the backend.
+- Writes send Django's CSRF token: `shared/api` reads the `csrftoken` cookie on every request (signing in replaces it) and echoes it as `X-CSRFToken`. `GET /api/v1/me` hands out the cookie, and the session endpoints check it even for anonymous callers, against login CSRF.
 - HTTP lives only in `shared/api`: typed resource functions plus TanStack `queryOptions` with Tenant-first query keys. A lint rule rejects `fetch` anywhere else.
 - Pages and the Tenant shell are lazy-loaded per route. React gets its own long-cached vendor chunk; Ant Design is split by usage, so a screen downloads only the components it renders. Motion loads its animation features after the first render (`LazyMotion` with `m.*` components; a full `motion.*` component fails at runtime). Initial JavaScript stays below 300 KB gzipped. Routes live under `/t/{tenant_slug}/…`.
 - Feature folders mirror the backend modules (`features/compliance`, `features/risk`, …), plus `shared/ui` and `shared/api`.

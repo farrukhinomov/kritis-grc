@@ -12,6 +12,7 @@ from typing import Annotated, Literal, Self
 from django.core.exceptions import ImproperlyConfigured
 from pydantic import (
     Field,
+    HttpUrl,
     PostgresDsn,
     SecretStr,
     ValidationError,
@@ -43,6 +44,21 @@ class AppSettings(BaseSettings):
     allowed_hosts: Annotated[list[str], NoDecode] = Field(default_factory=list)
     csrf_trusted_origins: Annotated[list[str], NoDecode] = Field(default_factory=list)
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+    # Off unless asked for: the password-less demo login must never appear by accident.
+    demo_login_enabled: bool = False
+    # The shared demo fixtures; next to the backend in the repository, copied into images.
+    seed_dir: Path = BACKEND_DIR.parent / "seed"
+    # S3-compatible object store for Evidence files. Unset, uploads answer 503.
+    storage_endpoint_url: str | None = None
+    # What browsers reach; defaults to the endpoint when server and browser share it.
+    storage_public_endpoint_url: str | None = None
+    storage_bucket: str | None = None
+    storage_region: str = "auto"
+    storage_access_key_id: SecretStr | None = None
+    storage_secret_access_key: SecretStr | None = None
+    # The stateless service that calculates Residual Ratings. Unset outside production,
+    # Risks stay "calculation pending" and their recalculation is retried.
+    risk_engine_url: HttpUrl | None = None
 
     @field_validator("allowed_hosts", "csrf_trusted_origins", mode="before")
     @classmethod
@@ -58,7 +74,7 @@ class AppSettings(BaseSettings):
         if self.app_env is Environment.PRODUCTION:
             missing = [
                 name
-                for name in ("allowed_hosts", "csrf_trusted_origins")
+                for name in ("allowed_hosts", "csrf_trusted_origins", "risk_engine_url")
                 if not getattr(self, name)
             ]
             if missing:

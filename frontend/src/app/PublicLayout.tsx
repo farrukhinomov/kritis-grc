@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "antd";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Link, Outlet, useLocation, useNavigate } from "react-router";
 
 import { sessionQuery } from "@/shared/api/auth";
 import { LOGIN_PATH } from "@/shared/session/paths";
@@ -31,6 +31,10 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
         <main id={MAIN_CONTENT_ID} tabIndex={-1} className="grc-shell-main" data-narrow>
           {children ?? <Outlet />}
         </main>
+        <footer className="grc-public-footer">
+          <Link to="/impressum">{t("legal.imprintLink")}</Link>
+          <Link to="/datenschutz">{t("legal.privacyLink")}</Link>
+        </footer>
       </div>
     </div>
   );

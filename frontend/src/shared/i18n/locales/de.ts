@@ -782,6 +782,49 @@ export const de = {
       hint: "Nur in der Entwicklung sichtbar. Einstellungen bleiben in diesem Browser gespeichert.",
     },
   },
+  legal: {
+    imprint: {
+      title: "Impressum",
+      basis: "Angaben gemäß § 5 DDG",
+      prototype:
+        "Diese Plattform ist eine öffentliche Demonstration mit fiktiven Daten. Sie stellt keine Rechtsberatung dar.",
+    },
+    privacy: {
+      title: "Datenschutzerklärung",
+      controller: {
+        title: "Verantwortlicher",
+        text: "Verantwortlich für die Verarbeitung personenbezogener Daten auf dieser Plattform ist:",
+      },
+      data: {
+        title: "Welche Daten wir verarbeiten",
+        text: "Wenn Sie sich anmelden, verarbeiten wir Ihre E-Mail-Adresse und prüfen Ihr Passwort; gespeichert wird nur ein Hashwert des Passworts. Änderungen an Compliance-Daten werden mit Ihrem Namen und dem Zeitpunkt im Aktivitätsprotokoll festgehalten, damit nachvollziehbar bleibt, wer was geändert hat (Art. 6 Abs. 1 lit. b und f DSGVO).",
+      },
+      cookies: {
+        title: "Cookies",
+        text: "Wir setzen nur technisch notwendige Cookies: ein Sitzungscookie, das Sie angemeldet hält, und ein Cookie zum Schutz vor gefälschten Anfragen (CSRF). Dafür ist keine Einwilligung erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG). Wir verwenden keine Analyse- oder Werbe-Cookies.",
+      },
+      logs: {
+        title: "Server-Protokolle",
+        text: "Für Betrieb und Sicherheit protokollieren wir zu jeder Anfrage Zeitpunkt, aufgerufenen Pfad ohne Suchparameter, Antwortstatus und eine Kennung der Anfrage. Die Protokolle werden nach kurzer Zeit gelöscht (Art. 6 Abs. 1 lit. f DSGVO).",
+      },
+      demo: {
+        title: "Demo-Zugang",
+        text: "Der Demo-Mandant enthält ausschließlich fiktive Daten und wird jede Nacht vollständig zurückgesetzt, einschließlich hochgeladener Dateien. Bitte geben Sie dort keine echten oder personenbezogenen Daten ein.",
+      },
+      hosting: {
+        title: "Hosting",
+        text: "Anwendung, Datenbank und Dateien werden in Rechenzentren innerhalb der Europäischen Union betrieben. Die Anbieter verarbeiten Daten nur in unserem Auftrag (Art. 28 DSGVO). Funktionen mit künstlicher Intelligenz erhalten nur öffentliche Gesetzestexte, niemals Ihre Daten.",
+      },
+      rights: {
+        title: "Ihre Rechte",
+        text: "Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15 bis 21 DSGVO). Sie können sich außerdem bei einer Datenschutz-Aufsichtsbehörde beschweren, etwa beim Unabhängigen Datenschutzzentrum Saarland.",
+      },
+    },
+    notConfigured: "Die Angaben zum Betreiber sind für diese Installation noch nicht hinterlegt.",
+    email: "E-Mail",
+    imprintLink: "Impressum",
+    privacyLink: "Datenschutz",
+  },
   notFound: {
     title: "Seite nicht gefunden",
     backHome: "Zur Startseite",

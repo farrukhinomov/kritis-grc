@@ -14,7 +14,7 @@ Requires [uv](https://docs.astral.sh/uv/). Run everything from this folder.
 | Tests with coverage (≥ 80 % enforced) | `uv run pytest` |
 | Lint and format | `uv run ruff check . && uv run ruff format --check .` |
 | Type-check (strict) | `uv run mypy src tests` |
-| Export the OpenAPI schema | `PYTHONPATH=src uv run python -m risk_engine.export_openapi openapi.json` |
+| Export the OpenAPI schema (committed: the backend's tests hold the engine to it, CI checks it is current) | `PYTHONPATH=src uv run python -m risk_engine.export_openapi openapi.json` |
 | Container image | `docker build -t grc-risk-engine .` |
 
 ## Configuration

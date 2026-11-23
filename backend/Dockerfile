@@ -23,6 +23,20 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 COPY manage.py ./
 COPY src ./src
 
+# Scalar renders the API reference at /api/ui. It is served from here rather than from a
+# CDN, so the page runs under a self-only CSP and never loads third-party code. The
+# download is pinned by checksum; the version was at least two weeks old when chosen. The
+# source map reference is dropped: the map isn't shipped, and the manifest storage refuses
+# to hash a file whose map it can't find.
+ARG SCALAR_VERSION=1.76.4
+ADD --checksum=sha256:b8b74a96c74c6fd06f1dc604ddbf8385fd0b14a0bb9467bb8f27b59978be168c \
+    https://registry.npmjs.org/@scalar/api-reference/-/api-reference-${SCALAR_VERSION}.tgz \
+    /tmp/scalar.tgz
+RUN mkdir -p vendor-static/scalar \
+    && tar -xzf /tmp/scalar.tgz -O package/dist/browser/standalone.js \
+       | sed '/^\/\/# sourceMappingURL=/d' > vendor-static/scalar/standalone.js \
+    && rm /tmp/scalar.tgz
+
 # Settings are validated even for collectstatic. These placeholders exist only in this
 # build step; the runtime image gets its real configuration from the platform.
 RUN APP_ENV=production \
@@ -30,6 +44,7 @@ RUN APP_ENV=production \
     DATABASE_URL=postgres://build:build@localhost:5432/build \
     ALLOWED_HOSTS=build.invalid \
     CSRF_TRUSTED_ORIGINS=https://build.invalid \
+    RISK_ENGINE_URL=http://build.invalid \
     PYTHONPATH=/app/src \
     /app/.venv/bin/python manage.py collectstatic --noinput
 
@@ -55,6 +70,10 @@ RUN apt-get update \
 WORKDIR /app
 # Files stay owned by root, so the application user can read but never modify its code.
 COPY --from=builder /app /app
+# The shared demo fixtures live outside this build context and come in as the named
+# context "seed" (compose: additional_contexts, CI: build-contexts).
+COPY --from=seed . /app/seed
+ENV SEED_DIR=/app/seed
 
 USER app
 EXPOSE 8080

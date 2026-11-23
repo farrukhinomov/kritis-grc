@@ -115,7 +115,7 @@ Evidence consisting of an uploaded document, such as a PDF or screenshot.
 Evidence consisting of a URL pointing to content outside the platform.
 
 **Reference Evidence**:
-Evidence that points to another Implementation in the same Scope, typically from a different Framework, so one piece of work counts toward several Frameworks.
+Evidence that points to another Implementation in the same Tenant, typically from a different Framework, so one piece of work counts toward several Frameworks.
 _Avoid_: cross-reference, mapping (a mapping relates requirements, not evidence)
 
 **Resilience Plan**:

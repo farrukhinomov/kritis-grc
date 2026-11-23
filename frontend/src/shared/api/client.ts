@@ -14,6 +14,10 @@ const API_ROOT = "/api/v1";
 const GENERIC_ERROR_CODE = "http_error";
 const INVALID_RESPONSE_CODE = "invalid_response";
 const NO_CONTENT = 204;
+// Django's names. The cookie is readable by script on purpose: the SPA echoes it in a
+// header, which another site can't do, and that is what makes the check work.
+const CSRF_COOKIE = "csrftoken";
+const CSRF_HEADER = "X-CSRFToken";
 
 export interface FieldError {
   field: string;
@@ -77,6 +81,10 @@ export async function apiRequest<T>(path: string, options: RequestOptions): Prom
   if (options.idempotencyKey !== undefined) {
     headers["Idempotency-Key"] = options.idempotencyKey;
   }
+  const csrf = options.method === "GET" ? undefined : csrfToken();
+  if (csrf !== undefined) {
+    headers[CSRF_HEADER] = csrf;
+  }
 
   const response = await fetch(path, {
     method: options.method,
@@ -103,6 +111,20 @@ export async function apiRequest<T>(path: string, options: RequestOptions): Prom
   } catch {
     throw new ApiError(response.status, INVALID_RESPONSE_CODE, "Malformed JSON response.");
   }
+}
+
+/**
+ * The current CSRF token, read on every request: signing in replaces it, so a value
+ * remembered from earlier would be rejected.
+ */
+export function csrfToken(): string | undefined {
+  for (const cookie of document.cookie.split(";")) {
+    const [name, ...value] = cookie.trim().split("=");
+    if (name === CSRF_COOKIE) {
+      return decodeURIComponent(value.join("="));
+    }
+  }
+  return undefined;
 }
 
 export function apiGet<T>(path: string, signal?: AbortSignal): Promise<T> {
