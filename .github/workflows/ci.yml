@@ -153,7 +153,7 @@ jobs:
       - run: uv sync --locked
       - run: uv run ruff format --check .
       - run: uv run ruff check --output-format=github .
-      - run: uv run mypy src tests
+      - run: uv run mypy src tests evals
       - run: uv run pytest
       - name: Runtime dependency licenses
         run: uv run python ../../scripts/check_python_licenses.py

@@ -44,7 +44,12 @@ class FakeMessages:
             parsed_output=self.answer,
             stop_reason=self.stop_reason,
             model=MODEL,
-            usage=SimpleNamespace(input_tokens=10, cache_read_input_tokens=900, output_tokens=50),
+            usage=SimpleNamespace(
+                input_tokens=10,
+                cache_creation_input_tokens=0,
+                cache_read_input_tokens=900,
+                output_tokens=50,
+            ),
         )
 
 
